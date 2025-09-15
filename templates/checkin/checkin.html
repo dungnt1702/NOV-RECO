@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Check-in</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: #2d3748;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header .subtitle {
+      color: #718096;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      color: #2d3748;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: #f8fafc;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .file-upload {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-upload input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      border: 2px dashed #cbd5e0;
+      border-radius: 12px;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .file-upload-label:hover {
+      border-color: #667eea;
+      background: #edf2f7;
+    }
+
+    .file-upload-icon {
+      font-size: 24px;
+      margin-right: 8px;
+    }
+
+    .file-upload-text {
+      color: #4a5568;
+      font-weight: 500;
+    }
+
+    .file-preview {
+      margin-top: 10px;
+      padding: 10px;
+      background: #e6fffa;
+      border-radius: 8px;
+      border: 1px solid #81e6d9;
+      display: none;
+    }
+
+    .file-preview img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .btn-checkin {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-checkin:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-checkin:active {
+      transform: translateY(0);
+    }
+
+    .btn-checkin:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .alert-success {
+      background: #f0fff4;
+      border: 1px solid #9ae6b4;
+      color: #22543d;
+    }
+
+    .alert-error {
+      background: #fed7d7;
+      border: 1px solid #feb2b2;
+      color: #742a2a;
+    }
+
+    .location-info {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #4a5568;
+      display: none;
+    }
+
+    .location-info.show {
+      display: block;
+    }
+
+    /* Responsive design */
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 20px;
+        border-radius: 16px;
+      }
+      
+      .header h1 {
+        font-size: 24px;
+      }
+    }
+
+    /* Desktop view - keep mobile-like appearance */
+    @media (min-width: 768px) {
+      .container {
+        max-width: 400px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📍 Check-in</h1>
+      <p class="subtitle">Bạn cần bật <strong>định vị (GPS)</strong> trên trình duyệt. Ảnh được lưu để xác thực check-in.</p>
+    </div>
+
+    <div id="alert" class="alert"></div>
+
+    <form id="checkin-form">
+      <div class="form-group">
+        <label class="form-label" for="location">Chọn địa điểm</label>
+        <select id="location" class="form-select" required>
+          <option value="">Đang tải danh sách địa điểm...</option>
+        </select>
+        <div id="location-info" class="location-info"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ảnh check-in</label>
+        <div class="file-upload">
+          <input id="photo" type="file" accept="image/*" capture="environment" required>
+          <label for="photo" class="file-upload-label">
+            <span class="file-upload-icon">📷</span>
+            <span class="file-upload-text">Chạm để chọn ảnh</span>
+          </label>
+        </div>
+        <div id="file-preview" class="file-preview"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="note">Ghi chú (tùy chọn)</label>
+        <textarea id="note" class="form-textarea" placeholder="Ví dụ: Team A, ca 9h..."></textarea>
+      </div>
+
+      <button type="submit" id="btn-checkin" class="btn-checkin">
+        <span class="btn-text">Gửi Check-in</span>
+        <div class="loading">
+          <div class="spinner"></div>
+          <span>Đang xử lý...</span>
+        </div>
+      </button>
+    </form>
+  </div>
+
+  <script>
+    const api = (p, opt={}) => fetch(p, Object.assign({
+      headers: {'X-Requested-With': 'XMLHttpRequest'},
+      credentials: 'include'
+    }, opt));
+
+    // Utility functions
+    function showAlert(message, type = 'error') {
+      const alert = document.getElementById('alert');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = message;
+      alert.style.display = 'block';
+      setTimeout(() => {
+        alert.style.display = 'none';
+      }, 5000);
+    }
+
+    function setLoading(loading) {
+      const btn = document.getElementById('btn-checkin');
+      const btnText = btn.querySelector('.btn-text');
+      const loadingEl = btn.querySelector('.loading');
+      
+      if (loading) {
+        btn.disabled = true;
+        btnText.style.display = 'none';
+        loadingEl.style.display = 'flex';
+      } else {
+        btn.disabled = false;
+        btnText.style.display = 'block';
+        loadingEl.style.display = 'none';
+      }
+    }
+
+    function showFilePreview(file) {
+      const preview = document.getElementById('file-preview');
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
+    function showLocationInfo(locationId, locations) {
+      const location = locations.find(l => l.id == locationId);
+      const info = document.getElementById('location-info');
+      if (location) {
+        info.innerHTML = `
+          <strong>📍 ${location.name}</strong><br>
+          Bán kính: ${location.radius_m}m từ vị trí địa điểm
+        `;
+        info.classList.add('show');
+      } else {
+        info.classList.remove('show');
+      }
+    }
+
+    // Load locations
+    async function loadLocations(){
+      try {
+        const r = await api('/checkin/locations/');
+        const locs = await r.json();
+        const sel = document.getElementById('location');
+        sel.innerHTML = '<option value="">Chọn địa điểm...</option>' + 
+          locs.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+        
+        // Store locations for info display
+        window.locations = locs;
+      } catch (error) {
+        showAlert('Không thể tải danh sách địa điểm. Vui lòng thử lại.', 'error');
+      }
+    }
+
+    // Get current position
+    function getPosition(){ 
+      return new Promise((res, rej)=>{
+        if(!navigator.geolocation) {
+          return rej(new Error('Thiết bị không hỗ trợ định vị.'));
+        }
+        navigator.geolocation.getCurrentPosition(
+          p => res(p),
+          err => {
+            let message = 'Không lấy được vị trí. ';
+            switch(err.code) {
+              case err.PERMISSION_DENIED:
+                message += 'Vui lòng cho phép truy cập vị trí.';
+                break;
+              case err.POSITION_UNAVAILABLE:
+                message += 'Vị trí hiện tại không khả dụng.';
+                break;
+              case err.TIMEOUT:
+                message += 'Hết thời gian chờ lấy vị trí.';
+                break;
+              default:
+                message += err.message;
+            }
+            rej(new Error(message));
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        );
+      });
+    }
+
+    // File input change handler
+    document.getElementById('photo').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      showFilePreview(file);
+    });
+
+    // Location select change handler
+    document.getElementById('location').addEventListener('change', (e) => {
+      if (window.locations) {
+        showLocationInfo(e.target.value, window.locations);
+      }
+    });
+
+    // Form submit handler
+    document.getElementById('checkin-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      try {
+        setLoading(true);
+        
+        // Validate form
+        const locationId = document.getElementById('location').value;
+        const file = document.getElementById('photo').files[0];
+        
+        if (!locationId) {
+          showAlert('Vui lòng chọn địa điểm.', 'error');
+          return;
+        }
+        
+        if (!file) {
+          showAlert('Vui lòng chọn ảnh check-in.', 'error');
+          return;
+        }
+
+        // Get position
+        const pos = await getPosition();
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        // Prepare form data
+        const form = new FormData();
+        form.append('location_id', locationId);
+        form.append('lat', lat);
+        form.append('lng', lng);
+        form.append('note', document.getElementById('note').value);
+        form.append('photo', file);
+
+        // Submit check-in
+        const r = await api('/checkin/submit/', { 
+          method: 'POST', 
+          body: form 
+        });
+        
+        const data = await r.json();
+        
+        if (!r.ok) {
+          throw new Error(data.detail || JSON.stringify(data));
+        }
+
+        // Success
+        showAlert('Check-in thành công! 🎉', 'success');
+        
+        // Reset form
+        document.getElementById('checkin-form').reset();
+        document.getElementById('file-preview').style.display = 'none';
+        document.getElementById('location-info').classList.remove('show');
+        
+      } catch (error) {
+        showAlert(error.message || 'Có lỗi xảy ra. Vui lòng thử lại.', 'error');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // Initialize
+    loadLocations();
+  </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Check-in App</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 16px}
+    a.button{display:inline-block;padding:10px 14px;border:1px solid #999;border-radius:8px;text-decoration:none}
+  </style>
+</head>
+<body>
+  {% if user.is_authenticated %}
+    <p>Xin chào, <b>{{ user.get_full_name|default:user.email }}</b>!</p>
+    <p><a href="/accounts/logout/" class="button">Đăng xuất</a></p>
+    <hr>
+    <p><a href="/checkin/" class="button">Đi tới trang Check-in</a></p>
+  {% else %}
+    <h3>Đăng nhập</h3>
+    <p><a href="/accounts/google/login/" class="button">Đăng nhập bằng Google</a></p>
+  {% endif %}
+</body>
+</html>

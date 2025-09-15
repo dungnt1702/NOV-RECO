@@ -1,0 +1,4 @@
+Django==5.0.7
+django-allauth==64.2.1
+djangorestframework==3.15.2
+Pillow==10.4.0
