@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Check-in</title>
+  <title>NOV-RECO Check-in System</title>
+  <link rel="icon" type="image/png" href="/static/favicon.png">
   <style>
     * {
       margin: 0;
@@ -13,7 +14,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0A5597 0%, #1D5795 50%, #F5831F 100%);
       min-height: 100vh;
       padding: 20px;
       display: flex;
@@ -39,7 +40,7 @@
       left: 0;
       right: 0;
       height: 4px;
-      background: linear-gradient(90deg, #667eea, #764ba2);
+      background: linear-gradient(90deg, #0A5597, #F5831F);
     }
 
     .header {
@@ -48,7 +49,7 @@
     }
 
     .header h1 {
-      color: #2d3748;
+      color: #0A5597;
       font-size: 28px;
       font-weight: 700;
       margin-bottom: 8px;
@@ -84,9 +85,9 @@
 
     .form-input:focus, .form-select:focus, .form-textarea:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #0A5597;
       background: white;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      box-shadow: 0 0 0 3px rgba(10, 85, 151, 0.1);
     }
 
     .form-textarea {
@@ -122,7 +123,7 @@
     }
 
     .file-upload-label:hover {
-      border-color: #667eea;
+      border-color: #0A5597;
       background: #edf2f7;
     }
 
@@ -154,7 +155,7 @@
     .btn-checkin {
       width: 100%;
       padding: 16px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0A5597 0%, #F5831F 100%);
       color: white;
       border: none;
       border-radius: 12px;
@@ -168,7 +169,7 @@
 
     .btn-checkin:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 10px 25px rgba(10, 85, 151, 0.3);
     }
 
     .btn-checkin:active {
@@ -264,7 +265,10 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>📍 Check-in</h1>
+      <div style="margin-bottom: 15px;">
+        <img src="/static/logo.svg" alt="NOV-RECO Logo" style="height: 50px;">
+      </div>
+      <h1>📍 Check-in System</h1>
       <p class="subtitle">Bạn cần bật <strong>định vị (GPS)</strong> trên trình duyệt. Ảnh được lưu để xác thực check-in.</p>
     </div>
 
