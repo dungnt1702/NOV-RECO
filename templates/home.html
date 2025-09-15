@@ -139,10 +139,15 @@
     
     {% if user.is_authenticated %}
       <div class="welcome">
-        Xin chào, <strong>{{ user.get_full_name|default:user.email }}</strong>! 👋
+        Xin chào, <strong>{{ user.get_display_name }}</strong>! 👋
+        <br><small>Vai trò: {{ user.get_role_display }}</small>
       </div>
       
-      <a href="/checkin/" class="button">📍 Đi tới Check-in</a>
+      <a href="/checkin/dashboard/" class="button">📊 Dashboard</a>
+      <a href="/checkin/" class="button">📍 Check-in</a>
+      {% if user.is_admin %}
+        <a href="/checkin/users/" class="button secondary">👥 Quản lý người dùng</a>
+      {% endif %}
       <a href="/accounts/logout/" class="button secondary">🚪 Đăng xuất</a>
       
       <div class="divider"></div>

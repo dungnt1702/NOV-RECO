@@ -1,5 +1,46 @@
 from django.conf import settings
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import PermissionDenied
+
+# User Roles
+class UserRole(models.TextChoices):
+    ADMIN = 'admin', 'Admin'
+    MANAGER = 'manager', 'Quản lý'
+    EMPLOYEE = 'employee', 'Nhân viên'
+
+# Custom User Model
+class User(AbstractUser):
+    role = models.CharField(
+        max_length=20,
+        choices=UserRole.choices,
+        default=UserRole.EMPLOYEE,
+        help_text="Vai trò của người dùng trong hệ thống"
+    )
+    phone = models.CharField(max_length=15, blank=True, help_text="Số điện thoại")
+    department = models.CharField(max_length=100, blank=True, help_text="Phòng ban")
+    employee_id = models.CharField(max_length=20, blank=True, unique=True, help_text="Mã nhân viên")
+    
+    def is_admin(self):
+        return self.role == UserRole.ADMIN
+    
+    def is_manager(self):
+        return self.role == UserRole.MANAGER
+    
+    def is_employee(self):
+        return self.role == UserRole.EMPLOYEE
+    
+    def can_view_all_checkins(self):
+        return self.is_admin() or self.is_manager()
+    
+    def can_manage_users(self):
+        return self.is_admin()
+    
+    def can_manage_locations(self):
+        return self.is_admin() or self.is_manager()
+    
+    def get_display_name(self):
+        return self.get_full_name() or self.username or self.email
 
 class Location(models.Model):
     name = models.CharField(max_length=120)

@@ -87,6 +87,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Custom User Model
+AUTH_USER_MODEL = 'checkin.User'
+
 # django-allauth
 SITE_ID = int(os.environ.get("SITE_ID", "1"))
 AUTHENTICATION_BACKENDS = [

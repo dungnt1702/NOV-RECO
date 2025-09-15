@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Checkin, Location
+from .models import Checkin, Location, User
 from .utils import haversine_m
 
 class CheckinCreateSerializer(serializers.ModelSerializer):
@@ -34,3 +34,22 @@ class CheckinCreateSerializer(serializers.ModelSerializer):
             user_agent = req.META.get("HTTP_USER_AGENT", "")[:255],
             **validated
         )
+
+class CheckinListSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source='user.get_display_name', read_only=True)
+    user_email = serializers.CharField(source='user.email', read_only=True)
+    location_name = serializers.CharField(source='location.name', read_only=True)
+    created_at = serializers.DateTimeField(format='%d/%m/%Y %H:%M', read_only=True)
+    
+    class Meta:
+        model = Checkin
+        fields = ['id', 'user_name', 'user_email', 'location_name', 'lat', 'lng', 
+                 'distance_m', 'note', 'created_at', 'photo']
+
+class UserSerializer(serializers.ModelSerializer):
+    display_name = serializers.CharField(source='get_display_name', read_only=True)
+    
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'first_name', 'last_name', 'display_name', 
+                 'role', 'phone', 'department', 'employee_id', 'is_active', 'date_joined']

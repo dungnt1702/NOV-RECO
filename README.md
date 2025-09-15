@@ -1,19 +1,47 @@
-# Check-in Web App (Django + Google Sign-In)
+# NOV-RECO Check-in System
 
-Tính năng:
-- Đăng nhập bằng Gmail (Google OAuth2/OpenID Connect) qua `django-allauth`.
-- Trang web check-in: chọn địa điểm, lấy tọa độ GPS từ trình duyệt, upload ảnh, lưu DB.
-- API bằng Django REST Framework.
-- Lưu ảnh về `MEDIA/` (mặc định).
+Hệ thống check-in thông minh với phân quyền người dùng và quản lý địa điểm.
 
-## 1) Cài đặt
+## ✨ Tính năng chính
+- 🔐 **Hệ thống phân quyền**: Admin, Quản lý, Nhân viên
+- 📍 **Check-in GPS**: Xác thực vị trí với bán kính cho phép
+- 📱 **Responsive Design**: Giao diện thân thiện trên mọi thiết bị
+- 📊 **Dashboard**: Thống kê và quản lý theo vai trò
+- 👥 **Quản lý người dùng**: Tạo và phân quyền tài khoản
+- 📸 **Upload ảnh**: Chụp ảnh check-in với xác thực
+- 🌐 **Google OAuth**: Đăng nhập nhanh với Google
+
+## 🚀 Khởi động nhanh
+
+### Cách 1: Tự động khởi động (Khuyến nghị)
 ```bash
-cd checkin_project
-python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py createsuperuser
+# Mở terminal trong thư mục dự án và chạy:
+./quick_start.sh
 ```
+
+### Cách 2: Khởi động thủ công
+```bash
+# Cài đặt dependencies
+pip3 install -r requirements.txt
+
+# Chạy migrations
+python3 manage.py migrate
+
+# Tạo admin (nếu chưa có)
+python3 manage.py create_admin
+
+# Khởi động server
+python3 manage.py runserver 127.0.0.1:3000
+```
+
+### Cách 3: VS Code Auto Start
+1. Mở dự án trong VS Code
+2. Nhấn `Cmd+Shift+P` → "Tasks: Run Task" → "Start Django Server"
+3. Hoặc mở file `start_server.py` và nhấn F5
+
+## 🔑 Tài khoản mặc định
+- **Admin**: admin@nov-reco.com / admin123
+- **URL**: http://localhost:3000
 
 ## 2) Chạy server với port tùy chỉnh
 
