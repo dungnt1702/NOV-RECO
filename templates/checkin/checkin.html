@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NOV-RECO Check-in System</title>
   <link rel="icon" type="image/png" href="/static/favicon.png">
-  <!-- Google Maps API - Thay YOUR_API_KEY bằng API key thực tế -->
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap" async defer></script>
+  <!-- Google Maps API - Tạm thời tắt để tránh lỗi InvalidKey -->
+  <!-- Để sử dụng, thay YOUR_API_KEY bằng API key thực tế từ Google Cloud Console -->
+  <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap" async defer></script> -->
   <style>
     * {
       margin: 0;
@@ -787,19 +787,8 @@
     // Initialize everything
     window.addEventListener('load', () => {
       loadUserInfo();
-      // Try to initialize map, fallback if API not available
-      if (typeof google !== 'undefined' && google.maps) {
-        initMap();
-      } else {
-        // Fallback: show message and initialize map later
-        setTimeout(() => {
-          if (typeof google !== 'undefined' && google.maps) {
-            initMap();
-          } else {
-            initMap(); // This will show the fallback message
-          }
-        }, 1000);
-      }
+      // Initialize map (will show fallback message if Google Maps not available)
+      initMap();
       initCamera();
     });
   </script>
