@@ -1,10 +1,14 @@
 <!doctype html>
 <html lang="vi">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NOV-RECO Check-in System</title>
   <link rel="icon" type="image/png" href="/static/favicon.png">
+  <!-- Google Maps API - Thay YOUR_API_KEY bằng API key thực tế -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap" async defer></script>
   <style>
     * {
       margin: 0;
@@ -28,7 +32,7 @@
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
       padding: 30px;
       width: 100%;
-      max-width: 400px;
+      max-width: 500px;
       position: relative;
       overflow: hidden;
     }
@@ -73,7 +77,9 @@
       margin-bottom: 8px;
     }
 
-    .form-input, .form-select, .form-textarea {
+    .form-input,
+    .form-select,
+    .form-textarea {
       width: 100%;
       padding: 12px 16px;
       border: 2px solid #e2e8f0;
@@ -83,7 +89,9 @@
       background: #f8fafc;
     }
 
-    .form-input:focus, .form-select:focus, .form-textarea:focus {
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
       outline: none;
       border-color: #0A5597;
       background: white;
@@ -199,8 +207,13 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     .alert {
@@ -238,17 +251,187 @@
       display: block;
     }
 
+    /* User info styles */
+    .user-info {
+      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .user-info h3 {
+      color: #0A5597;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .user-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 14px;
+      color: #4a5568;
+    }
+
+    .user-detail {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .user-detail-icon {
+      font-size: 16px;
+    }
+
+    /* Map styles */
+    .map-container {
+      margin-bottom: 20px;
+    }
+
+    .map-wrapper {
+      height: 200px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid #e2e8f0;
+      position: relative;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .map-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .btn-get-location {
+      background: #0A5597;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-get-location:hover {
+      background: #1D5795;
+      transform: translateY(-1px);
+    }
+
+    .btn-get-location:disabled {
+      background: #a0aec0;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .coordinates {
+      font-size: 12px;
+      color: #718096;
+      font-family: monospace;
+    }
+
+    /* Camera styles */
+    .camera-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .camera-preview {
+      width: 100%;
+      height: 200px;
+      background: #f8fafc;
+      border: 2px dashed #cbd5e0;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .camera-preview:hover {
+      border-color: #0A5597;
+      background: #edf2f7;
+    }
+
+    .camera-preview.has-image {
+      border: 2px solid #0A5597;
+      background: white;
+    }
+
+    .camera-preview img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .camera-icon {
+      font-size: 48px;
+      color: #a0aec0;
+      margin-bottom: 8px;
+    }
+
+    .camera-text {
+      color: #4a5568;
+      font-weight: 500;
+    }
+
+    .camera-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-camera {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #0A5597;
+      background: white;
+      color: #0A5597;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-camera:hover {
+      background: #0A5597;
+      color: white;
+    }
+
+    .btn-camera.danger {
+      border-color: #e53e3e;
+      color: #e53e3e;
+    }
+
+    .btn-camera.danger:hover {
+      background: #e53e3e;
+      color: white;
+    }
+
     /* Responsive design */
     @media (max-width: 480px) {
       body {
         padding: 10px;
       }
-      
+
       .container {
         padding: 20px;
         border-radius: 16px;
       }
-      
+
       .header h1 {
         font-size: 24px;
       }
@@ -262,6 +445,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
@@ -269,39 +453,80 @@
         <img src="/static/logo.svg" alt="NOV-RECO Logo" style="height: 50px;">
       </div>
       <h1>📍 Check-in System</h1>
-      <p class="subtitle">Bạn cần bật <strong>định vị (GPS)</strong> trên trình duyệt. Ảnh được lưu để xác thực check-in.</p>
+      <p class="subtitle">Chụp ảnh trực tiếp và lấy vị trí GPS để check-in</p>
     </div>
 
     <div id="alert" class="alert"></div>
 
-    <form id="checkin-form">
-      <div class="form-group">
-        <label class="form-label" for="location">Chọn địa điểm</label>
-        <select id="location" class="form-select" required>
-          <option value="">Đang tải danh sách địa điểm...</option>
-        </select>
-        <div id="location-info" class="location-info"></div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Ảnh check-in</label>
-        <div class="file-upload">
-          <input id="photo" type="file" accept="image/*" capture="environment" required>
-          <label for="photo" class="file-upload-label">
-            <span class="file-upload-icon">📷</span>
-            <span class="file-upload-text">Chạm để chọn ảnh</span>
-          </label>
+    <!-- User Information -->
+    <div class="user-info">
+      <h3>👤 Thông tin người dùng</h3>
+      <div class="user-details">
+        <div class="user-detail">
+          <span class="user-detail-icon">👤</span>
+          <span id="user-name">Đang tải...</span>
         </div>
-        <div id="file-preview" class="file-preview"></div>
+        <div class="user-detail">
+          <span class="user-detail-icon">🏢</span>
+          <span id="user-department">Đang tải...</span>
+        </div>
+        <div class="user-detail">
+          <span class="user-detail-icon">🆔</span>
+          <span id="user-employee-id">Đang tải...</span>
+        </div>
+        <div class="user-detail">
+          <span class="user-detail-icon">📧</span>
+          <span id="user-email">Đang tải...</span>
+        </div>
+      </div>
+    </div>
+
+    <form id="checkin-form">
+      <!-- Google Maps -->
+      <div class="form-group">
+        <label class="form-label">📍 Vị trí hiện tại</label>
+        <div class="map-container">
+          <div class="map-wrapper">
+            <div id="map"></div>
+          </div>
+          <div class="map-controls">
+            <button type="button" id="btn-get-location" class="btn-get-location">
+              📍 Lấy tọa độ
+            </button>
+            <div class="coordinates" id="coordinates">
+              Chưa có vị trí
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Camera Capture -->
+      <div class="form-group">
+        <label class="form-label">📷 Ảnh check-in</label>
+        <div class="camera-container">
+          <div id="camera-preview" class="camera-preview">
+            <div class="camera-icon">📷</div>
+            <div class="camera-text">Chạm để chụp ảnh</div>
+          </div>
+          <div class="camera-controls">
+            <button type="button" id="btn-capture" class="btn-camera">
+              📷 Chụp ảnh
+            </button>
+            <button type="button" id="btn-retake" class="btn-camera danger" style="display: none;">
+              🔄 Chụp lại
+            </button>
+          </div>
+        </div>
+        <input type="file" id="photo" accept="image/*" capture="environment" style="display: none;">
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="note">Ghi chú (tùy chọn)</label>
+        <label class="form-label" for="note">📝 Ghi chú (tùy chọn)</label>
         <textarea id="note" class="form-textarea" placeholder="Ví dụ: Team A, ca 9h..."></textarea>
       </div>
 
       <button type="submit" id="btn-checkin" class="btn-checkin">
-        <span class="btn-text">Gửi Check-in</span>
+        <span class="btn-text">✅ Gửi Check-in</span>
         <div class="loading">
           <div class="spinner"></div>
           <span>Đang xử lý...</span>
@@ -311,10 +536,15 @@
   </div>
 
   <script>
-    const api = (p, opt={}) => fetch(p, Object.assign({
-      headers: {'X-Requested-With': 'XMLHttpRequest'},
+    const api = (p, opt = {}) => fetch(p, Object.assign({
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
       credentials: 'include'
     }, opt));
+
+    // Global variables
+    let map;
+    let currentPosition = null;
+    let currentPhoto = null;
 
     // Utility functions
     function showAlert(message, type = 'error') {
@@ -331,7 +561,7 @@
       const btn = document.getElementById('btn-checkin');
       const btnText = btn.querySelector('.btn-text');
       const loadingEl = btn.querySelector('.loading');
-      
+
       if (loading) {
         btn.disabled = true;
         btnText.style.display = 'none';
@@ -343,147 +573,207 @@
       }
     }
 
-    function showFilePreview(file) {
-      const preview = document.getElementById('file-preview');
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-          preview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      } else {
-        preview.style.display = 'none';
-      }
-    }
-
-    function showLocationInfo(locationId, locations) {
-      const location = locations.find(l => l.id == locationId);
-      const info = document.getElementById('location-info');
-      if (location) {
-        info.innerHTML = `
-          <strong>📍 ${location.name}</strong><br>
-          Bán kính: ${location.radius_m}m từ vị trí địa điểm
-        `;
-        info.classList.add('show');
-      } else {
-        info.classList.remove('show');
-      }
-    }
-
-    // Load locations
-    async function loadLocations(){
+    // Load user information
+    async function loadUserInfo() {
       try {
-        const r = await api('/checkin/locations/');
-        const locs = await r.json();
-        const sel = document.getElementById('location');
-        sel.innerHTML = '<option value="">Chọn địa điểm...</option>' + 
-          locs.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
-        
-        // Store locations for info display
-        window.locations = locs;
+        const response = await api('/checkin/user-info/');
+        const user = await response.json();
+
+        document.getElementById('user-name').textContent = user.display_name || 'N/A';
+        document.getElementById('user-department').textContent = user.department || 'N/A';
+        document.getElementById('user-employee-id').textContent = user.employee_id || 'N/A';
+        document.getElementById('user-email').textContent = user.email || 'N/A';
       } catch (error) {
-        showAlert('Không thể tải danh sách địa điểm. Vui lòng thử lại.', 'error');
+        console.error('Error loading user info:', error);
+        showAlert('Không thể tải thông tin người dùng', 'error');
       }
     }
 
-    // Get current position
-    function getPosition(){ 
-      return new Promise((res, rej)=>{
-        if(!navigator.geolocation) {
-          return rej(new Error('Thiết bị không hỗ trợ định vị.'));
-        }
-        navigator.geolocation.getCurrentPosition(
-          p => res(p),
-          err => {
-            let message = 'Không lấy được vị trí. ';
-            switch(err.code) {
-              case err.PERMISSION_DENIED:
-                message += 'Vui lòng cho phép truy cập vị trí.';
-                break;
-              case err.POSITION_UNAVAILABLE:
-                message += 'Vị trí hiện tại không khả dụng.';
-                break;
-              case err.TIMEOUT:
-                message += 'Hết thời gian chờ lấy vị trí.';
-                break;
-              default:
-                message += err.message;
-            }
-            rej(new Error(message));
-          },
-          { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-        );
+    // Initialize Google Maps
+    function initMap() {
+      if (typeof google === 'undefined' || !google.maps) {
+        console.warn('Google Maps API not loaded. Using fallback location input.');
+        document.getElementById('map').innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f8fafc; color: #718096; text-align: center; padding: 20px;">
+            <div>
+              <div style="font-size: 24px; margin-bottom: 8px;">🗺️</div>
+              <div>Google Maps API chưa được cấu hình</div>
+              <div style="font-size: 12px; margin-top: 4px;">Vui lòng cấu hình API key trong template</div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        center: { lat: 10.7769, lng: 106.7009 }, // Ho Chi Minh City default
+        mapTypeId: 'roadmap',
+        disableDefaultUI: true,
+        zoomControl: true,
+        streetViewControl: false,
+        fullscreenControl: false
       });
     }
 
-    // File input change handler
-    document.getElementById('photo').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      showFilePreview(file);
-    });
+    // Get current position and update map
+    async function getCurrentLocation() {
+      const btn = document.getElementById('btn-get-location');
+      const coordinates = document.getElementById('coordinates');
 
-    // Location select change handler
-    document.getElementById('location').addEventListener('change', (e) => {
-      if (window.locations) {
-        showLocationInfo(e.target.value, window.locations);
+      btn.disabled = true;
+      btn.textContent = '🔄 Đang lấy vị trí...';
+
+      try {
+        if (!navigator.geolocation) {
+          throw new Error('Thiết bị không hỗ trợ định vị');
+        }
+
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+          });
+        });
+
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        currentPosition = { lat, lng };
+
+        // Update map if Google Maps is available
+        if (map && typeof google !== 'undefined' && google.maps) {
+          map.setCenter({ lat, lng });
+          new google.maps.Marker({
+            position: { lat, lng },
+            map: map,
+            title: 'Vị trí hiện tại'
+          });
+        }
+
+        // Update coordinates display
+        coordinates.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+        showAlert('Đã lấy vị trí thành công!', 'success');
+
+      } catch (error) {
+        let message = 'Không lấy được vị trí. ';
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            message += 'Vui lòng cho phép truy cập vị trí.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message += 'Vị trí hiện tại không khả dụng.';
+            break;
+          case error.TIMEOUT:
+            message += 'Hết thời gian chờ lấy vị trí.';
+            break;
+          default:
+            message += error.message;
+        }
+        showAlert(message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📍 Lấy tọa độ';
       }
-    });
+    }
+
+    // Camera functions
+    function initCamera() {
+      const cameraPreview = document.getElementById('camera-preview');
+      const btnCapture = document.getElementById('btn-capture');
+      const btnRetake = document.getElementById('btn-retake');
+      const photoInput = document.getElementById('photo');
+
+      // Capture photo
+      btnCapture.addEventListener('click', () => {
+        photoInput.click();
+      });
+
+      // Retake photo
+      btnRetake.addEventListener('click', () => {
+        currentPhoto = null;
+        cameraPreview.innerHTML = `
+          <div class="camera-icon">📷</div>
+          <div class="camera-text">Chạm để chụp ảnh</div>
+        `;
+        cameraPreview.classList.remove('has-image');
+        btnCapture.style.display = 'block';
+        btnRetake.style.display = 'none';
+        photoInput.value = '';
+      });
+
+      // Handle photo selection
+      photoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          currentPhoto = file;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            cameraPreview.innerHTML = `<img src="${e.target.result}" alt="Captured photo">`;
+            cameraPreview.classList.add('has-image');
+            btnCapture.style.display = 'none';
+            btnRetake.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
 
     // Form submit handler
     document.getElementById('checkin-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       try {
         setLoading(true);
-        
+
         // Validate form
-        const locationId = document.getElementById('location').value;
-        const file = document.getElementById('photo').files[0];
-        
-        if (!locationId) {
-          showAlert('Vui lòng chọn địa điểm.', 'error');
-          return;
-        }
-        
-        if (!file) {
-          showAlert('Vui lòng chọn ảnh check-in.', 'error');
+        if (!currentPosition) {
+          showAlert('Vui lòng lấy vị trí trước khi check-in.', 'error');
           return;
         }
 
-        // Get position
-        const pos = await getPosition();
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
+        if (!currentPhoto) {
+          showAlert('Vui lòng chụp ảnh check-in.', 'error');
+          return;
+        }
 
         // Prepare form data
         const form = new FormData();
-        form.append('location_id', locationId);
-        form.append('lat', lat);
-        form.append('lng', lng);
+        form.append('lat', currentPosition.lat);
+        form.append('lng', currentPosition.lng);
         form.append('note', document.getElementById('note').value);
-        form.append('photo', file);
+        form.append('photo', currentPhoto);
 
         // Submit check-in
-        const r = await api('/checkin/submit/', { 
-          method: 'POST', 
-          body: form 
+        const r = await api('/checkin/submit/', {
+          method: 'POST',
+          body: form
         });
-        
+
         const data = await r.json();
-        
+
         if (!r.ok) {
           throw new Error(data.detail || JSON.stringify(data));
         }
 
         // Success
         showAlert('Check-in thành công! 🎉', 'success');
-        
+
         // Reset form
         document.getElementById('checkin-form').reset();
-        document.getElementById('file-preview').style.display = 'none';
-        document.getElementById('location-info').classList.remove('show');
-        
+        currentPosition = null;
+        currentPhoto = null;
+        document.getElementById('coordinates').textContent = 'Chưa có vị trí';
+        document.getElementById('camera-preview').innerHTML = `
+          <div class="camera-icon">📷</div>
+          <div class="camera-text">Chạm để chụp ảnh</div>
+        `;
+        document.getElementById('camera-preview').classList.remove('has-image');
+        document.getElementById('btn-capture').style.display = 'block';
+        document.getElementById('btn-retake').style.display = 'none';
+
       } catch (error) {
         showAlert(error.message || 'Có lỗi xảy ra. Vui lòng thử lại.', 'error');
       } finally {
@@ -491,8 +781,28 @@
       }
     });
 
-    // Initialize
-    loadLocations();
+    // Event listeners
+    document.getElementById('btn-get-location').addEventListener('click', getCurrentLocation);
+
+    // Initialize everything
+    window.addEventListener('load', () => {
+      loadUserInfo();
+      // Try to initialize map, fallback if API not available
+      if (typeof google !== 'undefined' && google.maps) {
+        initMap();
+      } else {
+        // Fallback: show message and initialize map later
+        setTimeout(() => {
+          if (typeof google !== 'undefined' && google.maps) {
+            initMap();
+          } else {
+            initMap(); // This will show the fallback message
+          }
+        }, 1000);
+      }
+      initCamera();
+    });
   </script>
 </body>
+
 </html>

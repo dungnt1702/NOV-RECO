@@ -3,22 +3,43 @@ from .models import Checkin, Location, User
 from .utils import haversine_m
 
 class CheckinCreateSerializer(serializers.ModelSerializer):
-    location_id = serializers.IntegerField(write_only=True)
-
     class Meta:
         model = Checkin
-        fields = ["location_id", "lat", "lng", "photo", "note"]
+        fields = ["lat", "lng", "photo", "note"]
 
     def validate(self, data):
-        try:
-            loc = Location.objects.get(id=data["location_id"], is_active=True)
-        except Location.DoesNotExist:
-            raise serializers.ValidationError("Địa điểm không hợp lệ hoặc đã tạm khóa.")
-        dist = haversine_m(data["lat"], data["lng"], loc.lat, loc.lng)
-        if dist > loc.radius_m:
-            raise serializers.ValidationError(f"Bạn đang ở ngoài bán kính check-in ({int(dist)}m > {loc.radius_m}m).")
-        data["_location"] = loc
-        data["_distance_m"] = dist
+        # Tìm địa điểm gần nhất trong bán kính cho phép
+        lat = data["lat"]
+        lng = data["lng"]
+        
+        # Lấy tất cả địa điểm active
+        locations = Location.objects.filter(is_active=True)
+        valid_locations = []
+        
+        for loc in locations:
+            dist = haversine_m(lat, lng, loc.lat, loc.lng)
+            if dist <= loc.radius_m:
+                valid_locations.append((loc, dist))
+        
+        if not valid_locations:
+            # Nếu không có địa điểm nào trong bán kính, tạo một địa điểm mặc định
+            default_location, created = Location.objects.get_or_create(
+                name="Vị trí tự do",
+                defaults={
+                    'lat': lat,
+                    'lng': lng,
+                    'radius_m': 1000,  # Bán kính 1km
+                    'is_active': True
+                }
+            )
+            data["_location"] = default_location
+            data["_distance_m"] = 0
+        else:
+            # Chọn địa điểm gần nhất
+            closest_location, closest_distance = min(valid_locations, key=lambda x: x[1])
+            data["_location"] = closest_location
+            data["_distance_m"] = closest_distance
+        
         return data
 
     def create(self, validated):
@@ -36,6 +57,7 @@ class CheckinCreateSerializer(serializers.ModelSerializer):
         )
 
 class CheckinListSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
     user_name = serializers.CharField(source='user.get_display_name', read_only=True)
     user_email = serializers.CharField(source='user.email', read_only=True)
     location_name = serializers.CharField(source='location.name', read_only=True)
@@ -43,7 +65,7 @@ class CheckinListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Checkin
-        fields = ['id', 'user_name', 'user_email', 'location_name', 'lat', 'lng', 
+        fields = ['id', 'user_id', 'user_name', 'user_email', 'location_name', 'lat', 'lng', 
                  'distance_m', 'note', 'created_at', 'photo']
 
 class UserSerializer(serializers.ModelSerializer):

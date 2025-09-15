@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.decorators import api_view, permission_classes
 from .models import Location, Checkin, User, UserRole
-from .serializers import CheckinCreateSerializer, CheckinListSerializer
+from .serializers import CheckinCreateSerializer, CheckinListSerializer, UserSerializer
 from .decorators import admin_required, manager_required, employee_required
 
 # Dashboard views
@@ -112,3 +112,30 @@ def user_management(request):
         'roles': UserRole.choices
     }
     return render(request, 'checkin/user_management.html', context)
+
+# User info API
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_info_api(request):
+    """API để lấy thông tin người dùng hiện tại"""
+    user = request.user
+    serializer = UserSerializer(user)
+    return Response(serializer.data)
+
+# Check-in list view
+@manager_required
+def checkin_list_view(request):
+    """Trang danh sách check-in cho Manager và Admin"""
+    return render(request, 'checkin/checkin_list.html')
+
+# Users API for filter
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def users_api(request):
+    """API để lấy danh sách người dùng cho filter"""
+    if not (request.user.is_admin() or request.user.is_manager()):
+        return Response({'error': 'Permission denied'}, status=403)
+    
+    users = User.objects.filter(is_active=True).order_by('first_name')
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
