@@ -1,0 +1,708 @@
+{% extends 'base.html' %}
+
+{% block title %}Lịch sử Check-in - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body styles removed - using base.html styles */
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 20px auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #0A5597, #F5831F);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 16px;
+      color: #718096;
+    }
+
+    .user-info {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .user-details {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #0A5597, #F5831F);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .user-text h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 5px;
+    }
+
+    .user-text p {
+      font-size: 14px;
+      color: #718096;
+    }
+
+    .stats {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0A5597;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .filter-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #4a5568;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-group input,
+    .filter-group select {
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      background: white;
+    }
+
+    .filter-group input:focus,
+    .filter-group select:focus {
+      outline: none;
+      border-color: #0A5597;
+      box-shadow: 0 0 0 3px rgba(10, 85, 151, 0.1);
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0A5597 0%, #F5831F 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(10, 85, 151, 0.3);
+    }
+
+    .btn-secondary {
+      background: #f7fafc;
+      color: #4a5568;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+      background: #edf2f7;
+    }
+
+    .checkin-list {
+      display: grid;
+      gap: 20px;
+    }
+
+    .checkin-item {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .checkin-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .checkin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .checkin-time {
+      font-size: 14px;
+      color: #718096;
+      font-weight: 500;
+    }
+
+    .checkin-status {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-success {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    .checkin-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .detail-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #4a5568;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+      font-size: 14px;
+      color: #2d3748;
+      font-weight: 500;
+    }
+
+    .coordinates {
+      font-family: monospace;
+      background: #edf2f7;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .checkin-note {
+      background: #edf2f7;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #4a5568;
+      font-style: italic;
+      margin-bottom: 15px;
+    }
+
+    .checkin-photo {
+      width: 100%;
+      max-width: 200px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #718096;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #718096;
+    }
+
+    .empty-state h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #4a5568;
+    }
+
+    .empty-state p {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .pagination button {
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: #f7fafc;
+      border-color: #0A5597;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination .current {
+      background: #0A5597;
+      color: white;
+      border-color: #0A5597;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 20px;
+        border-radius: 15px;
+      }
+      
+      .header h1 {
+        font-size: 24px;
+      }
+      
+      .user-info {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .stats {
+        justify-content: center;
+      }
+      
+      .filters {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .filter-group {
+        width: 100%;
+      }
+      
+      .checkin-details {
+        grid-template-columns: 1fr;
+      }
+      
+      .actions {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px;
+        border-radius: 10px;
+      }
+      
+      .header h1 {
+        font-size: 20px;
+      }
+      
+      .user-details {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .stats {
+        gap: 15px;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="header">
+      <h1>📋 Lịch sử Check-in</h1>
+      <p>Xem tất cả các lần check-in của bạn</p>
+    </div>
+
+    <div class="user-info">
+      <div class="user-details">
+        <div class="user-avatar" id="user-avatar">U</div>
+        <div class="user-text">
+          <h3 id="user-name">Đang tải...</h3>
+          <p id="user-email">Đang tải...</p>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-number" id="total-checkins">0</div>
+          <div class="stat-label">Tổng check-in</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="this-month">0</div>
+          <div class="stat-label">Tháng này</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="this-week">0</div>
+          <div class="stat-label">Tuần này</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <div class="filter-group">
+        <label>Từ ngày</label>
+        <input type="date" id="date-from" />
+      </div>
+      <div class="filter-group">
+        <label>Đến ngày</label>
+        <input type="date" id="date-to" />
+      </div>
+      <div class="filter-group">
+        <label>Vị trí</label>
+        <select id="location-filter">
+          <option value="">Tất cả vị trí</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="applyFilters()">🔍 Lọc</button>
+      <button class="btn btn-secondary" onclick="clearFilters()">🔄 Xóa lọc</button>
+    </div>
+
+    <div id="loading" class="loading" style="display: none;">
+      <p>🔄 Đang tải dữ liệu...</p>
+    </div>
+
+    <div id="empty-state" class="empty-state" style="display: none;">
+      <h3>📭 Chưa có check-in nào</h3>
+      <p>Bạn chưa thực hiện check-in nào. Hãy bắt đầu check-in ngay!</p>
+      <a href="/checkin/" class="btn btn-primary">📝 Check-in ngay</a>
+    </div>
+
+    <div id="checkin-list" class="checkin-list">
+      <!-- Check-in items will be loaded here -->
+    </div>
+
+    <div id="pagination" class="pagination" style="display: none;">
+      <button id="prev-btn" onclick="changePage(-1)">← Trước</button>
+      <span id="page-info">Trang 1 / 1</span>
+      <button id="next-btn" onclick="changePage(1)">Sau →</button>
+    </div>
+
+    <div class="actions" style="margin-top: 30px; justify-content: center;">
+      <a href="/checkin/" class="btn btn-primary">📝 Check-in Mới</a>
+      <a href="/checkin/dashboard/" class="btn btn-secondary">📊 Dashboard</a>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentPage = 1;
+    let totalPages = 1;
+    let checkinData = [];
+    let userData = null;
+
+    // Load user info
+    async function loadUserInfo() {
+      try {
+        const response = await fetch('/checkin/user-info/', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          userData = await response.json();
+          document.getElementById('user-name').textContent = userData.display_name || 'N/A';
+          document.getElementById('user-email').textContent = userData.email || 'N/A';
+          document.getElementById('user-avatar').textContent = (userData.first_name || 'U')[0].toUpperCase();
+        }
+      } catch (error) {
+        console.error('Error loading user info:', error);
+      }
+    }
+
+    // Load check-ins
+    async function loadCheckins() {
+      const loading = document.getElementById('loading');
+      const emptyState = document.getElementById('empty-state');
+      const checkinList = document.getElementById('checkin-list');
+      const pagination = document.getElementById('pagination');
+
+      loading.style.display = 'block';
+      emptyState.style.display = 'none';
+      checkinList.innerHTML = '';
+      pagination.style.display = 'none';
+
+      try {
+        const params = new URLSearchParams({
+          page: currentPage,
+          from_date: document.getElementById('date-from').value,
+          to_date: document.getElementById('date-to').value,
+          location: document.getElementById('location-filter').value
+        });
+
+        const response = await fetch(`/checkin/user-history/?${params}`, {
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          checkinData = data.checkins || [];
+          totalPages = data.total_pages || 1;
+
+          // Update stats
+          document.getElementById('total-checkins').textContent = data.total_count || 0;
+          document.getElementById('this-month').textContent = data.this_month || 0;
+          document.getElementById('this-week').textContent = data.this_week || 0;
+
+          if (checkinData.length === 0) {
+            emptyState.style.display = 'block';
+          } else {
+            renderCheckins();
+            if (totalPages > 1) {
+              pagination.style.display = 'flex';
+              updatePagination();
+            }
+          }
+        } else {
+          throw new Error('Failed to load check-ins');
+        }
+      } catch (error) {
+        console.error('Error loading check-ins:', error);
+        checkinList.innerHTML = '<div class="empty-state"><h3>❌ Lỗi tải dữ liệu</h3><p>Không thể tải lịch sử check-in. Vui lòng thử lại.</p></div>';
+      } finally {
+        loading.style.display = 'none';
+      }
+    }
+
+    // Render check-ins
+    function renderCheckins() {
+      const checkinList = document.getElementById('checkin-list');
+      checkinList.innerHTML = '';
+
+      checkinData.forEach(checkin => {
+        const checkinItem = document.createElement('div');
+        checkinItem.className = 'checkin-item';
+        
+        const checkinTime = new Date(checkin.created_at).toLocaleString('vi-VN');
+        const coordinates = `${checkin.lat.toFixed(6)}, ${checkin.lng.toFixed(6)}`;
+        
+        checkinItem.innerHTML = `
+          <div class="checkin-header">
+            <div class="checkin-time">${checkinTime}</div>
+            <div class="checkin-status status-success">✓ Thành công</div>
+          </div>
+          
+          <div class="checkin-details">
+            <div class="detail-item">
+              <div class="detail-label">📍 Vị trí</div>
+              <div class="detail-value">${checkin.location_name}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">🗺️ Tọa độ</div>
+              <div class="detail-value">
+                <span class="coordinates">${coordinates}</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">📏 Khoảng cách</div>
+              <div class="detail-value">${checkin.distance_m}m</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">🌐 IP</div>
+              <div class="detail-value">${checkin.ip || 'N/A'}</div>
+            </div>
+          </div>
+          
+          ${checkin.note ? `<div class="checkin-note">📝 ${checkin.note}</div>` : ''}
+          
+          ${checkin.photo_url ? `<img src="${checkin.photo_url}" alt="Ảnh check-in" class="checkin-photo">` : ''}
+          
+          <div class="actions">
+            <button class="btn btn-sm btn-secondary" onclick="viewDetails(${checkin.id})">👁️ Chi tiết</button>
+            <button class="btn btn-sm btn-primary" onclick="quickCheckin(${checkin.id})">⚡ Check-in lại</button>
+          </div>
+        `;
+        
+        checkinList.appendChild(checkinItem);
+      });
+    }
+
+    // Update pagination
+    function updatePagination() {
+      document.getElementById('page-info').textContent = `Trang ${currentPage} / ${totalPages}`;
+      document.getElementById('prev-btn').disabled = currentPage <= 1;
+      document.getElementById('next-btn').disabled = currentPage >= totalPages;
+    }
+
+    // Change page
+    function changePage(direction) {
+      const newPage = currentPage + direction;
+      if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        loadCheckins();
+      }
+    }
+
+    // Apply filters
+    function applyFilters() {
+      currentPage = 1;
+      loadCheckins();
+    }
+
+    // Clear filters
+    function clearFilters() {
+      document.getElementById('date-from').value = '';
+      document.getElementById('date-to').value = '';
+      document.getElementById('location-filter').value = '';
+      currentPage = 1;
+      loadCheckins();
+    }
+
+    // View details
+    function viewDetails(checkinId) {
+      // TODO: Implement view details modal
+      alert(`Xem chi tiết check-in #${checkinId}`);
+    }
+
+    // Quick check-in
+    function quickCheckin(checkinId) {
+      // TODO: Implement quick check-in with same data
+      alert(`Check-in lại với dữ liệu của check-in #${checkinId}`);
+    }
+
+    // Load locations for filter
+    async function loadLocations() {
+      try {
+        const response = await fetch('/checkin/locations/', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const locationFilter = document.getElementById('location-filter');
+          
+          // Kết hợp areas và locations thành một mảng
+          const allLocations = [...(data.areas || []), ...(data.locations || [])];
+          
+          allLocations.forEach(location => {
+            const option = document.createElement('option');
+            option.value = location.id;
+            option.textContent = location.name;
+            locationFilter.appendChild(option);
+          });
+          
+          console.log('Loaded locations:', allLocations.length, 'items');
+        }
+      } catch (error) {
+        console.error('Error loading locations:', error);
+      }
+    }
+
+    // Initialize page
+    window.addEventListener('load', async () => {
+      await loadUserInfo();
+      await loadLocations();
+      await loadCheckins();
+    });
+</script>
+{% endblock %}
