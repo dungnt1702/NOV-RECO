@@ -90,7 +90,7 @@ def employee_dashboard(request):
 # Check-in views
 @employee_required
 def checkin_page(request):
-    return render(request, "checkin/checkin_new.html")
+    return render(request, "checkin/checkin.html")
 
 
 # API Views
