@@ -34,7 +34,7 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            padding: 15px 20px;
+            padding: 8px 20px;
         }
 
         .nav-container {
@@ -49,16 +49,16 @@
         .nav-logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             text-decoration: none;
             color: #0A5597;
             font-weight: 700;
-            font-size: 1.2rem;
-            margin-left: 50px; /* Space for nav-toggle */
+            font-size: 1.1rem;
+            margin-left: 45px; /* Space for nav-toggle */
         }
 
         .nav-logo img {
-            height: 35px;
+            height: 28px;
             width: auto;
         }
 
@@ -114,12 +114,13 @@
         .user-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            flex-wrap: nowrap;
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: linear-gradient(135deg, #0A5597, #F5831F);
             display: flex;
@@ -127,29 +128,36 @@
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
         }
 
         .user-name {
-            color: #333;
-            font-weight: 600;
-            font-size: 0.9rem;
+            display: none;
         }
 
         .logout-btn {
             background: #dc3545;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 6px 8px;
+            border-radius: 50%;
             text-decoration: none;
             font-size: 0.9rem;
             transition: all 0.3s ease;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .logout-btn:hover {
             background: #c82333;
             transform: translateY(-2px);
+        }
+
+        .logout-btn i {
+            font-size: 0.9rem;
         }
 
         /* Mobile Navigation */
@@ -160,10 +168,10 @@
 
             .nav-menu {
                 position: fixed;
-                top: 105px;
+                top: 70px;
                 left: -50%;
                 width: 50%;
-                height: calc(100vh - 105px);
+                height: calc(100vh - 70px);
                 background: rgba(255, 255, 255, 0.98);
                 backdrop-filter: blur(10px);
                 flex-direction: column;
@@ -196,7 +204,7 @@
             }
 
             .user-info {
-                flex-direction: column;
+                flex-direction: row;
                 gap: 10px;
                 text-align: center;
             }
@@ -208,16 +216,16 @@
 
         @media (max-width: 480px) {
             .navbar {
-                padding: 10px 15px;
+                padding: 6px 15px;
             }
 
             .nav-logo {
                 font-size: 1rem;
-                margin-left: 45px; /* Smaller space for mobile */
+                margin-left: 40px; /* Smaller space for mobile */
             }
 
             .nav-logo img {
-                height: 30px;
+                height: 24px;
             }
 
             .nav-menu {
@@ -234,12 +242,32 @@
                 font-size: 0.9rem;
                 padding: 10px 15px;
             }
+
+            .user-info {
+                gap: 8px;
+            }
+
+            .user-name {
+                display: none;
+            }
+
+            .user-avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+
+            .logout-btn {
+                width: 28px;
+                height: 28px;
+                padding: 4px 6px;
+            }
         }
 
         /* Main Content */
         .main-content {
-            margin-top: 80px;
-            min-height: calc(100vh - 80px);
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
         }
 
         /* Overlay for mobile menu */
@@ -329,12 +357,12 @@
                         {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
                     </div>
                     <div class="user-name">{{ user.get_display_name }}</div>
-                    <a href="/accounts/logout/" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    <a href="/accounts/logout/" class="logout-btn" title="Đăng xuất">
+                        <i class="fas fa-sign-out-alt"></i>
                     </a>
                 {% else %}
-                    <a href="/accounts/login/" class="logout-btn">
-                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                    <a href="/accounts/login/" class="logout-btn" title="Đăng nhập">
+                        <i class="fas fa-sign-in-alt"></i>
                     </a>
                 {% endif %}
             </div>
