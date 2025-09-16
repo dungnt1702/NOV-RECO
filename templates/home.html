@@ -1,40 +1,29 @@
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NOV-RECO Check-in System</title>
-  <link rel="icon" type="image/png" href="/static/favicon.png">
-  <style>
+{% extends 'base.html' %}
+
+{% block title %}NOV-RECO Check-in System{% endblock %}
+
+{% block extra_css %}
+<style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
     
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #0A5597 0%, #1D5795 50%, #F5831F 100%);
-      min-height: 100vh;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .container {
+    .home-container {
       background: white;
       border-radius: 20px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
       padding: 40px;
       width: 100%;
       max-width: 500px;
+      margin: 20px auto;
       text-align: center;
       position: relative;
       overflow: hidden;
     }
     
-    .container::before {
+    .home-container::before {
       content: '';
       position: absolute;
       top: 0;
@@ -127,9 +116,10 @@
       color: #0A5597;
     }
   </style>
-</head>
-<body>
-  <div class="container">
+{% endblock %}
+
+{% block content %}
+  <div class="home-container">
     <div class="logo">
       <img src="/static/logo.svg" alt="NOV-RECO Logo">
     </div>
@@ -199,5 +189,4 @@
       </div>
     {% endif %}
   </div>
-</body>
-</html>
+{% endblock %}

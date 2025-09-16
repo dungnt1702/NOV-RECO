@@ -1,43 +1,28 @@
-<!doctype html>
-<html lang="vi">
+{% extends 'base.html' %}
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>Check-in Nhanh - NOV-RECO</title>
-  <link rel="icon" type="image/png" href="/static/favicon.png">
-  <style>
+{% block title %}Check-in Nhanh - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #0A5597 0%, #1D5795 50%, #F5831F 100%);
-      min-height: 100vh;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .container {
+    .quick-checkin-container {
       background: white;
       border-radius: 20px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
       padding: 40px;
       width: 100%;
       max-width: 600px;
+      margin: 20px auto;
       position: relative;
       overflow: hidden;
     }
 
-    .container::before {
+    .quick-checkin-container::before {
       content: '';
       position: absolute;
       top: 0;
@@ -268,10 +253,10 @@
       }
     }
   </style>
-</head>
+{% endblock %}
 
-<body>
-  <div class="container">
+{% block content %}
+  <div class="quick-checkin-container">
     <div class="header">
       <h1>⚡ Check-in Nhanh</h1>
       <p>Sử dụng dữ liệu từ lần check-in trước</p>
@@ -326,8 +311,10 @@
       </div>
     </form>
   </div>
+{% endblock %}
 
-  <script>
+{% block extra_js %}
+<script>
     let lastCheckinData = null;
 
     // Get URL parameters
@@ -482,6 +469,4 @@
       loadLastCheckin();
     });
   </script>
-</body>
-
-</html>
+{% endblock %}

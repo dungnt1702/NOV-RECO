@@ -1,44 +1,29 @@
-<!doctype html>
-<html lang="vi">
+{% extends 'base.html' %}
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>Check-in Thành Công - NOV-RECO</title>
-  <link rel="icon" type="image/png" href="/static/favicon.png">
-  <style>
+{% block title %}Check-in Thành Công - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #0A5597 0%, #1D5795 50%, #F5831F 100%);
-      min-height: 100vh;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .container {
+    .success-container {
       background: white;
       border-radius: 20px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
       padding: 40px;
       width: 100%;
       max-width: 600px;
+      margin: 20px auto;
       position: relative;
       overflow: hidden;
       text-align: center;
     }
 
-    .container::before {
+    .success-container::before {
       content: '';
       position: absolute;
       top: 0;
@@ -240,10 +225,10 @@
       }
     }
   </style>
-</head>
+{% endblock %}
 
-<body>
-  <div class="container">
+{% block content %}
+  <div class="success-container">
     <div class="success-icon">🎉</div>
     <h1 class="success-title">Check-in Thành Công!</h1>
     <p class="success-subtitle">Bạn đã check-in thành công với các thông tin bên dưới</p>
@@ -303,8 +288,10 @@
       <a href="/checkin/dashboard/" class="btn btn-outline">📊 Dashboard</a>
     </div>
   </div>
+{% endblock %}
 
-  <script>
+{% block extra_js %}
+<script>
     // Get check-in data from URL parameters
     function getUrlParams() {
       const params = new URLSearchParams(window.location.search);
@@ -381,6 +368,4 @@
       addButtonHandlers();
     });
   </script>
-</body>
-
-</html>
+{% endblock %}
