@@ -63,16 +63,22 @@ class CheckinCreateSerializer(serializers.ModelSerializer):
             ip=req.META.get("REMOTE_ADDR"),
             user_agent=req.META.get("HTTP_USER_AGENT", "")[:255],
             created_at=checkin_time,
-            **validated
+            **validated,
         )
 
 
 class CheckinListSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source="user.id", read_only=True)
-    user_name = serializers.CharField(source="user.get_display_name", read_only=True)
+    user_name = serializers.CharField(
+        source="user.get_display_name", read_only=True
+    )
     user_email = serializers.CharField(source="user.email", read_only=True)
-    location_name = serializers.CharField(source="location.name", read_only=True)
-    created_at = serializers.DateTimeField(format="%d/%m/%Y %H:%M", read_only=True)
+    location_name = serializers.CharField(
+        source="location.name", read_only=True
+    )
+    created_at = serializers.DateTimeField(
+        format="%d/%m/%Y %H:%M", read_only=True
+    )
 
     class Meta:
         model = Checkin
@@ -92,7 +98,9 @@ class CheckinListSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    display_name = serializers.CharField(source="get_display_name", read_only=True)
+    display_name = serializers.CharField(
+        source="get_display_name", read_only=True
+    )
 
     class Meta:
         model = User
