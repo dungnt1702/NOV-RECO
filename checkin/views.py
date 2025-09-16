@@ -40,9 +40,9 @@ def admin_dashboard(request):
         "total_users": User.objects.count(),
         "total_checkins": Checkin.objects.count(),
         "total_locations": Location.objects.count(),
-        "recent_checkins": Checkin.objects.select_related("user", "location").order_by(
-            "-created_at"
-        )[:10],
+        "recent_checkins": Checkin.objects.select_related(
+            "user", "location"
+        ).order_by("-created_at")[:10],
         "users_by_role": {
             "admin": User.objects.filter(role=UserRole.ADMIN).count(),
             "manager": User.objects.filter(role=UserRole.MANAGER).count(),
@@ -58,10 +58,12 @@ def manager_dashboard(request):
     context = {
         "total_employees": User.objects.filter(role=UserRole.EMPLOYEE).count(),
         "total_checkins": Checkin.objects.count(),
-        "recent_checkins": Checkin.objects.select_related("user", "location").order_by(
-            "-created_at"
-        )[:10],
-        "employees": User.objects.filter(role=UserRole.EMPLOYEE).order_by("first_name"),
+        "recent_checkins": Checkin.objects.select_related(
+            "user", "location"
+        ).order_by("-created_at")[:10],
+        "employees": User.objects.filter(role=UserRole.EMPLOYEE).order_by(
+            "first_name"
+        ),
     }
     return render(request, "checkin/manager_dashboard.html", context)
 
@@ -114,14 +116,26 @@ def checkin_submit_view(request):
     """Xử lý form submit check-in và redirect đến trang success"""
     if request.method == "POST":
         print(f"DEBUG: Received POST request from {request.user}")
-        print(f"DEBUG: Request data: {request.data}")
         print(f"DEBUG: Request POST: {request.POST}")
         print(f"DEBUG: Request FILES: {request.FILES}")
 
         try:
-            # Tạo serializer instance
+            # Với FormData từ JavaScript, cần xử lý đặc biệt
+            data = request.POST.copy()
+            files = request.FILES
+
+            print(f"DEBUG: Data before processing: {data}")
+            print(f"DEBUG: Files: {files}")
+
+            # Thêm files vào data
+            for key, file in files.items():
+                data[key] = file
+                print(f"DEBUG: Added file {key}: {file}")
+
+            print(f"DEBUG: Final data: {data}")
+
             serializer = CheckinCreateSerializer(
-                data=request.data, context={"request": request}
+                data=data, context={"request": request}
             )
 
             print(f"DEBUG: Serializer is_valid: {serializer.is_valid()}")
@@ -141,7 +155,9 @@ def checkin_submit_view(request):
                     "user_employee_id": checkin.user.employee_id or "N/A",
                     "location_name": checkin.location.name,
                     "coordinates": f"{checkin.lat:.6f}, {checkin.lng:.6f}",
-                    "checkin_time": checkin.created_at.strftime("%d/%m/%Y %H:%M:%S"),
+                    "checkin_time": checkin.created_at.strftime(
+                        "%d/%m/%Y %H:%M:%S"
+                    ),
                     "note": checkin.note or "",
                     "photo_url": checkin.photo.url if checkin.photo else "",
                 }
@@ -160,6 +176,8 @@ def checkin_submit_view(request):
             print(f"DEBUG: Exception occurred: {str(e)}")
             print(f"DEBUG: Exception type: {type(e)}")
             import traceback
+
+            traceback.print_exc()
 
             print(f"DEBUG: Traceback: {traceback.format_exc()}")
             messages.error(request, f"Có lỗi xảy ra: {str(e)}")
@@ -343,10 +361,16 @@ def last_checkin_api(request):
                 "lat": float(last_checkin.lat),
                 "lng": float(last_checkin.lng),
                 "location_name": last_checkin.location.name,
-                "coordinates": (f"{last_checkin.lat:.6f}, {last_checkin.lng:.6f}"),
-                "checkin_time": last_checkin.created_at.strftime("%d/%m/%Y %H:%M:%S"),
+                "coordinates": (
+                    f"{last_checkin.lat:.6f}, {last_checkin.lng:.6f}"
+                ),
+                "checkin_time": last_checkin.created_at.strftime(
+                    "%d/%m/%Y %H:%M:%S"
+                ),
                 "note": last_checkin.note or "",
-                "photo_url": (last_checkin.photo.url if last_checkin.photo else None),
+                "photo_url": (
+                    last_checkin.photo.url if last_checkin.photo else None
+                ),
             }
         )
 

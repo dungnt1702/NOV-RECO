@@ -786,6 +786,9 @@
 
         currentPosition = { lat, lng };
 
+        // Update submit button state
+        updateSubmitButtonState();
+
         // Update map if OpenStreetMap is available
         if (map && isMapInitialized) {
           map.setView([lat, lng], 16);
@@ -872,6 +875,9 @@
         
         // Re-add click listener for camera preview
         cameraPreview.addEventListener('click', openCameraHandler);
+        
+        // Update submit button state
+        updateSubmitButtonState();
       });
     }
 
@@ -945,6 +951,9 @@
           
           currentPhoto = file;
           
+          // Update submit button state
+          updateSubmitButtonState();
+          
           // Show captured image
           const cameraPreview = document.getElementById('camera-preview');
           const img = document.createElement('img');
@@ -986,48 +995,39 @@
       }
     }
 
+    // Function to update submit button state
+    function updateSubmitButtonState() {
+      const btn = document.getElementById('btn-checkin');
+      const hasPosition = !!currentPosition;
+      const hasPhoto = !!currentPhoto;
+      const canSubmit = hasPosition && hasPhoto;
+      
+      if (canSubmit) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        btn.style.cursor = 'not-allowed';
+      }
+    }
+
     // Form submit handler
     document.getElementById('checkin-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       console.log('Form submitted');
       
+      // Check if we have position and photo BEFORE setting loading
+      if (!currentPosition || !currentPhoto) {
+        console.log('Missing data - currentPosition:', !!currentPosition, 'currentPhoto:', !!currentPhoto);
+        showAlert('⚠️ Vui lòng lấy vị trí và chụp ảnh trước khi submit!', 'error');
+        return;
+      }
+      
       try {
         setLoading(true);
         console.log('Loading started');
-        
-        // Auto-get position if not available
-        if (!currentPosition) {
-          console.log('No position - auto getting location');
-          showAlert('📍 Đang tự động lấy vị trí...', 'info');
-          try {
-            await getCurrentLocation(false); // Don't show button updates
-            if (!currentPosition) {
-              showAlert('⚠️ Không thể lấy vị trí. Vui lòng cho phép truy cập vị trí.', 'error');
-              setLoading(false);
-              return;
-            }
-          } catch (error) {
-            showAlert('⚠️ Không thể lấy vị trí. Vui lòng cho phép truy cập vị trí.', 'error');
-            setLoading(false);
-            return;
-          }
-        }
-        
-        // Auto-open camera if no photo
-        if (!currentPhoto) {
-          console.log('No photo - auto opening camera');
-          showAlert('📷 Vui lòng chụp ảnh check-in...', 'info');
-          try {
-            await openCamera();
-            // Wait for user to take photo
-            return; // Exit here, user will need to click submit again after taking photo
-          } catch (error) {
-            showAlert('⚠️ Không thể mở camera. Vui lòng cho phép truy cập camera.', 'error');
-            setLoading(false);
-            return;
-          }
-        }
-        
         console.log('Validation passed, submitting...');
 
         // Get CSRF token
@@ -1075,7 +1075,7 @@
         }
         
         // Check if redirected to success page
-        if (r.status === 302 && r.url.includes('/checkin/success/')) {
+        if (r.status === 200 && r.url.includes('/checkin/success/')) {
           console.log('Redirected to success page');
           // Redirect to success page
           window.location.href = r.url;
@@ -1103,6 +1103,9 @@
         currentPosition = null;
         currentPhoto = null;
         document.getElementById('coordinates').textContent = 'Chưa có vị trí';
+        
+        // Update submit button state
+        updateSubmitButtonState();
         
         // Stop camera if running
         stopCamera();
@@ -1150,6 +1153,7 @@
       // Initialize OpenStreetMap (no API key needed)
       initMap();
       initCamera();
+      updateSubmitButtonState();
     });
 
     // Cleanup camera when page is unloaded
