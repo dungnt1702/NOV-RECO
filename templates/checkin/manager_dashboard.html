@@ -1,28 +1,18 @@
-<!doctype html>
-<html lang="vi">
+{% extends 'base.html' %}
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Manager Dashboard - NOV-RECO</title>
-  <link rel="icon" type="image/png" href="/static/favicon.png">
-  <style>
+{% block title %}Manager Dashboard - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #0A5597 0%, #1D5795 50%, #F5831F 100%);
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .container {
+    .dashboard-container {
       max-width: 1200px;
-      margin: 0 auto;
+      margin: 20px auto;
       background: white;
       border-radius: 20px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -167,10 +157,10 @@
       background: #5a6268;
     }
   </style>
-</head>
+{% endblock %}
 
-<body>
-  <div class="container">
+{% block content %}
+  <div class="dashboard-container">
     <div class="header">
       <h1>👨‍💼 Manager Dashboard</h1>
       <p>Quản lý nhân viên và theo dõi check-in</p>
@@ -249,6 +239,4 @@
       </div>
     </div>
   </div>
-</body>
-
-</html>
+{% endblock %}

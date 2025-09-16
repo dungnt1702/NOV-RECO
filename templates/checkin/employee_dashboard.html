@@ -1,27 +1,18 @@
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Employee Dashboard - NOV-RECO</title>
-  <link rel="icon" type="image/png" href="/static/favicon.png">
-  <style>
+{% extends 'base.html' %}
+
+{% block title %}Employee Dashboard - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #0A5597 0%, #1D5795 50%, #F5831F 100%);
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .container {
+    .dashboard-container {
       max-width: 1000px;
-      margin: 0 auto;
+      margin: 20px auto;
       background: white;
       border-radius: 20px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -184,9 +175,10 @@
       background: #218838;
     }
   </style>
-</head>
-<body>
-  <div class="container">
+{% endblock %}
+
+{% block content %}
+  <div class="dashboard-container">
     <div class="header">
       <h1>👤 Employee Dashboard</h1>
       <p>Chào mừng {{ user.get_display_name }}!</p>
@@ -269,6 +261,5 @@
       </div>
     </div>
   </div>
-</body>
-</html>
+{% endblock %}
 
