@@ -14,6 +14,10 @@ from .views import (
     quick_checkin_view,
     user_history_api,
     last_checkin_api,
+    areas_api,
+    area_detail_api,
+    area_management,
+    update_checkins_areas_api,
 )
 
 urlpatterns = [
@@ -32,6 +36,15 @@ urlpatterns = [
     path("users-api/", users_api, name="users_api"),
     path("user-history/", user_history_api, name="user_history_api"),
     path("last-checkin/", last_checkin_api, name="last_checkin_api"),
+    # Area Management (Admin/Manager only)
+    path("areas/", areas_api, name="areas_api"),
+    path("areas/<int:area_id>/", area_detail_api, name="area_detail_api"),
+    path("area-management/", area_management, name="area_management"),
+    path(
+        "update-checkins-areas/",
+        update_checkins_areas_api,
+        name="update_checkins_areas",
+    ),
     # User Management (Admin only)
     path("users/", user_management, name="user_management"),
 ]

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- Navigation Menu Update: Left-side toggle, half-screen width -->
+    <title>{% block title %}NOV-RECO Check-in System{% endblock %}</title>
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0A5597 0%, #1D5795 50%, #F5831F 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 15px 20px;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #0A5597;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-left: 50px; /* Space for nav-toggle */
+        }
+
+        .nav-logo img {
+            height: 35px;
+            width: auto;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-menu li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .nav-menu li a:hover {
+            background: #0A5597;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-menu li a.active {
+            background: #F5831F;
+            color: white;
+        }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #0A5597;
+            cursor: pointer;
+            padding: 5px;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .nav-toggle:hover {
+            color: #F5831F;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0A5597, #F5831F);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .user-name {
+            color: #333;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Navigation */
+        @media (max-width: 768px) {
+            .nav-logo {
+                margin-left: 50px; /* Space for nav-toggle */
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 105px;
+                left: -50%;
+                width: 50%;
+                height: calc(100vh - 105px);
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                padding-top: 50px;
+                transition: left 0.3s ease;
+                box-shadow: 5px 0 20px rgba(0, 0, 0, 0.1);
+                z-index: 1001;
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .nav-menu li {
+                margin: 15px 0;
+            }
+
+            .nav-menu li a {
+                font-size: 1rem;
+                padding: 12px 20px;
+                width: 100%;
+                text-align: center;
+                margin: 0;
+            }
+
+            .nav-toggle {
+                display: block;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .user-name {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 10px 15px;
+            }
+
+            .nav-logo {
+                font-size: 1rem;
+                margin-left: 45px; /* Smaller space for mobile */
+            }
+
+            .nav-logo img {
+                height: 30px;
+            }
+
+            .nav-menu {
+                width: 60%;
+                left: -60%;
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .nav-menu li a {
+                width: 100%;
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Overlay for mobile menu */
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Animation for mobile menu */
+        @keyframes slideInLeft {
+            from {
+                left: -50%;
+            }
+            to {
+                left: 0;
+            }
+        }
+
+        .nav-menu.active {
+            animation: slideInLeft 0.3s ease;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <button class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <a href="/" class="nav-logo">
+                <img src="/static/logo.svg" alt="NOV-RECO Logo">
+                <span>NOV-RECO</span>
+            </a>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="/" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                    <i class="fas fa-home"></i> Trang chủ
+                </a></li>
+                
+                <li><a href="/checkin/" class="{% if request.resolver_match.url_name == 'checkin_page' %}active{% endif %}">
+                    <i class="fas fa-map-marker-alt"></i> Check-in
+                </a></li>
+                
+                {% if user.is_authenticated %}
+                    <li><a href="/checkin/history/" class="{% if request.resolver_match.url_name == 'user_history' %}active{% endif %}">
+                        <i class="fas fa-history"></i> Lịch sử
+                    </a></li>
+                    
+                    {% if user.is_admin or user.is_manager %}
+                        <li><a href="/checkin/list-view/" class="{% if request.resolver_match.url_name == 'checkin_list_view' %}active{% endif %}">
+                            <i class="fas fa-list"></i> Danh sách Check-in
+                        </a></li>
+                        
+                        <li><a href="/checkin/area-management/" class="{% if request.resolver_match.url_name == 'area_management' %}active{% endif %}">
+                            <i class="fas fa-map"></i> Quản lý Khu vực
+                        </a></li>
+                        
+                        {% if user.is_admin %}
+                            <li><a href="/checkin/users/" class="{% if request.resolver_match.url_name == 'user_management' %}active{% endif %}">
+                                <i class="fas fa-users"></i> Quản lý User
+                            </a></li>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </ul>
+
+            <div class="user-info">
+                {% if user.is_authenticated %}
+                    <div class="user-avatar">
+                        {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                    </div>
+                    <div class="user-name">{{ user.get_display_name }}</div>
+                    <a href="/accounts/logout/" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </a>
+                {% else %}
+                    <a href="/accounts/login/" class="logout-btn">
+                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                    </a>
+                {% endif %}
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- Overlay for mobile menu -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        // Mobile navigation toggle
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+        const navOverlay = document.getElementById('navOverlay');
+
+        function toggleNav() {
+            navMenu.classList.toggle('active');
+            navOverlay.classList.toggle('active');
+            
+            // Debug: Log menu state
+            console.log('Menu active:', navMenu.classList.contains('active'));
+            console.log('Menu position:', window.getComputedStyle(navMenu).left);
+            
+            // Change icon
+            const icon = navToggle.querySelector('i');
+            if (navMenu.classList.contains('active')) {
+                icon.className = 'fas fa-times';
+            } else {
+                icon.className = 'fas fa-bars';
+            }
+        }
+
+        function closeNav() {
+            navMenu.classList.remove('active');
+            navOverlay.classList.remove('active');
+            navToggle.querySelector('i').className = 'fas fa-bars';
+        }
+
+        // Event listeners
+        navToggle.addEventListener('click', toggleNav);
+        navOverlay.addEventListener('click', closeNav);
+
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', closeNav);
+        });
+
+        // Close menu on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeNav();
+            }
+        });
+
+        // Close menu when clicking outside the menu
+        document.addEventListener('click', function(e) {
+            const isClickInsideMenu = navMenu.contains(e.target);
+            const isClickOnToggle = navToggle.contains(e.target);
+            const isMenuOpen = navMenu.classList.contains('active');
+            
+            if (isMenuOpen && !isClickInsideMenu && !isClickOnToggle) {
+                closeNav();
+            }
+        });
+
+        // Close menu when window is resized to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeNav();
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

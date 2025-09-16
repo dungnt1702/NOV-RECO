@@ -33,13 +33,15 @@ Dự án hệ thống check-in cho công ty NOV-RECO với các tính năng:
 - [AUTO_FEATURES.md](./AUTO_FEATURES.md) - Tính năng auto-location và auto-camera
 - [SUCCESS_PAGE.md](./SUCCESS_PAGE.md) - Trang kết quả check-in
 - [SUCCESS_PAGE_UPDATE.md](./SUCCESS_PAGE_UPDATE.md) - Cập nhật trang kết quả với lịch sử và check-in nhanh
+- [AREA_MANAGEMENT.md](./AREA_MANAGEMENT.md) - Quản lý khu vực check-in cho Admin/Manager
+- [NAVIGATION_MENU.md](./NAVIGATION_MENU.md) - Navigation menu responsive với mobile toggle
 
 ## 🏗️ **Cấu trúc dự án**
 
 ```
 checkin_project/
 ├── checkin/                 # Django app chính
-│   ├── models.py           # Models (User, Checkin, Location)
+│   ├── models.py           # Models (User, Checkin, Location, Area)
 │   ├── views.py            # Views và APIs
 │   ├── serializers.py      # DRF serializers
 │   ├── urls.py             # URL patterns
@@ -51,6 +53,7 @@ checkin_project/
 │       ├── checkin_success.html  # Trang kết quả
 │       ├── user_history.html     # Lịch sử check-in
 │       ├── quick_checkin.html    # Check-in nhanh
+│       ├── area_management.html  # Quản lý khu vực
 │       └── *.html          # Các trang khác
 ├── docs/                   # Tài liệu dự án
 │   ├── INDEX.md           # File này
@@ -85,6 +88,7 @@ checkin_project/
 5. **Truy cập:**
    - http://localhost:3000 - Trang chủ
    - http://localhost:3000/checkin/ - Check-in
+   - http://localhost:3000/checkin/area-management/ - Quản lý khu vực (Admin/Manager)
    - http://localhost:3000/admin/ - Admin panel
 
 ## 🔧 **Troubleshooting**

@@ -2,16 +2,18 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib import messages
+from django.db import models
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.decorators import api_view, permission_classes
-from .models import Location, Checkin, User, UserRole
+from .models import Location, Checkin, User, UserRole, Area
 from .serializers import (
     CheckinCreateSerializer,
     CheckinListSerializer,
     UserSerializer,
+    AreaSerializer,
 )
 from .decorators import admin_required, manager_required, employee_required
 
@@ -40,8 +42,9 @@ def admin_dashboard(request):
         "total_users": User.objects.count(),
         "total_checkins": Checkin.objects.count(),
         "total_locations": Location.objects.count(),
+        "total_areas": Area.objects.count(),
         "recent_checkins": Checkin.objects.select_related(
-            "user", "location"
+            "user", "area", "location"
         ).order_by("-created_at")[:10],
         "users_by_role": {
             "admin": User.objects.filter(role=UserRole.ADMIN).count(),
@@ -87,7 +90,7 @@ def employee_dashboard(request):
 # Check-in views
 @employee_required
 def checkin_page(request):
-    return render(request, "checkin/checkin.html")
+    return render(request, "checkin/checkin_new.html")
 
 
 # API Views
@@ -96,11 +99,22 @@ class LocationListView(ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        data = list(
+        # Lấy danh sách areas
+        areas = list(
+            Area.objects.filter(is_active=True).values(
+                "id", "name", "lat", "lng", "radius_m"
+            )
+        )
+
+        # Lấy danh sách locations
+        locations = list(
             Location.objects.filter(is_active=True).values(
                 "id", "name", "lat", "lng", "radius_m"
             )
         )
+
+        # Kết hợp và trả về
+        data = {"areas": areas, "locations": locations}
         return Response(data)
 
 
@@ -153,7 +167,7 @@ def checkin_submit_view(request):
                     "user_email": checkin.user.email,
                     "user_department": checkin.user.department or "N/A",
                     "user_employee_id": checkin.user.employee_id or "N/A",
-                    "location_name": checkin.location.name,
+                    "location_name": checkin.get_location_name(),
                     "coordinates": f"{checkin.lat:.6f}, {checkin.lng:.6f}",
                     "checkin_time": checkin.created_at.strftime(
                         "%d/%m/%Y %H:%M:%S"
@@ -195,14 +209,14 @@ def checkin_list_api(request):
 
     if user.can_view_all_checkins():
         # Admin và Manager có thể xem tất cả check-in
-        checkins = Checkin.objects.select_related("user", "location").order_by(
-            "-created_at"
-        )
+        checkins = Checkin.objects.select_related(
+            "user", "area", "location"
+        ).order_by("-created_at")
     else:
         # Nhân viên chỉ xem được check-in của mình
         checkins = (
             Checkin.objects.filter(user=user)
-            .select_related("location")
+            .select_related("area", "location")
             .order_by("-created_at")
         )
 
@@ -271,7 +285,7 @@ def user_history_api(request):
     # Base queryset
     checkins = (
         Checkin.objects.filter(user=user)
-        .select_related("location")
+        .select_related("area", "location")
         .order_by("-created_at")
     )
 
@@ -292,7 +306,11 @@ def user_history_api(request):
 
     if location_id:
         try:
-            checkins = checkins.filter(location_id=int(location_id))
+            # Filter by area or location
+            checkins = checkins.filter(
+                models.Q(area_id=int(location_id))
+                | models.Q(location_id=int(location_id))
+            )
         except ValueError:
             pass
 
@@ -320,7 +338,7 @@ def user_history_api(request):
                 "created_at": checkin.created_at.isoformat(),
                 "lat": float(checkin.lat),
                 "lng": float(checkin.lng),
-                "location_name": checkin.location.name,
+                "location_name": checkin.get_location_name(),
                 "distance_m": checkin.distance_m,
                 "note": checkin.note,
                 "photo_url": checkin.photo.url if checkin.photo else None,
@@ -347,7 +365,7 @@ def last_checkin_api(request):
     try:
         last_checkin = (
             Checkin.objects.filter(user=user)
-            .select_related("location")
+            .select_related("area", "location")
             .order_by("-created_at")
             .first()
         )
@@ -360,7 +378,7 @@ def last_checkin_api(request):
                 "id": last_checkin.id,
                 "lat": float(last_checkin.lat),
                 "lng": float(last_checkin.lng),
-                "location_name": last_checkin.location.name,
+                "location_name": last_checkin.get_location_name(),
                 "coordinates": (
                     f"{last_checkin.lat:.6f}, {last_checkin.lng:.6f}"
                 ),
@@ -389,3 +407,94 @@ def users_api(request):
     users = User.objects.filter(is_active=True).order_by("first_name")
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
+
+
+# Area Management APIs
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def areas_api(request):
+    """API để quản lý khu vực"""
+    if not (request.user.is_admin() or request.user.is_manager()):
+        return Response({"error": "Permission denied"}, status=403)
+
+    if request.method == "GET":
+        areas = Area.objects.all().order_by("-created_at")
+        serializer = AreaSerializer(areas, many=True)
+        return Response(serializer.data)
+
+    elif request.method == "POST":
+        serializer = AreaSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(created_by=request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+
+@api_view(["GET", "PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
+def area_detail_api(request, area_id):
+    """API để quản lý chi tiết khu vực"""
+    if not (request.user.is_admin() or request.user.is_manager()):
+        return Response({"error": "Permission denied"}, status=403)
+
+    try:
+        area = Area.objects.get(id=area_id)
+    except Area.DoesNotExist:
+        return Response({"error": "Khu vực không tồn tại"}, status=404)
+
+    if request.method == "GET":
+        serializer = AreaSerializer(area)
+        return Response(serializer.data)
+
+    elif request.method == "PUT":
+        serializer = AreaSerializer(area, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    elif request.method == "DELETE":
+        area.delete()
+        return Response({"message": "Khu vực đã được xóa"}, status=200)
+
+
+@admin_required
+def area_management(request):
+    """Trang quản lý khu vực cho Admin"""
+    return render(request, "checkin/area_management_new.html")
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def update_checkins_areas_api(request):
+    """API để cập nhật tất cả check-in dựa trên area hiện có"""
+    from django.core.management import call_command
+    from io import StringIO
+    import sys
+
+    if not request.user.can_view_all_checkins():
+        return Response(
+            {"error": "Không có quyền thực hiện thao tác này"}, status=403
+        )
+
+    try:
+        # Capture output
+        old_stdout = sys.stdout
+        sys.stdout = captured_output = StringIO()
+
+        # Run the command
+        call_command("update_all_checkins_areas")
+
+        # Get output
+        output = captured_output.getvalue()
+        sys.stdout = old_stdout
+
+        return Response(
+            {"message": "Đã cập nhật check-in thành công", "output": output}
+        )
+
+    except Exception as e:
+        sys.stdout = old_stdout
+        return Response(
+            {"error": f"Lỗi cập nhật check-in: {str(e)}"}, status=500
+        )

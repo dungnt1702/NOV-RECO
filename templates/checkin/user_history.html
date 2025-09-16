@@ -1,27 +1,16 @@
-<!doctype html>
-<html lang="vi">
+{% extends 'base.html' %}
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>Lịch sử Check-in - NOV-RECO</title>
-  <link rel="icon" type="image/png" href="/static/favicon.png">
-  <style>
+{% block title %}Lịch sử Check-in - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #0A5597 0%, #1D5795 50%, #F5831F 100%);
-      min-height: 100vh;
-      padding: 20px;
-    }
+    /* Body styles removed - using base.html styles */
 
     .container {
       background: white;
@@ -30,7 +19,7 @@
       padding: 40px;
       width: 100%;
       max-width: 1200px;
-      margin: 0 auto;
+      margin: 20px auto;
       position: relative;
       overflow: hidden;
     }
@@ -427,9 +416,9 @@
       }
     }
   </style>
-</head>
+{% endblock %}
 
-<body>
+{% block content %}
   <div class="container">
     <div class="header">
       <h1>📋 Lịch sử Check-in</h1>
@@ -504,8 +493,10 @@
       <a href="/checkin/dashboard/" class="btn btn-secondary">📊 Dashboard</a>
     </div>
   </div>
+{% endblock %}
 
-  <script>
+{% block extra_js %}
+<script>
     let currentPage = 1;
     let totalPages = 1;
     let checkinData = [];
@@ -687,15 +678,20 @@
         });
         
         if (response.ok) {
-          const locations = await response.json();
+          const data = await response.json();
           const locationFilter = document.getElementById('location-filter');
           
-          locations.forEach(location => {
+          // Kết hợp areas và locations thành một mảng
+          const allLocations = [...(data.areas || []), ...(data.locations || [])];
+          
+          allLocations.forEach(location => {
             const option = document.createElement('option');
             option.value = location.id;
             option.textContent = location.name;
             locationFilter.appendChild(option);
           });
+          
+          console.log('Loaded locations:', allLocations.length, 'items');
         }
       } catch (error) {
         console.error('Error loading locations:', error);
@@ -708,7 +704,5 @@
       await loadLocations();
       await loadCheckins();
     });
-  </script>
-</body>
-
-</html>
+</script>
+{% endblock %}
