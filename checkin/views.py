@@ -461,7 +461,7 @@ def area_detail_api(request, area_id):
 @admin_required
 def area_management(request):
     """Trang quản lý khu vực cho Admin"""
-    return render(request, "checkin/area_management_new.html")
+    return render(request, "checkin/area_management.html")
 
 
 @api_view(["POST"])
