@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NOV-RECO Check-in System</title>
   <link rel="icon" type="image/png" href="/static/favicon.png">
-  <!-- Google Maps API - Tạm thời tắt để tránh lỗi InvalidKey -->
-  <!-- Để sử dụng, thay YOUR_API_KEY bằng API key thực tế từ Google Cloud Console -->
-  <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap" async defer></script> -->
+  <!-- OpenStreetMap - Miễn phí, không cần API key -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     * {
       margin: 0;
@@ -426,12 +426,12 @@
       body {
         padding: 10px;
       }
-
+      
       .container {
         padding: 20px;
         border-radius: 16px;
       }
-
+      
       .header h1 {
         font-size: 24px;
       }
@@ -543,8 +543,10 @@
 
     // Global variables
     let map;
+    let marker;
     let currentPosition = null;
     let currentPhoto = null;
+    let isMapInitialized = false;
 
     // Utility functions
     function showAlert(message, type = 'error') {
@@ -561,7 +563,7 @@
       const btn = document.getElementById('btn-checkin');
       const btnText = btn.querySelector('.btn-text');
       const loadingEl = btn.querySelector('.loading');
-
+      
       if (loading) {
         btn.disabled = true;
         btnText.style.display = 'none';
@@ -589,31 +591,51 @@
       }
     }
 
-    // Initialize Google Maps
+    // Initialize OpenStreetMap
     function initMap() {
-      if (typeof google === 'undefined' || !google.maps) {
-        console.warn('Google Maps API not loaded. Using fallback location input.');
-        document.getElementById('map').innerHTML = `
-          <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #f8fafc; color: #718096; text-align: center; padding: 20px;">
-            <div>
-              <div style="font-size: 24px; margin-bottom: 8px;">🗺️</div>
-              <div>Google Maps API chưa được cấu hình</div>
-              <div style="font-size: 12px; margin-top: 4px;">Vui lòng cấu hình API key trong template</div>
-            </div>
+      try {
+        // Initialize map centered on Ho Chi Minh City
+        map = L.map('map').setView([10.8231, 106.6297], 15);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          maxZoom: 19
+        }).addTo(map);
+
+        // Add click listener to map (disabled for manual editing)
+        map.on('click', (event) => {
+          // Users cannot manually edit position - this is intentional
+          // Only GPS location is allowed
+          console.log('Map clicked, but manual position editing is disabled');
+        });
+
+        isMapInitialized = true;
+        console.log('OpenStreetMap initialized successfully');
+      } catch (error) {
+        console.error('Error initializing map:', error);
+        // Show fallback message
+        const mapContainer = document.getElementById('map');
+        mapContainer.innerHTML = `
+          <div style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            color: #6c757d;
+            text-align: center;
+            padding: 20px;
+          ">
+            <div style="font-size: 48px; margin-bottom: 16px;">🗺️</div>
+            <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Không thể tải bản đồ</div>
+            <div style="font-size: 14px; color: #868e96;">Vui lòng kiểm tra kết nối internet</div>
           </div>
         `;
-        return;
       }
-      
-      map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 15,
-        center: { lat: 10.7769, lng: 106.7009 }, // Ho Chi Minh City default
-        mapTypeId: 'roadmap',
-        disableDefaultUI: true,
-        zoomControl: true,
-        streetViewControl: false,
-        fullscreenControl: false
-      });
     }
 
     // Get current position and update map
@@ -642,14 +664,18 @@
 
         currentPosition = { lat, lng };
 
-        // Update map if Google Maps is available
-        if (map && typeof google !== 'undefined' && google.maps) {
-          map.setCenter({ lat, lng });
-          new google.maps.Marker({
-            position: { lat, lng },
-            map: map,
-            title: 'Vị trí hiện tại'
-          });
+        // Update map if OpenStreetMap is available
+        if (map && isMapInitialized) {
+          map.setView([lat, lng], 16);
+          
+          // Remove existing marker if any
+          if (marker) {
+            map.removeLayer(marker);
+          }
+          
+          // Add new marker
+          marker = L.marker([lat, lng]).addTo(map);
+          marker.bindPopup('Vị trí hiện tại').openPopup();
         }
 
         // Update coordinates display
@@ -658,18 +684,18 @@
         showAlert('Đã lấy vị trí thành công!', 'success');
 
       } catch (error) {
-        let message = 'Không lấy được vị trí. ';
+            let message = 'Không lấy được vị trí. ';
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            message += 'Vui lòng cho phép truy cập vị trí.';
-            break;
+                message += 'Vui lòng cho phép truy cập vị trí.';
+                break;
           case error.POSITION_UNAVAILABLE:
-            message += 'Vị trí hiện tại không khả dụng.';
-            break;
+                message += 'Vị trí hiện tại không khả dụng.';
+                break;
           case error.TIMEOUT:
-            message += 'Hết thời gian chờ lấy vị trí.';
-            break;
-          default:
+                message += 'Hết thời gian chờ lấy vị trí.';
+                break;
+              default:
             message += error.message;
         }
         showAlert(message, 'error');
@@ -724,16 +750,16 @@
     // Form submit handler
     document.getElementById('checkin-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-
+      
       try {
         setLoading(true);
-
+        
         // Validate form
         if (!currentPosition) {
           showAlert('Vui lòng lấy vị trí trước khi check-in.', 'error');
           return;
         }
-
+        
         if (!currentPhoto) {
           showAlert('Vui lòng chụp ảnh check-in.', 'error');
           return;
@@ -747,20 +773,20 @@
         form.append('photo', currentPhoto);
 
         // Submit check-in
-        const r = await api('/checkin/submit/', {
-          method: 'POST',
-          body: form
+        const r = await api('/checkin/submit/', { 
+          method: 'POST', 
+          body: form 
         });
-
+        
         const data = await r.json();
-
+        
         if (!r.ok) {
           throw new Error(data.detail || JSON.stringify(data));
         }
 
         // Success
         showAlert('Check-in thành công! 🎉', 'success');
-
+        
         // Reset form
         document.getElementById('checkin-form').reset();
         currentPosition = null;
@@ -773,7 +799,7 @@
         document.getElementById('camera-preview').classList.remove('has-image');
         document.getElementById('btn-capture').style.display = 'block';
         document.getElementById('btn-retake').style.display = 'none';
-
+        
       } catch (error) {
         showAlert(error.message || 'Có lỗi xảy ra. Vui lòng thử lại.', 'error');
       } finally {
@@ -787,7 +813,7 @@
     // Initialize everything
     window.addEventListener('load', () => {
       loadUserInfo();
-      // Initialize map (will show fallback message if Google Maps not available)
+      // Initialize OpenStreetMap (no API key needed)
       initMap();
       initCamera();
     });
