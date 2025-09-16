@@ -4,12 +4,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>NOV-RECO Check-in System</title>
   <link rel="icon" type="image/png" href="/static/favicon.png">
   <!-- OpenStreetMap - Miễn phí, không cần API key -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
+    /* Version: 2025-09-16-01 - Force reload */
     * {
       margin: 0;
       padding: 0;
@@ -30,11 +34,95 @@
       background: white;
       border-radius: 20px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      padding: 30px;
+      padding: 20px;
       width: 100%;
       max-width: 500px;
       position: relative;
       overflow: hidden;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 15px;
+        border-radius: 15px;
+        margin: 0;
+      }
+      
+      .map-container {
+        height: 250px;
+      }
+      
+      .map-controls {
+        margin-top: 15px;
+        margin-bottom: 35px;
+      }
+      
+      .form-group {
+        margin-bottom: 18px;
+      }
+      
+      .camera-container {
+        margin-top: 12px;
+        margin-bottom: 22px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 10px;
+        border-radius: 10px;
+      }
+      
+      .map-container {
+        height: 280px;
+      }
+      
+      .camera-container {
+        height: 200px;
+        margin-top: 15px;
+        margin-bottom: 25px;
+      }
+      
+      .form-group {
+        margin-bottom: 20px;
+      }
+      
+      .form-label {
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+      
+      .btn {
+        padding: 10px 15px;
+        font-size: 14px;
+      }
+      
+      .map-controls {
+        margin-top: 20px;
+        margin-bottom: 40px;
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+      }
+      
+      .btn-get-location {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+      }
+      
+      .coordinates {
+        text-align: center;
+        font-size: 12px;
+        padding: 8px;
+        background: #f7fafc;
+        border-radius: 6px;
+      }
     }
 
     .container::before {
@@ -236,6 +324,12 @@
       color: #742a2a;
     }
 
+    .alert-info {
+      background: #e6f3ff;
+      border: 1px solid #90cdf4;
+      color: #2c5282;
+    }
+
     .location-info {
       background: #f7fafc;
       border: 1px solid #e2e8f0;
@@ -307,7 +401,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 10px;
+      margin-top: 15px;
+      margin-bottom: 30px; /* Tăng khoảng cách giữa map và camera */
+      padding: 0 5px;
     }
 
     .btn-get-location {
@@ -343,6 +439,7 @@
     .camera-container {
       position: relative;
       margin-bottom: 20px;
+      margin-top: 10px;
     }
 
     .camera-preview {
@@ -357,6 +454,7 @@
       flex-direction: column;
       cursor: pointer;
       transition: all 0.3s ease;
+      user-select: none;
     }
 
     .camera-preview:hover {
@@ -482,6 +580,7 @@
     </div>
 
     <form id="checkin-form">
+      {% csrf_token %}
       <!-- Google Maps -->
       <div class="form-group">
         <label class="form-label">📍 Vị trí hiện tại</label>
@@ -536,10 +635,18 @@
   </div>
 
   <script>
-    const api = (p, opt = {}) => fetch(p, Object.assign({
-      headers: { 'X-Requested-With': 'XMLHttpRequest' },
-      credentials: 'include'
-    }, opt));
+    const api = (p, opt = {}) => {
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+      const headers = { 
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': csrfToken
+      };
+      
+      return fetch(p, Object.assign({
+        headers,
+        credentials: 'include'
+      }, opt));
+    };
 
     // Global variables
     let map;
@@ -579,6 +686,16 @@
     async function loadUserInfo() {
       try {
         const response = await api('/checkin/user-info/');
+        
+        // Check if redirected to login
+        if (response.status === 302 || response.url.includes('/accounts/login/')) {
+          showAlert('Bạn cần đăng nhập để sử dụng hệ thống. Vui lòng đăng nhập lại.', 'error');
+          setTimeout(() => {
+            window.location.href = '/accounts/login/';
+          }, 2000);
+          return;
+        }
+        
         const user = await response.json();
 
         document.getElementById('user-name').textContent = user.display_name || 'N/A';
@@ -587,7 +704,10 @@
         document.getElementById('user-email').textContent = user.email || 'N/A';
       } catch (error) {
         console.error('Error loading user info:', error);
-        showAlert('Không thể tải thông tin người dùng', 'error');
+        showAlert('Không thể tải thông tin người dùng. Vui lòng đăng nhập lại.', 'error');
+        setTimeout(() => {
+          window.location.href = '/accounts/login/';
+        }, 2000);
       }
     }
 
@@ -639,12 +759,14 @@
     }
 
     // Get current position and update map
-    async function getCurrentLocation() {
+    async function getCurrentLocation(showButton = true) {
       const btn = document.getElementById('btn-get-location');
       const coordinates = document.getElementById('coordinates');
 
-      btn.disabled = true;
-      btn.textContent = '🔄 Đang lấy vị trí...';
+      if (showButton) {
+        btn.disabled = true;
+        btn.textContent = '🔄 Đang lấy vị trí...';
+      }
 
       try {
         if (!navigator.geolocation) {
@@ -681,7 +803,9 @@
         // Update coordinates display
         coordinates.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 
-        showAlert('Đã lấy vị trí thành công!', 'success');
+        if (showButton) {
+          showAlert('Đã lấy vị trí thành công!', 'success');
+        }
 
       } catch (error) {
             let message = 'Không lấy được vị trí. ';
@@ -699,23 +823,40 @@
             message += error.message;
         }
         showAlert(message, 'error');
+        throw error; // Re-throw for auto-location
       } finally {
-        btn.disabled = false;
-        btn.textContent = '📍 Lấy tọa độ';
+        if (showButton) {
+          btn.disabled = false;
+          btn.textContent = '📍 Lấy tọa độ';
+        }
       }
     }
 
     // Camera functions
+    let stream = null;
+    let video = null;
+    let canvas = null;
+
     function initCamera() {
       const cameraPreview = document.getElementById('camera-preview');
       const btnCapture = document.getElementById('btn-capture');
       const btnRetake = document.getElementById('btn-retake');
-      const photoInput = document.getElementById('photo');
 
-      // Capture photo
-      btnCapture.addEventListener('click', () => {
-        photoInput.click();
-      });
+      // Open camera function
+      const openCameraHandler = async () => {
+        try {
+          await openCamera();
+        } catch (error) {
+          console.error('Error opening camera:', error);
+          showAlert('Không thể mở camera. Vui lòng cho phép truy cập camera.', 'error');
+        }
+      };
+
+      // Capture photo - Open camera directly
+      btnCapture.addEventListener('click', openCameraHandler);
+
+      // Camera preview click - Open camera directly
+      cameraPreview.addEventListener('click', openCameraHandler);
 
       // Retake photo
       btnRetake.addEventListener('click', () => {
@@ -727,83 +868,276 @@
         cameraPreview.classList.remove('has-image');
         btnCapture.style.display = 'block';
         btnRetake.style.display = 'none';
-        photoInput.value = '';
+        stopCamera();
+        
+        // Re-add click listener for camera preview
+        cameraPreview.addEventListener('click', openCameraHandler);
       });
+    }
 
-      // Handle photo selection
-      photoInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          currentPhoto = file;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            cameraPreview.innerHTML = `<img src="${e.target.result}" alt="Captured photo">`;
-            cameraPreview.classList.add('has-image');
-            btnCapture.style.display = 'none';
-            btnRetake.style.display = 'block';
-          };
-          reader.readAsDataURL(file);
+    // Open camera and show live preview
+    async function openCamera() {
+      try {
+        // Check if getUserMedia is supported
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error('Camera not supported');
         }
-      });
+
+        // Request camera access
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'environment', // Use back camera on mobile
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
+
+        // Create video element
+        video = document.createElement('video');
+        video.srcObject = stream;
+        video.play();
+        video.style.width = '100%';
+        video.style.height = '100%';
+        video.style.objectFit = 'cover';
+
+        // Create canvas for capturing
+        canvas = document.createElement('canvas');
+        canvas.width = 1280;
+        canvas.height = 720;
+
+        // Update preview
+        const cameraPreview = document.getElementById('camera-preview');
+        cameraPreview.innerHTML = '';
+        cameraPreview.appendChild(video);
+        cameraPreview.classList.add('has-image');
+
+        // Update buttons
+        const btnCapture = document.getElementById('btn-capture');
+        const btnRetake = document.getElementById('btn-retake');
+        btnCapture.textContent = '📸 Chụp ảnh';
+        btnCapture.style.display = 'block';
+        btnRetake.style.display = 'none';
+
+        // Add capture functionality
+        btnCapture.onclick = capturePhoto;
+
+      } catch (error) {
+        console.error('Camera error:', error);
+        throw error;
+      }
+    }
+
+    // Capture photo from video stream
+    function capturePhoto() {
+      if (!video || !canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Convert to blob
+      canvas.toBlob((blob) => {
+        if (blob) {
+          // Create a File object with proper name and extension
+          const file = new File([blob], 'checkin_photo.jpg', {
+            type: 'image/jpeg',
+            lastModified: Date.now()
+          });
+          
+          currentPhoto = file;
+          
+          // Show captured image
+          const cameraPreview = document.getElementById('camera-preview');
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(blob);
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.objectFit = 'cover';
+          cameraPreview.innerHTML = '';
+          cameraPreview.appendChild(img);
+
+          // Update buttons
+          const btnCapture = document.getElementById('btn-capture');
+          const btnRetake = document.getElementById('btn-retake');
+          btnCapture.style.display = 'none';
+          btnRetake.style.display = 'block';
+
+          // Stop camera
+          stopCamera();
+          
+          showAlert('Đã chụp ảnh thành công!', 'success');
+        }
+      }, 'image/jpeg', 0.8);
+    }
+
+    // Stop camera stream
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      if (video) {
+        try {
+          video.pause();
+          video.srcObject = null;
+        } catch (error) {
+          console.log('Video pause error (ignored):', error.message);
+        }
+        video = null;
+      }
     }
 
     // Form submit handler
     document.getElementById('checkin-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      console.log('Form submitted');
       
       try {
         setLoading(true);
+        console.log('Loading started');
         
-        // Validate form
+        // Auto-get position if not available
         if (!currentPosition) {
-          showAlert('Vui lòng lấy vị trí trước khi check-in.', 'error');
-          return;
+          console.log('No position - auto getting location');
+          showAlert('📍 Đang tự động lấy vị trí...', 'info');
+          try {
+            await getCurrentLocation(false); // Don't show button updates
+            if (!currentPosition) {
+              showAlert('⚠️ Không thể lấy vị trí. Vui lòng cho phép truy cập vị trí.', 'error');
+              setLoading(false);
+              return;
+            }
+          } catch (error) {
+            showAlert('⚠️ Không thể lấy vị trí. Vui lòng cho phép truy cập vị trí.', 'error');
+            setLoading(false);
+            return;
+          }
         }
         
+        // Auto-open camera if no photo
         if (!currentPhoto) {
-          showAlert('Vui lòng chụp ảnh check-in.', 'error');
-          return;
+          console.log('No photo - auto opening camera');
+          showAlert('📷 Vui lòng chụp ảnh check-in...', 'info');
+          try {
+            await openCamera();
+            // Wait for user to take photo
+            return; // Exit here, user will need to click submit again after taking photo
+          } catch (error) {
+            showAlert('⚠️ Không thể mở camera. Vui lòng cho phép truy cập camera.', 'error');
+            setLoading(false);
+            return;
+          }
         }
+        
+        console.log('Validation passed, submitting...');
 
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // Get current timestamp
+        const now = new Date();
+        const checkinTime = now.toISOString();
+        const checkinTimeFormatted = now.toLocaleString('vi-VN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+        
+        console.log('Check-in time:', checkinTimeFormatted);
+        
         // Prepare form data
         const form = new FormData();
         form.append('lat', currentPosition.lat);
         form.append('lng', currentPosition.lng);
         form.append('note', document.getElementById('note').value);
         form.append('photo', currentPhoto);
+        form.append('checkin_time', checkinTime);
+        form.append('csrfmiddlewaretoken', csrfToken);
 
         // Submit check-in
-        const r = await api('/checkin/submit/', { 
+        console.log('Sending request to /checkin/submit/');
+        const r = await fetch('/checkin/submit/', { 
           method: 'POST', 
-          body: form 
+          body: form,
+          credentials: 'include'
         });
         
-        const data = await r.json();
+        console.log('Response status:', r.status);
+        console.log('Response URL:', r.url);
+        console.log('Response headers:', [...r.headers.entries()]);
+        
+        // Check if redirected to login
+        if (r.status === 302 || r.url.includes('/accounts/login/')) {
+          console.log('Redirected to login');
+          throw new Error('Bạn cần đăng nhập để thực hiện check-in. Vui lòng đăng nhập lại.');
+        }
+        
+        // Check if redirected to success page
+        if (r.status === 302 && r.url.includes('/checkin/success/')) {
+          console.log('Redirected to success page');
+          // Redirect to success page
+          window.location.href = r.url;
+          return;
+        }
         
         if (!r.ok) {
-          throw new Error(data.detail || JSON.stringify(data));
+          console.log('Response not OK, trying to parse error');
+          try {
+            const data = await r.json();
+            console.log('Error data:', data);
+            throw new Error(data.detail || JSON.stringify(data));
+          } catch (parseError) {
+            console.log('Could not parse error response:', parseError);
+            throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+          }
         }
 
-        // Success
-        showAlert('Check-in thành công! 🎉', 'success');
+        // If not redirected, show success message
+        console.log('Showing success message');
+        showAlert(`Check-in thành công! 🎉\nThời gian: ${checkinTimeFormatted}`, 'success');
         
         // Reset form
         document.getElementById('checkin-form').reset();
         currentPosition = null;
         currentPhoto = null;
         document.getElementById('coordinates').textContent = 'Chưa có vị trí';
-        document.getElementById('camera-preview').innerHTML = `
+        
+        // Stop camera if running
+        stopCamera();
+        
+        // Reset camera preview
+        const cameraPreview = document.getElementById('camera-preview');
+        cameraPreview.innerHTML = `
           <div class="camera-icon">📷</div>
           <div class="camera-text">Chạm để chụp ảnh</div>
         `;
-        document.getElementById('camera-preview').classList.remove('has-image');
-        document.getElementById('btn-capture').style.display = 'block';
-        document.getElementById('btn-retake').style.display = 'none';
+        cameraPreview.classList.remove('has-image');
+        
+        // Reset buttons
+        const btnCapture = document.getElementById('btn-capture');
+        const btnRetake = document.getElementById('btn-retake');
+        btnCapture.textContent = '📷 Chụp ảnh';
+        btnCapture.style.display = 'block';
+        btnRetake.style.display = 'none';
+        
+        // Re-add click listener for camera preview
+        cameraPreview.addEventListener('click', async () => {
+          try {
+            await openCamera();
+          } catch (error) {
+            console.error('Error opening camera:', error);
+            showAlert('Không thể mở camera. Vui lòng cho phép truy cập camera.', 'error');
+          }
+        });
         
       } catch (error) {
+        console.error('Submit error:', error);
         showAlert(error.message || 'Có lỗi xảy ra. Vui lòng thử lại.', 'error');
       } finally {
         setLoading(false);
+        console.log('Loading finished');
       }
     });
 
@@ -816,6 +1150,11 @@
       // Initialize OpenStreetMap (no API key needed)
       initMap();
       initCamera();
+    });
+
+    // Cleanup camera when page is unloaded
+    window.addEventListener('beforeunload', () => {
+      stopCamera();
     });
   </script>
 </body>

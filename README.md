@@ -2,115 +2,79 @@
 
 Hệ thống check-in thông minh với phân quyền người dùng và quản lý địa điểm.
 
+## 🚀 Quick Start
+
+### 1. Cài đặt dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Chạy migrations
+```bash
+python manage.py migrate
+```
+
+### 3. Tạo admin
+```bash
+python manage.py create_admin
+```
+
+### 4. Khởi động server
+```bash
+python manage.py runserver 3000
+```
+
+### 5. Truy cập
+- **URL**: http://localhost:3000
+- **Admin**: admin@nov-reco.com / admin123
+
+## 📚 Tài liệu
+
+Tất cả tài liệu chi tiết được tổ chức trong thư mục [`docs/`](./docs/):
+
+- **[INDEX.md](./docs/INDEX.md)** - Danh mục tài liệu đầy đủ
+- **[README.md](./docs/README.md)** - Hướng dẫn cài đặt chi tiết
+- **[GOOGLE_MAPS_SETUP.md](./docs/GOOGLE_MAPS_SETUP.md)** - Cài đặt Google Maps
+- **[OPENSTREETMAP_SETUP.md](./docs/OPENSTREETMAP_SETUP.md)** - Cài đặt OpenStreetMap
+- **[DEBUG_CHECKIN.md](./docs/DEBUG_CHECKIN.md)** - Debug check-in
+- **[RESPONSIVE_TEST.md](./docs/RESPONSIVE_TEST.md)** - Test responsive
+- **[SUCCESS_PAGE.md](./docs/SUCCESS_PAGE.md)** - Trang kết quả check-in
+- **[SUCCESS_PAGE_UPDATE.md](./docs/SUCCESS_PAGE_UPDATE.md)** - Cập nhật trang kết quả
+
 ## ✨ Tính năng chính
+
 - 🔐 **Hệ thống phân quyền**: Admin, Quản lý, Nhân viên
 - 📍 **Check-in GPS**: Xác thực vị trí với bán kính cho phép
 - 📱 **Responsive Design**: Giao diện thân thiện trên mọi thiết bị
 - 📊 **Dashboard**: Thống kê và quản lý theo vai trò
 - 👥 **Quản lý người dùng**: Tạo và phân quyền tài khoản
-- 📸 **Upload ảnh**: Chụp ảnh check-in với xác thực
-- 🌐 **Google OAuth**: Đăng nhập nhanh với Google
+- 📸 **Camera**: Chụp ảnh check-in trực tiếp
+- 🗺️ **Bản đồ**: OpenStreetMap tích hợp
+- 📋 **Lịch sử**: Xem lịch sử check-in
+- ⚡ **Check-in nhanh**: Sử dụng dữ liệu từ lần trước
 
-## 🚀 Khởi động nhanh
+## 🏗️ Cấu trúc dự án
 
-### Cách 1: Tự động khởi động (Khuyến nghị)
-```bash
-# Mở terminal trong thư mục dự án và chạy:
-./quick_start.sh
+```
+checkin_project/
+├── checkin/                 # Django app chính
+├── templates/              # HTML templates
+├── docs/                   # 📚 Tài liệu dự án
+├── manage.py              # Django management
+├── requirements.txt       # Python dependencies
+└── README.md             # File này
 ```
 
-### Cách 2: Khởi động thủ công
-```bash
-# Cài đặt dependencies
-pip3 install -r requirements.txt
+## 🔧 Troubleshooting
 
-# Chạy migrations
-python3 manage.py migrate
+Nếu gặp lỗi, hãy tham khảo tài liệu trong thư mục [`docs/`](./docs/):
 
-# Tạo admin (nếu chưa có)
-python3 manage.py create_admin
+1. **Lỗi Google Maps:** Xem [GOOGLE_MAPS_SETUP.md](./docs/GOOGLE_MAPS_SETUP.md)
+2. **Lỗi camera:** Xem [CAMERA_TEST.md](./docs/CAMERA_TEST.md)
+3. **Lỗi responsive:** Xem [RESPONSIVE_TEST.md](./docs/RESPONSIVE_TEST.md)
+4. **Lỗi check-in:** Xem [DEBUG_CHECKIN.md](./docs/DEBUG_CHECKIN.md)
 
-# Khởi động server
-python3 manage.py runserver 127.0.0.1:3000
-```
+---
 
-### Cách 3: VS Code Auto Start
-1. Mở dự án trong VS Code
-2. Nhấn `Cmd+Shift+P` → "Tasks: Run Task" → "Start Django Server"
-3. Hoặc mở file `start_server.py` và nhấn F5
-
-## 🔑 Tài khoản mặc định
-- **Admin**: admin@nov-reco.com / admin123
-- **URL**: http://localhost:3000
-
-## 2) Chạy server với port tùy chỉnh
-
-### Cách 1: Sử dụng lệnh Django trực tiếp
-```bash
-# Chạy trên port 3000 (hoặc port bất kỳ)
-python manage.py runserver 0.0.0.0:3000
-
-# Chạy trên port 5000
-python manage.py runserver 0.0.0.0:5000
-```
-
-### Cách 2: Sử dụng script Python
-```bash
-# Chạy với port mặc định (3000)
-python run_server.py
-
-# Chạy với port tùy chỉnh
-python run_server.py 5000
-```
-
-### Cách 3: Sử dụng script Shell (Linux/Mac)
-```bash
-# Cấp quyền thực thi
-chmod +x start_server.sh
-
-# Chạy với port mặc định (3000)
-./start_server.sh
-
-# Chạy với port tùy chỉnh
-./start_server.sh 5000
-```
-
-### Cách 4: Sử dụng biến môi trường
-```bash
-# Thiết lập port qua biến môi trường
-export SERVER_PORT=3000
-python run_server.py
-```
-
-Sau khi chạy, truy cập: http://localhost:[PORT] (thay [PORT] bằng port bạn đã chọn)
-
-## 3) Cấu hình Google OAuth
-- Truy cập Google Cloud Console → APIs & Services → OAuth consent screen (External).
-- Tạo OAuth Client (Web application):
-  - Authorized redirect URIs:
-    - http://127.0.0.1:3000/accounts/google/login/callback/
-    - http://localhost:3000/accounts/google/login/callback/
-    - http://127.0.0.1:5000/accounts/google/login/callback/
-    - http://localhost:5000/accounts/google/login/callback/
-    - (Thêm các port khác nếu bạn sử dụng)
-- Vào `/admin` → Social accounts → Social applications → Thêm Google app:
-  - Client ID / Client Secret (từ Google)
-  - Chọn Site = example.com (SITE_ID=1).
-
-> Production: thêm `https://yourdomain.com/accounts/google/login/callback/` vào Authorized redirect URIs và dùng HTTPS.
-
-## 4) Tạo địa điểm mẫu
-Vào `/admin` → Checkin → Locations → Add:
-- Name: "Điểm Check-in A"
-- lat/lng: toạ độ vị trí
-- radius_m: bán kính cho phép (ví dụ 150m)
-
-## 5) Quy trình người dùng
-1. Mở trang chủ → "Đăng nhập bằng Google".
-2. Vào `/checkin/`.
-3. Chọn địa điểm → bật GPS → chụp/tải ảnh → Gửi check-in.
-
-## 6) Tuỳ chỉnh
-- Chuyển sang PostgreSQL: sửa `DATABASES` trong `project/settings.py`.
-- Giới hạn domain email nội bộ: thêm `HOSTED_DOMAIN` trong `SOCIALACCOUNT_PROVIDERS['google']`.
-- Lưu ảnh lên S3/Cloud Storage: thay `DEFAULT_FILE_STORAGE` (không cấu hình sẵn trong mẫu).
+**Cập nhật lần cuối:** 16/09/2024  
+**Phiên bản:** 1.0.0

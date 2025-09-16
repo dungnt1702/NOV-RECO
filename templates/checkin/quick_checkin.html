@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Check-in Nhanh - NOV-RECO</title>
+  <link rel="icon" type="image/png" href="/static/favicon.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #0A5597 0%, #1D5795 50%, #F5831F 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 600px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #0A5597, #F5831F);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 16px;
+      color: #718096;
+    }
+
+    .quick-info {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    .info-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .info-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #4a5568;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-value {
+      font-size: 14px;
+      color: #2d3748;
+      font-weight: 500;
+    }
+
+    .coordinates {
+      font-family: monospace;
+      background: #edf2f7;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #0A5597;
+      box-shadow: 0 0 0 3px rgba(10, 85, 151, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0A5597 0%, #F5831F 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(10, 85, 151, 0.3);
+    }
+
+    .btn-secondary {
+      background: #f7fafc;
+      color: #4a5568;
+      border: 1px solid #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+      background: #edf2f7;
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: #718096;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .alert-success {
+      background: #c6f6d5;
+      color: #22543d;
+      border: 1px solid #9ae6b4;
+    }
+
+    .alert-error {
+      background: #fed7d7;
+      color: #742a2a;
+      border: 1px solid #feb2b2;
+    }
+
+    .alert-info {
+      background: #bee3f8;
+      color: #2a4365;
+      border: 1px solid #90cdf4;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 30px 20px;
+        border-radius: 15px;
+      }
+      
+      .header h1 {
+        font-size: 24px;
+      }
+      
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .actions {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 15px;
+        border-radius: 10px;
+      }
+      
+      .header h1 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>⚡ Check-in Nhanh</h1>
+      <p>Sử dụng dữ liệu từ lần check-in trước</p>
+    </div>
+
+    <div id="alert-container"></div>
+
+    <div class="quick-info">
+      <div class="info-title">
+        📋 Thông tin từ lần check-in trước
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">📍 Vị trí</div>
+          <div class="info-value" id="last-location">Đang tải...</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">🗺️ Tọa độ</div>
+          <div class="info-value">
+            <span class="coordinates" id="last-coordinates">Đang tải...</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">📅 Thời gian cuối</div>
+          <div class="info-value" id="last-time">Đang tải...</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">📝 Ghi chú cuối</div>
+          <div class="info-value" id="last-note">Đang tải...</div>
+        </div>
+      </div>
+    </div>
+
+    <form id="quick-checkin-form">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="note">📝 Ghi chú (tùy chọn)</label>
+        <textarea id="note" name="note" placeholder="Nhập ghi chú cho lần check-in này..."></textarea>
+      </div>
+
+      <div class="loading" id="loading">
+        <p>🔄 Đang xử lý check-in...</p>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary" id="submit-btn">
+          ⚡ Check-in Ngay
+        </button>
+        <a href="/checkin/" class="btn btn-secondary">📝 Check-in Mới</a>
+        <a href="/checkin/history/" class="btn btn-secondary">📋 Lịch sử</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    let lastCheckinData = null;
+
+    // Get URL parameters
+    function getUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        lat: params.get('lat'),
+        lng: params.get('lng'),
+        location_name: params.get('location_name'),
+        note: params.get('note')
+      };
+    }
+
+    // Load last check-in data
+    async function loadLastCheckin() {
+      try {
+        // Check if we have data from URL parameters (from success page)
+        const urlData = getUrlParams();
+        if (urlData.lat && urlData.lng) {
+          lastCheckinData = {
+            lat: parseFloat(urlData.lat),
+            lng: parseFloat(urlData.lng),
+            location_name: urlData.location_name || 'Vị trí hiện tại',
+            coordinates: `${urlData.lat}, ${urlData.lng}`,
+            checkin_time: 'Vừa xong',
+            note: urlData.note || ''
+          };
+          
+          // Update UI
+          document.getElementById('last-location').textContent = lastCheckinData.location_name;
+          document.getElementById('last-coordinates').textContent = lastCheckinData.coordinates;
+          document.getElementById('last-time').textContent = lastCheckinData.checkin_time;
+          document.getElementById('last-note').textContent = lastCheckinData.note || 'Không có ghi chú';
+          
+          // Pre-fill note if available
+          if (lastCheckinData.note) {
+            document.getElementById('note').value = lastCheckinData.note;
+          }
+          
+          return;
+        }
+        
+        // Otherwise, fetch from API
+        const response = await fetch('/checkin/last-checkin/', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          lastCheckinData = await response.json();
+          
+          // Update UI
+          document.getElementById('last-location').textContent = lastCheckinData.location_name || 'N/A';
+          document.getElementById('last-coordinates').textContent = lastCheckinData.coordinates || 'N/A';
+          document.getElementById('last-time').textContent = lastCheckinData.checkin_time || 'N/A';
+          document.getElementById('last-note').textContent = lastCheckinData.note || 'Không có ghi chú';
+          
+          // Pre-fill note if available
+          if (lastCheckinData.note) {
+            document.getElementById('note').value = lastCheckinData.note;
+          }
+        } else {
+          showAlert('Không thể tải dữ liệu check-in trước. Vui lòng thử lại.', 'error');
+        }
+      } catch (error) {
+        console.error('Error loading last checkin:', error);
+        showAlert('Lỗi tải dữ liệu. Vui lòng thử lại.', 'error');
+      }
+    }
+
+    // Show alert
+    function showAlert(message, type = 'info') {
+      const alertContainer = document.getElementById('alert-container');
+      const alertClass = `alert alert-${type}`;
+      
+      alertContainer.innerHTML = `<div class="${alertClass}">${message}</div>`;
+      
+      // Auto hide after 5 seconds
+      setTimeout(() => {
+        alertContainer.innerHTML = '';
+      }, 5000);
+    }
+
+    // Set loading state
+    function setLoading(loading) {
+      const loadingEl = document.getElementById('loading');
+      const submitBtn = document.getElementById('submit-btn');
+      
+      loadingEl.style.display = loading ? 'block' : 'none';
+      submitBtn.disabled = loading;
+      submitBtn.textContent = loading ? '🔄 Đang xử lý...' : '⚡ Check-in Ngay';
+    }
+
+    // Form submit handler
+    document.getElementById('quick-checkin-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!lastCheckinData) {
+        showAlert('Không có dữ liệu check-in trước. Vui lòng thử lại.', 'error');
+        return;
+      }
+
+      try {
+        setLoading(true);
+        
+        // Prepare form data
+        const formData = new FormData();
+        formData.append('lat', lastCheckinData.lat);
+        formData.append('lng', lastCheckinData.lng);
+        formData.append('note', document.getElementById('note').value);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        
+        // Add current time
+        const now = new Date();
+        formData.append('checkin_time', now.toISOString());
+        
+        // Submit check-in
+        const response = await fetch('/checkin/submit/', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include'
+        });
+        
+        if (response.status === 302 && response.url.includes('/checkin/success/')) {
+          // Redirect to success page
+          window.location.href = response.url;
+          return;
+        }
+        
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.detail || 'Có lỗi xảy ra khi gửi check-in');
+        }
+        
+        showAlert('Check-in thành công! 🎉', 'success');
+        
+        // Reset form
+        document.getElementById('quick-checkin-form').reset();
+        
+        // Reload last check-in data
+        await loadLastCheckin();
+        
+      } catch (error) {
+        console.error('Submit error:', error);
+        showAlert(`Lỗi: ${error.message}`, 'error');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // Initialize page
+    window.addEventListener('load', () => {
+      loadLastCheckin();
+    });
+  </script>
+</body>
+
+</html>
