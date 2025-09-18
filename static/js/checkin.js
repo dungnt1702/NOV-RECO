@@ -9,10 +9,12 @@ let stream = null;
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Checkin page loaded, initializing...');
     initializeMap();
     loadUserInfo();
     setupEventListeners();
     updateSubmitButtonState();
+    console.log('Checkin page initialization complete');
 });
 
 // Initialize map
@@ -62,10 +64,15 @@ function updateUserInfo(userData) {
 
 // Setup event listeners
 function setupEventListeners() {
+    console.log('Setting up event listeners...');
+    
     // Get location button
     const getLocationBtn = document.getElementById('btn-get-location');
     if (getLocationBtn) {
+        console.log('Location button found, adding listener');
         getLocationBtn.addEventListener('click', getCurrentLocation);
+    } else {
+        console.warn('Location button not found');
     }
     
     // Camera buttons
@@ -74,16 +81,37 @@ function setupEventListeners() {
     const cameraPreview = document.getElementById('camera-preview');
     
     if (captureBtn) {
-        captureBtn.addEventListener('click', openCameraHandler);
+        console.log('Capture button found, adding listener');
+        captureBtn.addEventListener('click', function() {
+            if (currentPhoto) {
+                // If already have photo, retake
+                retakePhoto();
+            } else if (stream) {
+                // If camera is open, capture photo
+                capturePhoto();
+            } else {
+                // If camera is not open, open it
+                openCameraHandler();
+            }
+        });
+    } else {
+        console.warn('Capture button not found');
     }
     
     if (retakeBtn) {
+        console.log('Retake button found, adding listener');
         retakeBtn.addEventListener('click', retakePhoto);
+    } else {
+        console.warn('Retake button not found');
     }
     
     if (cameraPreview) {
+        console.log('Camera preview found, adding listener');
         cameraPreview.addEventListener('click', openCameraHandler);
+    } else {
+        console.warn('Camera preview not found');
     }
+    
     
     // Form submission
     const form = document.getElementById('checkin-form');
@@ -137,18 +165,29 @@ function getCurrentLocation() {
         },
         function(error) {
             let message = 'Không thể lấy vị trí GPS';
+            let suggestion = '';
+            
             switch(error.code) {
                 case error.PERMISSION_DENIED:
                     message = 'Bị từ chối quyền truy cập vị trí';
+                    suggestion = 'Vui lòng cho phép truy cập vị trí trong cài đặt trình duyệt';
                     break;
                 case error.POSITION_UNAVAILABLE:
                     message = 'Vị trí không khả dụng';
+                    suggestion = 'Kiểm tra kết nối mạng và GPS, thử lại sau';
                     break;
                 case error.TIMEOUT:
                     message = 'Hết thời gian chờ lấy vị trí';
+                    suggestion = 'Vui lòng thử lại, có thể do tín hiệu yếu';
+                    break;
+                default:
+                    message = 'Lỗi không xác định khi lấy vị trí';
+                    suggestion = 'Vui lòng thử lại hoặc kiểm tra cài đặt vị trí';
                     break;
             }
-            showAlert(message, 'error');
+            
+            console.error('Geolocation error:', error);
+            showAlert(`${message}. ${suggestion}`, 'error');
             setLoading(btn, false);
         },
         {
@@ -161,17 +200,27 @@ function getCurrentLocation() {
 
 // Open camera handler
 function openCameraHandler() {
+    console.log('Camera button clicked');
     if (currentPhoto) {
+        console.log('Retaking photo');
         retakePhoto();
         return;
     }
     
+    console.log('Opening camera...');
     openCamera();
 }
 
 // Open camera
 async function openCamera() {
     try {
+        console.log('Requesting camera access...');
+        
+        // Check if getUserMedia is supported
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('Camera không được hỗ trợ trên trình duyệt này');
+        }
+        
         stream = await navigator.mediaDevices.getUserMedia({
             video: { 
                 facingMode: 'environment',
@@ -180,15 +229,27 @@ async function openCamera() {
             }
         });
         
+        console.log('Camera access granted, creating video element...');
+        
         const video = document.createElement('video');
+        video.id = 'video';
         video.srcObject = stream;
-        video.play();
+        video.autoplay = true;
+        video.muted = true;
+        video.playsInline = true;
+        
+        // Wait for video to be ready
+        video.onloadedmetadata = function() {
+            console.log('Video metadata loaded, playing...');
+            video.play().catch(e => console.error('Error playing video:', e));
+        };
         
         const cameraPreview = document.getElementById('camera-preview');
         if (cameraPreview) {
+            console.log('Updating camera preview...');
             cameraPreview.innerHTML = '';
             cameraPreview.appendChild(video);
-            cameraPreview.classList.add('has-photo');
+            cameraPreview.classList.add('has-photo', 'showing-video');
         }
         
         // Show capture button
@@ -198,9 +259,24 @@ async function openCamera() {
         if (captureBtn) captureBtn.textContent = '📷 Chụp ảnh';
         if (retakeBtn) retakeBtn.style.display = 'none';
         
+        updateSubmitButtonState();
+        console.log('Camera opened successfully');
+        
     } catch (error) {
-        console.error('Camera error:', error);
-        showAlert('Không thể mở camera. Vui lòng kiểm tra quyền truy cập.', 'error');
+        console.error('Error opening camera:', error);
+        let errorMessage = 'Không thể mở camera';
+        
+        if (error.name === 'NotAllowedError') {
+            errorMessage = 'Bị từ chối quyền truy cập camera. Vui lòng cho phép truy cập camera trong cài đặt trình duyệt.';
+        } else if (error.name === 'NotFoundError') {
+            errorMessage = 'Không tìm thấy camera. Vui lòng kiểm tra kết nối camera.';
+        } else if (error.name === 'NotSupportedError') {
+            errorMessage = 'Camera không được hỗ trợ trên trình duyệt này.';
+        } else {
+            errorMessage = errorMessage + ': ' + error.message;
+        }
+        
+        showAlert(errorMessage, 'error');
     }
 }
 
@@ -234,6 +310,7 @@ function capturePhoto() {
             cameraPreview.innerHTML = '';
             cameraPreview.appendChild(img);
             cameraPreview.classList.add('has-photo');
+            cameraPreview.classList.remove('showing-video');
         }
         
         // Update buttons
@@ -260,7 +337,7 @@ function retakePhoto() {
             <div class="camera-icon">📷</div>
             <div class="camera-text">Chạm để chụp ảnh</div>
         `;
-        cameraPreview.classList.remove('has-photo');
+        cameraPreview.classList.remove('has-photo', 'showing-video');
     }
     
     // Update buttons
@@ -392,6 +469,7 @@ function resetForm() {
     
     updateSubmitButtonState();
 }
+
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', function() {

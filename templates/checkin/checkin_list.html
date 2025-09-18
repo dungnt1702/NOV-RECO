@@ -91,13 +91,19 @@
 
     async function loadCheckins() {
       try {
+        console.log('Loading checkins...');
         const response = await api('/checkin/list/');
+        console.log('Response status:', response.status);
         if (response.ok) {
           const data = await response.json();
+          console.log('Data received:', data);
           allCheckins = data.results || [];
           filteredCheckins = [...allCheckins];
+          console.log('Checkins loaded:', allCheckins.length);
           renderCheckinsTable();
           loadUsers();
+        } else {
+          console.error('API error:', response.status, response.statusText);
         }
       } catch (error) {
         console.error('Error loading checkins:', error);

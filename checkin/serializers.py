@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Checkin, Location, User, Area
+from .models import Checkin, Location, Area
+from users.models import User
 from .utils import haversine_m
 
 
@@ -74,8 +75,12 @@ class CheckinCreateSerializer(serializers.ModelSerializer):
         loc = validated.pop("_location", None)
         dist = validated.pop("_distance_m")
 
-        # Sử dụng checkin_time nếu có
+        # Sử dụng checkin_time nếu có, nếu không thì dùng thời gian hiện tại
         checkin_time = validated.pop("checkin_time", None)
+        if checkin_time is None:
+            from django.utils import timezone
+
+            checkin_time = timezone.now()
 
         return Checkin.objects.create(
             user=user,
@@ -97,7 +102,7 @@ class CheckinListSerializer(serializers.ModelSerializer):
     user_email = serializers.CharField(source="user.email", read_only=True)
     location_name = serializers.SerializerMethodField()
     created_at = serializers.DateTimeField(
-        format="%d/%m/%Y %H:%M", read_only=True
+        format="%Y-%m-%d %H:%M:%S", read_only=True
     )
 
     class Meta:
@@ -152,6 +157,9 @@ class UserSerializer(serializers.ModelSerializer):
     display_name = serializers.CharField(
         source="get_display_name", read_only=True
     )
+    role_display = serializers.CharField(
+        source="get_role_display", read_only=True
+    )
 
     class Meta:
         model = User
@@ -162,6 +170,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "display_name",
             "role",
+            "role_display",
             "phone",
             "department",
             "employee_id",

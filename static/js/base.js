@@ -140,14 +140,36 @@ function setLoading(element, loading = true) {
 
 // Format date for display
 function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    if (!dateString) return 'N/A';
+    
+    try {
+        // Parse the date string directly (format: YYYY-MM-DD HH:MM:SS)
+        const [datePart, timePart] = dateString.split(' ');
+        const [year, month, day] = datePart.split('-');
+        const [hour, minute, second] = timePart.split(':');
+        
+        // Create date object with Vietnam timezone
+        const date = new Date(year, month - 1, day, hour, minute, second);
+        
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
+            console.warn('Invalid date string:', dateString);
+            return 'Ngày không hợp lệ';
+        }
+        
+        // Format the date in Vietnamese format
+        return date.toLocaleDateString('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    } catch (error) {
+        console.error('Error formatting date:', error, 'Input:', dateString);
+        return 'Lỗi định dạng ngày';
+    }
 }
 
 // Format distance

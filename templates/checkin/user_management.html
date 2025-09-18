@@ -55,7 +55,6 @@
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/base.js' %}"></script>
   <script>
     // User management JavaScript
     async function loadUsers() {
@@ -111,6 +110,9 @@
     }
 
     // Load users on page load
-    document.addEventListener('DOMContentLoaded', loadUsers);
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('User management page loaded');
+      loadUsers();
+    });
   </script>
 {% endblock %}

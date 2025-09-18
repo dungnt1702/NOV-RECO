@@ -5,7 +5,6 @@ from .views import (
     LocationListView,
     checkin_submit_view,
     checkin_list_api,
-    user_management,
     user_info_api,
     checkin_list_view,
     users_api,
@@ -45,6 +44,4 @@ urlpatterns = [
         update_checkins_areas_api,
         name="update_checkins_areas",
     ),
-    # User Management (Admin only)
-    path("users/", user_management, name="user_management"),
 ]

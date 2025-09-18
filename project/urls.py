@@ -10,10 +10,11 @@ urlpatterns = (
         path("accounts/", include("allauth.urls")),  # Google Sign-In routes
         path(
             "",
-            TemplateView.as_view(template_name="home_new.html"),
+            TemplateView.as_view(template_name="home.html"),
             name="home",
         ),
         path("checkin/", include("checkin.urls")),  # UI + APIs for check-in
+        path("users/", include("users.urls")),  # User management
     ]
     + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

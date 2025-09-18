@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load socialaccount %}
+
+{% block title %}Đăng nhập{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-container">
+    <div class="auth-header">
+      <img src="{% static 'logo.svg' %}" alt="NOV-RECO Logo" class="auth-logo">
+      <h1>Đăng nhập</h1>
+      <p>Chào mừng bạn quay trở lại!</p>
+    </div>
+
+    <div class="auth-form-container">
+      {% if form.errors %}
+        <div class="alert alert-error">
+          <i class="fas fa-exclamation-triangle"></i>
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="POST" class="auth-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <label for="{{ form.login.id_for_label }}">
+            <i class="fas fa-envelope"></i>
+            Email hoặc Tên đăng nhập
+          </label>
+          {{ form.login }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.password.id_for_label }}">
+            <i class="fas fa-lock"></i>
+            Mật khẩu
+          </label>
+          {{ form.password }}
+        </div>
+
+        {% if form.remember %}
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            {{ form.remember }}
+            <span class="checkbox-text">Ghi nhớ đăng nhập</span>
+          </label>
+        </div>
+        {% endif %}
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-full">
+            <i class="fas fa-sign-in-alt"></i>
+            Đăng nhập
+          </button>
+        </div>
+
+        <div class="auth-links">
+          <a href="{% url 'account_reset_password' %}" class="auth-link">
+            <i class="fas fa-key"></i>
+            Quên mật khẩu?
+          </a>
+          <a href="{% url 'account_signup' %}" class="auth-link">
+            <i class="fas fa-user-plus"></i>
+            Tạo tài khoản mới
+          </a>
+        </div>
+      </form>
+
+      {% if socialaccount_providers %}
+      <div class="social-login">
+        <div class="divider">
+          <span>Hoặc đăng nhập với</span>
+        </div>
+        
+        {% for provider in socialaccount_providers %}
+          <a href="{% provider_login_url provider.id %}" class="btn btn-social btn-{{ provider.id }}">
+            <i class="fab fa-{{ provider.id }}"></i>
+            {{ provider.name }}
+          </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/auth.js' %}"></script>
+{% endblock %}

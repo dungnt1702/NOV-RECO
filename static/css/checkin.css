@@ -149,6 +149,7 @@
     margin-top: 10px;
 }
 
+
 .map-label {
     font-size: 14px;
     font-weight: 600;
@@ -178,6 +179,7 @@
     transform: none;
 }
 
+
 .coordinates {
     font-size: 12px;
     color: #718096;
@@ -200,6 +202,7 @@
 
 .camera-preview {
     width: 100%;
+    min-height: 200px;
     height: 200px;
     background: #f8fafc;
     border: 2px dashed #cbd5e0;
@@ -240,6 +243,28 @@
     display: flex;
     gap: 10px;
     margin-top: 10px;
+}
+
+/* Video element styles */
+#video {
+    width: 100%;
+    min-height: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    background: #000;
+}
+
+/* Camera preview when showing video */
+.camera-preview.showing-video {
+    padding: 0;
+    background: #000;
+    border: 2px solid #0A5597;
+}
+
+.camera-preview.showing-video .camera-icon,
+.camera-preview.showing-video .camera-text {
+    display: none;
 }
 
 .btn-camera {
@@ -314,6 +339,7 @@
 .btn-checkin.loading .loading {
     display: flex;
 }
+
 
 /* Responsive design */
 @media (max-width: 768px) {

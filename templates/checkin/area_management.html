@@ -1,564 +1,145 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Khu vực - NOV-RECO</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends 'base.html' %}
+{% load static %}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+{% block title %}Quản lý Khu vực - NOV-RECO{% endblock %}
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/area_management.css' %}">
+{% endblock %}
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: #2196F3;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #1976D2;
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background: #f44336;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #da190b;
-            transform: translateY(-2px);
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .area-form {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            border: 2px solid #e9ecef;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-        }
-
-        .map-container {
-            height: 400px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 2px solid #ddd;
-        }
-
-        .area-list {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .area-item {
-            padding: 20px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.3s ease;
-        }
-
-        .area-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .area-item:last-child {
-            border-bottom: none;
-        }
-
-        .area-info h3 {
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .area-info p {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .area-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 0.9rem;
-        }
-
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .area-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            
-            .area-actions {
-                width: 100%;
-                justify-content: flex-end;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-map-marker-alt"></i> Quản lý Khu vực</h1>
-            <p>Định nghĩa các khu vực check-in cho nhân viên</p>
-            <div class="nav-buttons">
-                <a href="/checkin/dashboard/" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Quay lại Dashboard
-                </a>
-                <a href="/checkin/list-view/" class="btn btn-primary">
-                    <i class="fas fa-list"></i> Xem Check-in
-                </a>
-            </div>
+{% block content %}
+<div class="area-management-page">
+    <div class="area-management-container">
+        <div class="area-management-header">
+            <h1 class="area-management-title">
+                <i class="fas fa-map-marked-alt"></i> Quản lý Khu vực
+            </h1>
+            <p class="area-management-subtitle">
+                Định nghĩa và quản lý các khu vực check-in
+            </p>
         </div>
 
-        <div class="content">
-            <!-- Form tạo khu vực -->
-            <div class="area-form">
-                <h2><i class="fas fa-plus-circle"></i> Tạo Khu vực Mới</h2>
-                <form id="areaForm">
-                    <div class="form-group">
-                        <label for="name">Tên khu vực *</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="description">Mô tả</label>
-                        <textarea id="description" name="description" rows="3"></textarea>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="lat">Vĩ độ *</label>
-                            <input type="number" id="lat" name="lat" step="any" required>
+        <div class="area-management-content">
+            <!-- Action Buttons -->
+            <div style="margin-bottom: 30px; text-align: center;">
+                <button id="addAreaBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Thêm Khu vực Mới
+                </button>
+                <button id="updateCheckinsBtn" class="btn btn-success">
+                    <i class="fas fa-sync"></i> Cập nhật Check-in
+                </button>
+            </div>
+
+            <!-- Form for adding/editing areas -->
+            <div id="areaForm" class="area-management-section" style="display: none;">
+                <h3>
+                    <i class="fas fa-edit"></i> 
+                    <span id="formTitle">Thêm Khu vực Mới</span>
+                </h3>
+                <form id="areaFormElement">
+                    {% csrf_token %}
+                    <div class="area-management-grid">
+                        <div>
+                            <div class="form-group">
+                                <label for="name">Tên khu vực *</label>
+                                <input type="text" id="name" name="name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Mô tả</label>
+                                <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="radius_m">Bán kính (mét) *</label>
+                                <input type="number" id="radius_m" name="radius_m" class="form-control" value="100" min="10" max="10000" required>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="is_active" name="is_active" checked> 
+                                    Khu vực hoạt động
+                                </label>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="lng">Kinh độ *</label>
-                            <input type="number" id="lng" name="lng" step="any" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="radius_m">Bán kính (mét) *</label>
-                            <input type="number" id="radius_m" name="radius_m" min="10" max="10000" value="100" required>
+                        <div>
+                            <div class="form-group">
+                                <label for="lat">Vĩ độ *</label>
+                                <input type="number" id="lat" name="lat" class="form-control" step="any" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lng">Kinh độ *</label>
+                                <input type="number" id="lng" name="lng" class="form-control" step="any" required>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" id="getCurrentLocationBtn" class="btn btn-info btn-sm" style="width: 100%; margin-top: 10px;">
+                                    <i class="fas fa-location-arrow"></i> Lấy vị trí hiện tại
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <p style="color: #6c757d; font-size: 0.9rem; margin-top: 10px;">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Nhấp vào bản đồ hoặc sử dụng nút trên để chọn vị trí khu vực
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Bản đồ (Click để chọn vị trí)</label>
-                        <div id="map" class="map-container"></div>
-                    </div>
-                    
-                    <div class="form-group">
+                    <div style="text-align: center; margin-top: 20px;">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Tạo Khu vực
+                            <i class="fas fa-save"></i> Lưu Khu vực
                         </button>
-                        <button type="button" id="clearForm" class="btn btn-secondary">
-                            <i class="fas fa-eraser"></i> Xóa Form
+                        <button type="button" class="btn btn-danger" onclick="cancelEdit()">
+                            <i class="fas fa-times"></i> Hủy
                         </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Danh sách khu vực -->
-            <div class="area-list">
-                <div style="padding: 20px; background: #f8f9fa; border-bottom: 1px solid #eee;">
-                    <h2><i class="fas fa-list"></i> Danh sách Khu vực</h2>
+            <!-- Main Content Grid -->
+            <div class="area-management-grid">
+                <!-- Map Section -->
+                <div class="area-management-section">
+                    <h3>
+                        <i class="fas fa-map"></i> Bản đồ Khu vực
+                    </h3>
+                    <div id="map" class="map-container"></div>
                 </div>
-                <div id="areaList">
-                    <div class="loading">
-                        <i class="fas fa-spinner fa-spin"></i> Đang tải...
+
+                <!-- Areas List Section -->
+                <div class="area-management-section">
+                    <h3>
+                        <i class="fas fa-list"></i> Danh sách Khu vực
+                    </h3>
+                    <div id="areasList" class="areas-list">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        let map;
-        let marker;
-        let areas = [];
-
-        // Khởi tạo bản đồ
-        function initMap() {
-            map = L.map('map').setView([20.9970, 105.8028], 13);
-            
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            // Click để chọn vị trí
-            map.on('click', function(e) {
-                const lat = e.latlng.lat;
-                const lng = e.latlng.lng;
-                
-                document.getElementById('lat').value = lat.toFixed(6);
-                document.getElementById('lng').value = lng.toFixed(6);
-                
-                if (marker) {
-                    map.removeLayer(marker);
-                }
-                
-                marker = L.marker([lat, lng]).addTo(map);
-                updateRadiusCircle(lat, lng);
-            });
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'js/area_management.js' %}"></script>
+<script>
+// Additional functions for the template
+function cancelEdit() {
+    document.getElementById('areaForm').style.display = 'none';
+    isEditing = false;
+    currentArea = null;
+    
+    // Clear map editing markers
+    map.eachLayer(layer => {
+        if (layer.options && layer.options.isEditing) {
+            map.removeLayer(layer);
         }
-
-        // Cập nhật vòng tròn bán kính
-        function updateRadiusCircle(lat, lng) {
-            const radius = parseInt(document.getElementById('radius_m').value) || 100;
-            
-            if (window.radiusCircle) {
-                map.removeLayer(window.radiusCircle);
-            }
-            
-            window.radiusCircle = L.circle([lat, lng], {
-                color: '#667eea',
-                fillColor: '#667eea',
-                fillOpacity: 0.2,
-                radius: radius
-            }).addTo(map);
-        }
-
-        // Load danh sách khu vực
-        async function loadAreas() {
-            try {
-                const response = await fetch('/checkin/areas/', {
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                });
-                
-                if (response.ok) {
-                    areas = await response.json();
-                    renderAreas();
-                } else {
-                    throw new Error('Lỗi tải danh sách khu vực');
-                }
-            } catch (error) {
-                document.getElementById('areaList').innerHTML = 
-                    `<div class="error">Lỗi: ${error.message}</div>`;
-            }
-        }
-
-        // Render danh sách khu vực
-        function renderAreas() {
-            const container = document.getElementById('areaList');
-            
-            if (areas.length === 0) {
-                container.innerHTML = '<div class="loading">Chưa có khu vực nào</div>';
-                return;
-            }
-            
-            container.innerHTML = areas.map(area => `
-                <div class="area-item">
-                    <div class="area-info">
-                        <h3>${area.name}</h3>
-                        <p><strong>Vị trí:</strong> ${area.lat.toFixed(6)}, ${area.lng.toFixed(6)}</p>
-                        <p><strong>Bán kính:</strong> ${area.radius_m}m</p>
-                        <p><strong>Tạo bởi:</strong> ${area.created_by_name}</p>
-                        <p><strong>Ngày tạo:</strong> ${area.created_at}</p>
-                        ${area.description ? `<p><strong>Mô tả:</strong> ${area.description}</p>` : ''}
-                    </div>
-                    <div class="area-actions">
-                        <span class="status-badge ${area.is_active ? 'status-active' : 'status-inactive'}">
-                            ${area.is_active ? 'Hoạt động' : 'Tạm dừng'}
-                        </span>
-                        <button class="btn btn-secondary btn-sm" onclick="editArea(${area.id})">
-                            <i class="fas fa-edit"></i> Sửa
-                        </button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteArea(${area.id})">
-                            <i class="fas fa-trash"></i> Xóa
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Tạo khu vực mới
-        document.getElementById('areaForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
-            
-            try {
-                const response = await fetch('/checkin/areas/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                if (response.ok) {
-                    showMessage('Tạo khu vực thành công!', 'success');
-                    this.reset();
-                    if (marker) {
-                        map.removeLayer(marker);
-                        marker = null;
-                    }
-                    if (window.radiusCircle) {
-                        map.removeLayer(window.radiusCircle);
-                        window.radiusCircle = null;
-                    }
-                    loadAreas();
-                } else {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Lỗi tạo khu vực');
-                }
-            } catch (error) {
-                showMessage(`Lỗi: ${error.message}`, 'error');
-            }
-        });
-
-        // Xóa form
-        document.getElementById('clearForm').addEventListener('click', function() {
-            document.getElementById('areaForm').reset();
-            if (marker) {
-                map.removeLayer(marker);
-                marker = null;
-            }
-            if (window.radiusCircle) {
-                map.removeLayer(window.radiusCircle);
-                window.radiusCircle = null;
-            }
-        });
-
-        // Cập nhật vòng tròn khi thay đổi bán kính
-        document.getElementById('radius_m').addEventListener('input', function() {
-            const lat = parseFloat(document.getElementById('lat').value);
-            const lng = parseFloat(document.getElementById('lng').value);
-            
-            if (!isNaN(lat) && !isNaN(lng)) {
-                updateRadiusCircle(lat, lng);
-            }
-        });
-
-        // Xóa khu vực
-        async function deleteArea(areaId) {
-            if (!confirm('Bạn có chắc chắn muốn xóa khu vực này?')) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/checkin/areas/${areaId}/`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                });
-                
-                if (response.ok) {
-                    showMessage('Xóa khu vực thành công!', 'success');
-                    loadAreas();
-                } else {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Lỗi xóa khu vực');
-                }
-            } catch (error) {
-                showMessage(`Lỗi: ${error.message}`, 'error');
-            }
-        }
-
-        // Sửa khu vực (placeholder)
-        function editArea(areaId) {
-            alert('Tính năng sửa khu vực sẽ được phát triển trong phiên bản tiếp theo');
-        }
-
-        // Hiển thị thông báo
-        function showMessage(message, type) {
-            const existing = document.querySelector('.error, .success');
-            if (existing) {
-                existing.remove();
-            }
-            
-            const div = document.createElement('div');
-            div.className = type;
-            div.textContent = message;
-            
-            document.querySelector('.content').insertBefore(div, document.querySelector('.area-form'));
-            
-            setTimeout(() => {
-                div.remove();
-            }, 5000);
-        }
-
-        // Lấy CSRF token
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        // Khởi tạo
-        document.addEventListener('DOMContentLoaded', function() {
-            initMap();
-            loadAreas();
-        });
-    </script>
-</body>
-</html>
+    });
+    
+    // Reload areas to show all markers
+    loadAreas();
+}
+</script>
+{% endblock %}

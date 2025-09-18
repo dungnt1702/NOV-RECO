@@ -15,7 +15,7 @@
       <div class="checkin-header">
         <div style="margin-bottom: 15px;">
           <img src="{% static 'logo.svg' %}" alt="NOV-RECO Logo" style="height: 50px;">
-        </div>
+    </div>
         <h1>📍 Check-in System</h1>
         <p class="checkin-subtitle">Chụp ảnh trực tiếp và lấy vị trí GPS để check-in</p>
       </div>
@@ -78,23 +78,24 @@
             </div>
           </div>
           <input type="file" id="photo" accept="image/*" capture="environment" style="display: none;">
-        </div>
+      </div>
 
-        <div class="form-group">
+      <div class="form-group">
           <label class="form-label" for="note">📝 Ghi chú (tùy chọn)</label>
-          <textarea id="note" class="form-textarea" placeholder="Ví dụ: Team A, ca 9h..."></textarea>
-        </div>
+        <textarea id="note" class="form-textarea" placeholder="Ví dụ: Team A, ca 9h..."></textarea>
+      </div>
 
-        <button type="submit" id="btn-checkin" class="btn-checkin">
+      <button type="submit" id="btn-checkin" class="btn-checkin">
           <span class="btn-text">✅ Gửi Check-in</span>
-          <div class="loading">
-            <div class="spinner"></div>
-            <span>Đang xử lý...</span>
-          </div>
-        </button>
-      </form>
-    </div>
+        <div class="loading">
+          <div class="spinner"></div>
+          <span>Đang xử lý...</span>
+        </div>
+      </button>
+    </form>
   </div>
+  </div>
+
 {% endblock %}
 
 {% block extra_js %}

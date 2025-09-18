@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load socialaccount %}
+
+{% block title %}Đăng ký{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-container">
+    <div class="auth-header">
+      <img src="{% static 'logo.svg' %}" alt="NOV-RECO Logo" class="auth-logo">
+      <h1>Đăng ký tài khoản</h1>
+      <p>Tạo tài khoản mới để sử dụng hệ thống</p>
+    </div>
+
+    <div class="auth-form-container">
+      {% if form.errors %}
+        <div class="alert alert-error">
+          <i class="fas fa-exclamation-triangle"></i>
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="POST" class="auth-form">
+        {% csrf_token %}
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">
+              <i class="fas fa-envelope"></i>
+              Email *
+            </label>
+            {{ form.email }}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">
+              <i class="fas fa-user"></i>
+              Tên đăng nhập *
+            </label>
+            {{ form.username }}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.password1.id_for_label }}">
+              <i class="fas fa-lock"></i>
+              Mật khẩu *
+            </label>
+            {{ form.password1 }}
+          </div>
+          
+          <div class="form-group">
+            <label for="{{ form.password2.id_for_label }}">
+              <i class="fas fa-lock"></i>
+              Xác nhận mật khẩu *
+            </label>
+            {{ form.password2 }}
+          </div>
+        </div>
+
+        {% if form.terms %}
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            {{ form.terms }}
+            <span class="checkbox-text">
+              Tôi đồng ý với 
+              <a href="#" class="terms-link">Điều khoản sử dụng</a>
+            </span>
+          </label>
+        </div>
+        {% endif %}
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-full">
+            <i class="fas fa-user-plus"></i>
+            Tạo tài khoản
+          </button>
+        </div>
+
+        <div class="auth-links">
+          <a href="{% url 'account_login' %}" class="auth-link">
+            <i class="fas fa-sign-in-alt"></i>
+            Đã có tài khoản? Đăng nhập
+          </a>
+        </div>
+      </form>
+
+      {% if socialaccount_providers %}
+      <div class="social-login">
+        <div class="divider">
+          <span>Hoặc đăng ký với</span>
+        </div>
+        
+        {% for provider in socialaccount_providers %}
+          <a href="{% provider_login_url provider.id %}" class="btn btn-social btn-{{ provider.id }}">
+            <i class="fab fa-{{ provider.id }}"></i>
+            {{ provider.name }}
+          </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/auth.js' %}"></script>
+{% endblock %}

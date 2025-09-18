@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quản lý người dùng{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/users.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="users-page">
+  <div class="page-header">
+    <h1>👥 Quản lý người dùng</h1>
+    <a href="{% url 'users:user_create' %}" class="btn btn-primary">
+      ➕ Thêm người dùng
+    </a>
+  </div>
+
+  <!-- Search and Filter -->
+  <div class="search-filter-section">
+    <form method="GET" class="search-form">
+      <div class="search-input-group">
+        <input type="text" name="search" value="{{ search_query }}" 
+               placeholder="Tìm kiếm theo tên, email, mã nhân viên..." 
+               class="form-control search-input">
+        <select name="role" class="form-control role-select">
+          <option value="">Tất cả vai trò</option>
+          {% for value, label in role_choices %}
+            <option value="{{ value }}" {% if role_filter == value %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-search">🔍 Tìm kiếm</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Users Table -->
+  <div class="users-table-container">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Thông tin</th>
+          <th>Vai trò</th>
+          <th>Phòng ban</th>
+          <th>Mã NV</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in page_obj %}
+        <tr>
+          <td class="user-info">
+            <div class="user-avatar">
+              {{ user.first_name|first|default:user.username|first|upper }}
+            </div>
+            <div class="user-details">
+              <div class="user-name">{{ user.get_display_name }}</div>
+              <div class="user-email">{{ user.email }}</div>
+            </div>
+          </td>
+          <td>
+            <span class="role-badge role-{{ user.role }}">
+              {{ user.get_role_display }}
+            </span>
+          </td>
+          <td>{{ user.department|default:"-" }}</td>
+          <td>{{ user.employee_id|default:"-" }}</td>
+          <td>
+            <span class="status-badge {% if user.is_active %}active{% else %}inactive{% endif %}">
+              {% if user.is_active %}Hoạt động{% else %}Không hoạt động{% endif %}
+            </span>
+          </td>
+          <td class="actions">
+            <a href="{% url 'users:user_update' user.id %}" class="btn btn-sm btn-edit">
+              ✏️ Sửa
+            </a>
+            <a href="{% url 'users:user_delete' user.id %}" class="btn btn-sm btn-danger">
+              🗑️ Xóa
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="no-data">
+            <div class="no-data-content">
+              <div class="no-data-icon">👥</div>
+              <div class="no-data-text">Không có người dùng nào</div>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <div class="pagination">
+    {% if page_obj.has_previous %}
+      <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="page-link">« Đầu</a>
+      <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="page-link">‹ Trước</a>
+    {% endif %}
+
+    <span class="page-info">
+      Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="page-link">Tiếp ›</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="page-link">Cuối »</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/users.js' %}"></script>
+{% endblock %}

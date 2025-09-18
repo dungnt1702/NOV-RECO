@@ -15,16 +15,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
-
     # Third-party
     "rest_framework",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-
     # Local apps
     "checkin",
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -66,29 +65,37 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = "users.User"
+
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"
+    },
 ]
 
 LANGUAGE_CODE = "vi"
-TIME_ZONE = "Asia/Bangkok"
+TIME_ZONE = "Asia/Ho_Chi_Minh"
 USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
+STATICFILES_DIRS = (
+    [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
+)
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Custom User Model
-AUTH_USER_MODEL = 'checkin.User'
 
 # django-allauth
 SITE_ID = int(os.environ.get("SITE_ID", "1"))
@@ -102,8 +109,12 @@ LOGOUT_REDIRECT_URL = "/"
 
 ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
+ACCOUNT_USERNAME_MIN_LENGTH = 3
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {

@@ -8,7 +8,8 @@ from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.decorators import api_view, permission_classes
-from .models import Location, Checkin, User, UserRole, Area
+from .models import Location, Checkin, Area
+from users.models import User, UserRole
 from .serializers import (
     CheckinCreateSerializer,
     CheckinListSerializer,
@@ -221,16 +222,10 @@ def checkin_list_api(request):
         )
 
     serializer = CheckinListSerializer(checkins, many=True)
-    return Response(serializer.data)
-
-
-# User management views
-@admin_required
-def user_management(request):
-    """Quản lý người dùng - chỉ Admin"""
-    users = User.objects.all().order_by("role", "first_name")
-    context = {"users": users, "roles": UserRole.choices}
-    return render(request, "checkin/user_management.html", context)
+    return Response({
+        "results": serializer.data,
+        "count": len(serializer.data)
+    })
 
 
 # User info API
@@ -343,12 +338,14 @@ def user_history_api(request):
                 "note": checkin.note,
                 "photo_url": checkin.photo.url if checkin.photo else None,
                 "ip": checkin.ip,
+                "user_name": checkin.user.get_display_name(),
+                "user_email": checkin.user.email,
             }
         )
 
     return Response(
         {
-            "checkins": checkin_data,
+            "results": checkin_data,
             "total_pages": paginator.num_pages,
             "current_page": page,
             **stats,
