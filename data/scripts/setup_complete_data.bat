@@ -4,7 +4,7 @@ echo        NOV-RECO COMPLETE DATA SETUP
 echo ================================================
 echo.
 
-cd /d C:\xampp\htdocs\checkin.reco.vn
+cd /d "%~dp0..\.."
 
 echo [1/3] Setting up user groups and permissions...
 C:\Users\%USERNAME%\AppData\Local\Programs\Python\Python311\python.exe manage.py setup_user_groups

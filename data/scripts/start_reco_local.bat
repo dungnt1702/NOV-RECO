@@ -4,7 +4,7 @@ echo.
 
 REM Khởi động Django development server
 echo Starting Django server on port 3000...
-start "Django Server" cmd /k "cd /d C:\xampp\htdocs\checkin.reco.vn && C:\Users\%USERNAME%\AppData\Local\Programs\Python\Python311\python.exe manage.py runserver 3000"
+start "Django Server" cmd /k "cd /d \"%~dp0..\..\" && C:\Users\%USERNAME%\AppData\Local\Programs\Python\Python311\python.exe manage.py runserver 3000"
 
 REM Đợi một chút để server khởi động
 timeout /t 3 /nobreak >nul
