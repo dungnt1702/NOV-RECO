@@ -17,12 +17,25 @@ def role_required(allowed_roles):
             if not request.user.is_authenticated:
                 return redirect("account_login")
 
+            # Debug logging
+            print(f"DEBUG: User: {request.user.username}")
+            print(f"DEBUG: Role: {request.user.role}")
+            print(f"DEBUG: Is superuser: {request.user.is_superuser}")
+            print(f"DEBUG: Allowed roles: {allowed_roles}")
+
+            # Superuser luôn có quyền truy cập
+            if request.user.is_superuser:
+                print("DEBUG: Superuser access granted")
+                return view_func(request, *args, **kwargs)
+
             if request.user.role not in allowed_roles:
+                print(f"DEBUG: Access denied - role {request.user.role} not in {allowed_roles}")
                 messages.error(
                     request, "Bạn không có quyền truy cập trang này."
                 )
                 return redirect("home")
 
+            print("DEBUG: Role access granted")
             return view_func(request, *args, **kwargs)
 
         return wrapper
@@ -31,12 +44,12 @@ def role_required(allowed_roles):
 
 
 def admin_required(view_func):
-    """Decorator cho Admin"""
+    """Decorator cho Admin và Superuser"""
     return role_required([UserRole.ADMIN])(view_func)
 
 
 def manager_required(view_func):
-    """Decorator cho Quản lý và Admin"""
+    """Decorator cho Quản lý, Admin và Superuser"""
     return role_required([UserRole.ADMIN, UserRole.MANAGER])(view_func)
 
 
@@ -45,6 +58,24 @@ def employee_required(view_func):
     return role_required(
         [UserRole.ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE]
     )(view_func)
+
+
+def superuser_required(view_func):
+    """Decorator chỉ cho Superuser"""
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("account_login")
+        
+        if not request.user.is_superuser:
+            messages.error(
+                request, "Chỉ có Superuser mới có quyền truy cập trang này."
+            )
+            return redirect("home")
+        
+        return view_func(request, *args, **kwargs)
+    
+    return wrapper
 
 
 def check_permission(user, permission):

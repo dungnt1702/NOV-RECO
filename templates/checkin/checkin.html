@@ -20,6 +20,26 @@
         <p class="checkin-subtitle">Chụp ảnh trực tiếp và lấy vị trí GPS để check-in</p>
       </div>
 
+      <!-- Browser Permissions Check -->
+      <div class="permissions-check-section">
+        <div class="permissions-title">🔐 Kiểm tra quyền truy cập</div>
+        <div class="permissions-grid">
+          <div class="permission-item">
+            <span class="permission-label">📍 GPS/Vị trí:</span>
+            <span class="permission-status" id="gps-status">Chưa kiểm tra</span>
+            <button type="button" id="btn-test-gps" class="btn-test-permission">Test GPS</button>
+          </div>
+          <div class="permission-item">
+            <span class="permission-label">📷 Camera:</span>
+            <span class="permission-status" id="camera-status">Chưa kiểm tra</span>
+            <button type="button" id="btn-test-camera" class="btn-test-permission">Test Camera</button>
+          </div>
+        </div>
+        <div class="permissions-help">
+          <p><strong>💡 Mẹo:</strong> Nếu không thấy popup yêu cầu quyền, hãy nhấp vào biểu tượng 🔒 bên trái thanh địa chỉ để cấp quyền thủ công.</p>
+        </div>
+      </div>
+
       <!-- User Info Section -->
       <div class="user-info-section">
         <div class="user-info-title">👤 Thông tin người dùng</div>

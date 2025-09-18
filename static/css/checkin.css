@@ -46,6 +46,98 @@
     margin-bottom: 20px;
 }
 
+/* Permissions check section */
+.permissions-check-section {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.permissions-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.permissions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.permission-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.permission-label {
+  font-weight: 500;
+  color: #495057;
+  flex: 1;
+  min-width: 120px;
+}
+
+.permission-status {
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #6c757d;
+  color: white;
+  text-align: center;
+  min-width: 100px;
+}
+
+.permission-status.granted {
+  background: #28a745;
+}
+
+.permission-status.denied {
+  background: #dc3545;
+}
+
+.permission-status.prompt {
+  background: #ffc107;
+  color: #212529;
+}
+
+.btn-test-permission {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s;
+  white-space: nowrap;
+}
+
+.btn-test-permission:hover {
+  background: #0056b3;
+}
+
+.permissions-help {
+  background: #e7f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 14px;
+  color: #0056b3;
+  text-align: center;
+}
+
 /* User info section */
 .user-info-section {
     background: #f8fafc;

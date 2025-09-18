@@ -14,8 +14,56 @@ document.addEventListener('DOMContentLoaded', function() {
     loadUserInfo();
     setupEventListeners();
     updateSubmitButtonState();
+    checkBrowserSupport();
     console.log('Checkin page initialization complete');
 });
+
+// Check browser support and show warnings
+function checkBrowserSupport() {
+    const warnings = [];
+    
+    // Check HTTPS
+    const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+    
+    if (!isSecureContext) {
+        warnings.push('⚠️ Trang web không bảo mật - GPS và Camera có thể không hoạt động');
+    }
+    
+    // Check geolocation support
+    if (!navigator.geolocation) {
+        warnings.push('❌ Trình duyệt không hỗ trợ GPS');
+    }
+    
+    // Check camera support
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        warnings.push('❌ Trình duyệt không hỗ trợ Camera');
+    }
+    
+    if (warnings.length > 0) {
+        const warningDiv = document.createElement('div');
+        warningDiv.className = 'browser-warnings';
+        warningDiv.style.cssText = `
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            color: #856404;
+        `;
+        warningDiv.innerHTML = `
+            <h4>⚠️ Cảnh báo trình duyệt:</h4>
+            <ul>
+                ${warnings.map(w => `<li>${w}</li>`).join('')}
+            </ul>
+            <p><strong>Khuyến nghị:</strong> Sử dụng Chrome/Firefox/Edge và truy cập qua <code>reco.local</code></p>
+        `;
+        
+        const container = document.querySelector('.checkin-container');
+        if (container) {
+            container.insertBefore(warningDiv, container.firstChild);
+        }
+    }
+}
 
 // Initialize map
 function initializeMap() {
@@ -65,6 +113,18 @@ function updateUserInfo(userData) {
 // Setup event listeners
 function setupEventListeners() {
     console.log('Setting up event listeners...');
+    
+    // Permission test buttons
+    const testGpsBtn = document.getElementById('btn-test-gps');
+    const testCameraBtn = document.getElementById('btn-test-camera');
+    
+    if (testGpsBtn) {
+        testGpsBtn.addEventListener('click', testGpsPermission);
+    }
+    
+    if (testCameraBtn) {
+        testCameraBtn.addEventListener('click', testCameraPermission);
+    }
     
     // Get location button
     const getLocationBtn = document.getElementById('btn-get-location');
@@ -127,16 +187,42 @@ function setupEventListeners() {
 }
 
 // Get current location
-function getCurrentLocation() {
+async function getCurrentLocation() {
     const btn = document.getElementById('btn-get-location');
     if (!btn) return;
     
     setLoading(btn, true);
     
-    if (!navigator.geolocation) {
-        showAlert('Trình duyệt không hỗ trợ định vị GPS', 'error');
+    // Check if running on HTTPS or localhost
+    const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+    
+    if (!isSecureContext) {
+        showAlert('⚠️ GPS chỉ hoạt động trên HTTPS hoặc localhost.\n\nVui lòng truy cập qua:\n• https:// (bảo mật)\n• localhost\n• reco.local', 'error');
         setLoading(btn, false);
         return;
+    }
+    
+    if (!navigator.geolocation) {
+        showAlert('❌ Trình duyệt không hỗ trợ định vị GPS', 'error');
+        setLoading(btn, false);
+        return;
+    }
+    
+    try {
+        // First check permissions if supported
+        if (navigator.permissions) {
+            const permission = await navigator.permissions.query({ name: 'geolocation' });
+            console.log('Geolocation permission:', permission.state);
+            
+            if (permission.state === 'denied') {
+                showAlert('🚫 Quyền truy cập vị trí bị từ chối!\n\n📋 Cách khắc phục:\n1️⃣ Nhấp vào biểu tượng 🔒 bên trái thanh địa chỉ\n2️⃣ Chọn "Vị trí" → "Cho phép"\n3️⃣ Tải lại trang và thử lại', 'error');
+                setLoading(btn, false);
+                return;
+            }
+        }
+        
+    } catch (error) {
+        console.log('Permissions API not supported, proceeding with geolocation');
     }
     
     navigator.geolocation.getCurrentPosition(
@@ -160,40 +246,40 @@ function getCurrentLocation() {
             }
             
             updateSubmitButtonState();
-            showAlert('Đã lấy vị trí thành công!', 'success');
+            showAlert('✅ Đã lấy vị trí thành công!', 'success');
             setLoading(btn, false);
         },
         function(error) {
-            let message = 'Không thể lấy vị trí GPS';
+            let message = '';
             let suggestion = '';
             
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    message = 'Bị từ chối quyền truy cập vị trí';
-                    suggestion = 'Vui lòng cho phép truy cập vị trí trong cài đặt trình duyệt';
+                    message = '🚫 Bị từ chối quyền truy cập vị trí';
+                    suggestion = '📋 Cách khắc phục:\n1️⃣ Nhấp vào biểu tượng 🔒 bên trái thanh địa chỉ\n2️⃣ Chọn "Vị trí" → "Cho phép"\n3️⃣ Tải lại trang và thử lại';
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    message = 'Vị trí không khả dụng';
-                    suggestion = 'Kiểm tra kết nối mạng và GPS, thử lại sau';
+                    message = '📍 Vị trí không khả dụng';
+                    suggestion = '🔧 Kiểm tra:\n• Kết nối mạng\n• GPS đã bật\n• Thử lại sau vài giây';
                     break;
                 case error.TIMEOUT:
-                    message = 'Hết thời gian chờ lấy vị trí';
-                    suggestion = 'Vui lòng thử lại, có thể do tín hiệu yếu';
+                    message = '⏰ Hết thời gian chờ lấy vị trí';
+                    suggestion = '🔄 Vui lòng thử lại (có thể do tín hiệu GPS yếu)';
                     break;
                 default:
-                    message = 'Lỗi không xác định khi lấy vị trí';
-                    suggestion = 'Vui lòng thử lại hoặc kiểm tra cài đặt vị trí';
+                    message = '❌ Lỗi không xác định khi lấy vị trí';
+                    suggestion = '🔄 Vui lòng thử lại hoặc kiểm tra cài đặt vị trí';
                     break;
             }
             
             console.error('Geolocation error:', error);
-            showAlert(`${message}. ${suggestion}`, 'error');
+            showAlert(`${message}\n\n${suggestion}`, 'error');
             setLoading(btn, false);
         },
         {
             enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 60000
+            timeout: 15000,
+            maximumAge: 30000
         }
     );
 }
@@ -216,9 +302,32 @@ async function openCamera() {
     try {
         console.log('Requesting camera access...');
         
+        // Check if running on HTTPS or localhost
+        const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+        
+        if (!isSecureContext) {
+            showAlert('⚠️ Camera chỉ hoạt động trên HTTPS hoặc localhost.\n\nVui lòng truy cập qua:\n• https:// (bảo mật)\n• localhost\n• reco.local', 'error');
+            return;
+        }
+        
         // Check if getUserMedia is supported
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            throw new Error('Camera không được hỗ trợ trên trình duyệt này');
+            throw new Error('📷 Camera không được hỗ trợ trên trình duyệt này');
+        }
+        
+        // Check camera permission first if supported
+        if (navigator.permissions) {
+            try {
+                const permission = await navigator.permissions.query({ name: 'camera' });
+                console.log('Camera permission:', permission.state);
+                
+                if (permission.state === 'denied') {
+                    showAlert('🚫 Quyền truy cập camera bị từ chối!\n\n📋 Cách khắc phục:\n1️⃣ Nhấp vào biểu tượng 🔒 bên trái thanh địa chỉ\n2️⃣ Chọn "Camera" → "Cho phép"\n3️⃣ Tải lại trang và thử lại', 'error');
+                    return;
+                }
+            } catch (permError) {
+                console.log('Camera permission check not supported, proceeding...');
+            }
         }
         
         stream = await navigator.mediaDevices.getUserMedia({
@@ -261,22 +370,31 @@ async function openCamera() {
         
         updateSubmitButtonState();
         console.log('Camera opened successfully');
+        showAlert('✅ Camera đã sẵn sàng!', 'success');
         
     } catch (error) {
         console.error('Error opening camera:', error);
-        let errorMessage = 'Không thể mở camera';
+        let errorMessage = '';
+        let suggestion = '';
         
         if (error.name === 'NotAllowedError') {
-            errorMessage = 'Bị từ chối quyền truy cập camera. Vui lòng cho phép truy cập camera trong cài đặt trình duyệt.';
+            errorMessage = '🚫 Bị từ chối quyền truy cập camera';
+            suggestion = '📋 Cách khắc phục:\n1️⃣ Nhấp vào biểu tượng 🔒 bên trái thanh địa chỉ\n2️⃣ Chọn "Camera" → "Cho phép"\n3️⃣ Tải lại trang và thử lại';
         } else if (error.name === 'NotFoundError') {
-            errorMessage = 'Không tìm thấy camera. Vui lòng kiểm tra kết nối camera.';
+            errorMessage = '📷 Không tìm thấy camera';
+            suggestion = '🔧 Kiểm tra:\n• Camera đã kết nối\n• Không có ứng dụng nào khác đang sử dụng camera';
         } else if (error.name === 'NotSupportedError') {
-            errorMessage = 'Camera không được hỗ trợ trên trình duyệt này.';
+            errorMessage = '❌ Camera không được hỗ trợ trên trình duyệt này';
+            suggestion = '🌐 Thử với trình duyệt khác (Chrome, Firefox, Edge)';
+        } else if (error.name === 'NotReadableError') {
+            errorMessage = '⚠️ Camera đang được sử dụng bởi ứng dụng khác';
+            suggestion = '🔄 Đóng các ứng dụng camera khác và thử lại';
         } else {
-            errorMessage = errorMessage + ': ' + error.message;
+            errorMessage = '❌ Lỗi không xác định với camera';
+            suggestion = `🔧 Chi tiết: ${error.message}`;
         }
         
-        showAlert(errorMessage, 'error');
+        showAlert(`${errorMessage}\n\n${suggestion}`, 'error');
     }
 }
 
@@ -468,6 +586,133 @@ function resetForm() {
     }
     
     updateSubmitButtonState();
+}
+
+// Test GPS permission
+async function testGpsPermission() {
+    const statusElement = document.getElementById('gps-status');
+    const btn = document.getElementById('btn-test-gps');
+    
+    if (statusElement) statusElement.textContent = 'Đang kiểm tra...';
+    if (btn) btn.disabled = true;
+    
+    try {
+        // Check secure context
+        const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+        
+        if (!isSecureContext) {
+            if (statusElement) {
+                statusElement.textContent = 'Không bảo mật';
+                statusElement.className = 'permission-status denied';
+            }
+            showAlert('⚠️ GPS cần HTTPS hoặc localhost để hoạt động', 'warning');
+            return;
+        }
+        
+        if (!navigator.geolocation) {
+            if (statusElement) {
+                statusElement.textContent = 'Không hỗ trợ';
+                statusElement.className = 'permission-status denied';
+            }
+            return;
+        }
+        
+        // Try to trigger permission request directly
+        navigator.geolocation.getCurrentPosition(
+            () => {
+                if (statusElement) {
+                    statusElement.textContent = '✅ Đã cho phép';
+                    statusElement.className = 'permission-status granted';
+                }
+                showAlert('✅ GPS đã được cấp quyền!', 'success');
+            },
+            (error) => {
+                if (statusElement) {
+                    statusElement.textContent = '❌ Bị từ chối';
+                    statusElement.className = 'permission-status denied';
+                }
+                
+                let message = '❌ GPS bị từ chối';
+                if (error.code === error.PERMISSION_DENIED) {
+                    message += '\n\n📋 Cách sửa:\n1️⃣ Nhấp 🔒 bên trái thanh địa chỉ\n2️⃣ Chọn "Vị trí" → "Cho phép"\n3️⃣ Tải lại trang';
+                }
+                showAlert(message, 'error');
+            },
+            { timeout: 5000 }
+        );
+        
+    } catch (error) {
+        console.error('Error testing GPS:', error);
+        if (statusElement) {
+            statusElement.textContent = '❌ Lỗi';
+            statusElement.className = 'permission-status denied';
+        }
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+// Test Camera permission
+async function testCameraPermission() {
+    const statusElement = document.getElementById('camera-status');
+    const btn = document.getElementById('btn-test-camera');
+    
+    if (statusElement) statusElement.textContent = 'Đang kiểm tra...';
+    if (btn) btn.disabled = true;
+    
+    try {
+        // Check secure context
+        const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+        
+        if (!isSecureContext) {
+            if (statusElement) {
+                statusElement.textContent = 'Không bảo mật';
+                statusElement.className = 'permission-status denied';
+            }
+            showAlert('⚠️ Camera cần HTTPS hoặc localhost để hoạt động', 'warning');
+            return;
+        }
+        
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            if (statusElement) {
+                statusElement.textContent = 'Không hỗ trợ';
+                statusElement.className = 'permission-status denied';
+            }
+            return;
+        }
+        
+        // Try to trigger permission request directly
+        try {
+            const testStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            testStream.getTracks().forEach(track => track.stop()); // Stop immediately
+            
+            if (statusElement) {
+                statusElement.textContent = '✅ Đã cho phép';
+                statusElement.className = 'permission-status granted';
+            }
+            showAlert('✅ Camera đã được cấp quyền!', 'success');
+        } catch (streamError) {
+            if (statusElement) {
+                statusElement.textContent = '❌ Bị từ chối';
+                statusElement.className = 'permission-status denied';
+            }
+            
+            let message = '❌ Camera bị từ chối';
+            if (streamError.name === 'NotAllowedError') {
+                message += '\n\n📋 Cách sửa:\n1️⃣ Nhấp 🔒 bên trái thanh địa chỉ\n2️⃣ Chọn "Camera" → "Cho phép"\n3️⃣ Tải lại trang';
+            }
+            showAlert(message, 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error testing camera:', error);
+        if (statusElement) {
+            statusElement.textContent = '❌ Lỗi';
+            statusElement.className = 'permission-status denied';
+        }
+    } finally {
+        if (btn) btn.disabled = false;
+    }
 }
 
 

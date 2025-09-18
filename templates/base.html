@@ -30,11 +30,20 @@
                 {% if user.is_authenticated %}
                     <li><a href="/checkin/">📍 Check-in</a></li>
                     <li><a href="/checkin/history/">📋 Lịch sử</a></li>
-                    {% if user.is_admin %}
+                    
+                    {% if user.is_superuser or user.is_admin_user %}
                         <li><a href="/users/">👥 Quản lý người dùng</a></li>
                         <li><a href="/checkin/area-management/">🗺️ Quản lý khu vực</a></li>
                         <li><a href="/checkin/list-view/">📊 Danh sách Check-in</a></li>
-                    {% elif user.is_manager %}
+                        {% if user.is_superuser %}
+                            <li><a href="/admin/">⚙️ Admin Panel</a></li>
+                        {% endif %}
+                    {% elif user.is_manager_user %}
+                        <li><a href="/checkin/area-management/">🗺️ Quản lý khu vực</a></li>
+                        <li><a href="/checkin/list-view/">📊 Danh sách Check-in</a></li>
+                    {% elif user.role == 'employee' and user.is_staff %}
+                        <!-- Thư ký -->
+                        <li><a href="/checkin/area-management/">🗺️ Quản lý khu vực</a></li>
                         <li><a href="/checkin/list-view/">📊 Danh sách Check-in</a></li>
                     {% endif %}
                 {% endif %}
