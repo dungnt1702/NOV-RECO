@@ -17,6 +17,8 @@ class Area(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         help_text="Người tạo khu vực",
+        null=True,
+        blank=True,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -50,7 +52,7 @@ class Location(models.Model):
 
 class Checkin(models.Model):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
     )
     area = models.ForeignKey(
         Area, on_delete=models.CASCADE, null=True, blank=True
