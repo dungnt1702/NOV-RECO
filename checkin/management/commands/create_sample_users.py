@@ -1,144 +1,133 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth import get_user_model
-from users.models import User, UserRole
+from django.contrib.auth.models import Group
+from users.models import User
+
 
 class Command(BaseCommand):
-    help = 'Tạo dữ liệu người dùng mẫu'
+    help = 'Create sample users for each group'
 
     def handle(self, *args, **options):
-        self.stdout.write('Đang tạo dữ liệu người dùng mẫu...')
-        
-        # Tạo Admin
-        admin, created = User.objects.get_or_create(
-            username='admin',
-            defaults={
-                'email': 'admin@nhaongay.vn',
-                'first_name': 'Quản trị',
-                'last_name': 'Viên',
-                'role': UserRole.ADMIN,
-                'phone': '0123456789',
-                'department': 'IT',
-                'employee_id': 'ADM001',
-                'is_active': True,
-                'is_staff': True,
+        # Dữ liệu users mẫu
+        sample_users = [
+            {
+                'username': 'superadmin',
+                'email': 'superadmin@reco.local',
+                'password': 'admin123',
+                'first_name': 'Super',
+                'last_name': 'Admin',
+                'employee_id': 'SA001',
+                'group': 'Super Admin',
+                'role': 'admin',
                 'is_superuser': True,
-            }
-        )
-        if created:
-            admin.set_password('admin123')
-            admin.save()
-            self.stdout.write(
-                self.style.SUCCESS(f'✅ Đã tạo Admin: {admin.username} (admin123)')
-            )
-        else:
-            self.stdout.write(
-                self.style.WARNING(f'⚠️ Admin đã tồn tại: {admin.username}')
-            )
-
-        # Tạo Manager
-        manager, created = User.objects.get_or_create(
-            username='manager',
-            defaults={
-                'email': 'manager@nhaongay.vn',
-                'first_name': 'Quản lý',
-                'last_name': 'Viên',
-                'role': UserRole.MANAGER,
-                'phone': '0123456790',
-                'department': 'Quản lý',
-                'employee_id': 'MGR001',
-                'is_active': True,
                 'is_staff': True,
-            }
-        )
-        if created:
-            manager.set_password('manager123')
-            manager.save()
-            self.stdout.write(
-                self.style.SUCCESS(f'✅ Đã tạo Manager: {manager.username} (manager123)')
-            )
-        else:
-            self.stdout.write(
-                self.style.WARNING(f'⚠️ Manager đã tồn tại: {manager.username}')
-            )
-
-        # Tạo 5 Employees
-        employees_data = [
+            },
             {
-                'username': 'employee1',
-                'email': 'nhanvien1@nhaongay.vn',
+                'username': 'quanly',
+                'email': 'quanly@reco.local',
+                'password': 'quanly123',
                 'first_name': 'Nguyễn',
-                'last_name': 'Văn A',
-                'phone': '0123456791',
-                'department': 'Kinh doanh',
-                'employee_id': 'EMP001',
+                'last_name': 'Quản Lý',
+                'employee_id': 'QL001',
+                'group': 'Quản lý',
+                'role': 'manager',
+                'is_staff': True,
             },
             {
-                'username': 'employee2',
-                'email': 'nhanvien2@nhaongay.vn',
+                'username': 'thuky',
+                'email': 'thuky@reco.local',
+                'password': 'thuky123',
                 'first_name': 'Trần',
-                'last_name': 'Thị B',
-                'phone': '0123456792',
-                'department': 'Marketing',
-                'employee_id': 'EMP002',
+                'last_name': 'Thư Ký',
+                'employee_id': 'TK001',
+                'group': 'Thư ký',
+                'role': 'employee',
+                'is_staff': True,
             },
             {
-                'username': 'employee3',
-                'email': 'nhanvien3@nhaongay.vn',
+                'username': 'nhanvien1',
+                'email': 'nhanvien1@reco.local',
+                'password': 'nhanvien123',
                 'first_name': 'Lê',
-                'last_name': 'Văn C',
-                'phone': '0123456793',
-                'department': 'Kỹ thuật',
-                'employee_id': 'EMP003',
+                'last_name': 'Nhân Viên',
+                'employee_id': 'NV001',
+                'group': 'Nhân viên',
+                'role': 'employee',
+                'is_staff': False,
             },
             {
-                'username': 'employee4',
-                'email': 'nhanvien4@nhaongay.vn',
+                'username': 'nhanvien2',
+                'email': 'nhanvien2@reco.local',
+                'password': 'nhanvien123',
                 'first_name': 'Phạm',
-                'last_name': 'Thị D',
-                'phone': '0123456794',
-                'department': 'Hành chính',
-                'employee_id': 'EMP004',
-            },
-            {
-                'username': 'employee5',
-                'email': 'nhanvien5@nhaongay.vn',
-                'first_name': 'Hoàng',
-                'last_name': 'Văn E',
-                'phone': '0123456795',
-                'department': 'Tài chính',
-                'employee_id': 'EMP005',
+                'last_name': 'Văn Bình',
+                'employee_id': 'NV002',
+                'group': 'Nhân viên',
+                'role': 'employee',
+                'is_staff': False,
             },
         ]
 
-        for emp_data in employees_data:
-            employee, created = User.objects.get_or_create(
-                username=emp_data['username'],
-                defaults={
-                    'email': emp_data['email'],
-                    'first_name': emp_data['first_name'],
-                    'last_name': emp_data['last_name'],
-                    'role': UserRole.EMPLOYEE,
-                    'phone': emp_data['phone'],
-                    'department': emp_data['department'],
-                    'employee_id': emp_data['employee_id'],
-                    'is_active': True,
-                }
-            )
-            if created:
-                employee.set_password('employee123')
-                employee.save()
+        for user_data in sample_users:
+            username = user_data['username']
+            group_name = user_data.pop('group')
+            role = user_data.pop('role')
+            
+            # Kiểm tra user đã tồn tại chưa
+            if User.objects.filter(username=username).exists():
                 self.stdout.write(
-                    self.style.SUCCESS(f'✅ Đã tạo Employee: {employee.username} (employee123)')
+                    self.style.WARNING(f'User {username} already exists')
                 )
-            else:
+                continue
+            
+            # Tạo user mới
+            try:
+                user = User.objects.create_user(
+                    username=user_data['username'],
+                    email=user_data['email'],
+                    password=user_data['password'],
+                    first_name=user_data['first_name'],
+                    last_name=user_data['last_name'],
+                    employee_id=user_data['employee_id'],
+                    role=role,
+                )
+                
+                # Set superuser và staff status
+                if user_data.get('is_superuser'):
+                    user.is_superuser = True
+                if user_data.get('is_staff'):
+                    user.is_staff = True
+                
+                user.save()
+                
+                # Thêm vào group
+                try:
+                    group = Group.objects.get(name=group_name)
+                    user.groups.add(group)
+                    
+                    self.stdout.write(
+                        self.style.SUCCESS(
+                            f'Created user: {username} ({group_name})'
+                        )
+                    )
+                except Group.DoesNotExist:
+                    self.stdout.write(
+                        self.style.ERROR(f'Group {group_name} does not exist')
+                    )
+                    
+            except Exception as e:
                 self.stdout.write(
-                    self.style.WARNING(f'⚠️ Employee đã tồn tại: {employee.username}')
+                    self.style.ERROR(f'Error creating user {username}: {str(e)}')
                 )
 
+        # Hiển thị thông tin đăng nhập
         self.stdout.write(
-            self.style.SUCCESS('\n🎉 Hoàn thành tạo dữ liệu người dùng mẫu!')
+            self.style.SUCCESS('\n=== THÔNG TIN ĐĂNG NHẬP ===')
         )
-        self.stdout.write('\n📋 Thông tin đăng nhập:')
-        self.stdout.write('👑 Admin: admin / admin123')
-        self.stdout.write('👨‍💼 Manager: manager / manager123')
-        self.stdout.write('👷 Employees: employee1-5 / employee123')
+        self.stdout.write('Super Admin: superadmin / admin123')
+        self.stdout.write('Quản lý: quanly / quanly123')
+        self.stdout.write('Thư ký: thuky / thuky123')
+        self.stdout.write('Nhân viên 1: nhanvien1 / nhanvien123')
+        self.stdout.write('Nhân viên 2: nhanvien2 / nhanvien123')
+        self.stdout.write(
+            self.style.SUCCESS('Sample users created successfully!')
+        )
