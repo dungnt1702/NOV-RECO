@@ -411,6 +411,8 @@ svg {
         display: block !important;
         opacity: 1 !important;
         visibility: visible !important;
+        background: var(--bg-secondary) !important;
+        border: 1px solid var(--primary-color) !important;
     }
 
     .dropdown-menu li a {
@@ -426,12 +428,6 @@ svg {
         transform: none;
         padding-left: var(--spacing-md);
     }
-    
-    /* Debug: Make sure dropdown is visible when active */
-    .dropdown-menu.active {
-        background: var(--bg-secondary) !important;
-        border: 1px solid var(--primary-color) !important;
-    }
 
     .user-info {
         gap: var(--spacing-sm);
@@ -446,6 +442,16 @@ svg {
     .logout-btn {
         width: 28px;
         height: 28px;
+    }
+    
+    /* Mobile bottom navigation */
+    .mobile-bottom-nav {
+        display: flex;
+    }
+    
+    .main-content {
+        padding: 0;
+        padding-bottom: 80px;
     }
 }
 
@@ -568,17 +574,6 @@ svg {
     line-height: 1.2;
 }
 
-/* Show mobile bottom nav only on mobile */
-@media (max-width: 768px) {
-    .mobile-bottom-nav {
-        display: flex;
-    }
-    
-    .main-content {
-        padding: 0;
-        padding-bottom: 80px;
-    }
-}
 
 @media (min-width: 769px) {
     .mobile-bottom-nav {
