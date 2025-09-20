@@ -124,22 +124,4 @@
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="{% static 'js/area_management.js' %}"></script>
-<script>
-// Additional functions for the template
-function cancelEdit() {
-    document.getElementById('areaForm').style.display = 'none';
-    isEditing = false;
-    currentArea = null;
-    
-    // Clear map editing markers
-    map.eachLayer(layer => {
-        if (layer.options && layer.options.isEditing) {
-            map.removeLayer(layer);
-        }
-    });
-    
-    // Reload areas to show all markers
-    loadAreas();
-}
-</script>
 {% endblock %}

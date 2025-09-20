@@ -247,6 +247,23 @@ async function deleteArea(areaId) {
     }
 }
 
+// Cancel edit
+function cancelEdit() {
+    document.getElementById('areaForm').style.display = 'none';
+    isEditing = false;
+    currentArea = null;
+    
+    // Clear map editing markers
+    map.eachLayer(layer => {
+        if (layer.options && layer.options.isEditing) {
+            map.removeLayer(layer);
+        }
+    });
+    
+    // Reload areas to show all markers
+    loadAreas();
+}
+
 // Handle form submission
 async function handleFormSubmit(e) {
     e.preventDefault();
