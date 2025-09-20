@@ -26,6 +26,9 @@ async function loadCheckins() {
         window.paginationComponent.config.onSearch = (filteredItems) => {
           renderCheckinsTable(window.paginationComponent.getCurrentPageItems());
         };
+        
+        // Render first page immediately
+        renderCheckinsTable(window.paginationComponent.getCurrentPageItems());
       }
       
       console.log('Checkins loaded:', allCheckins.length);

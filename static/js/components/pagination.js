@@ -49,6 +49,11 @@ class PaginationComponent {
     this.totalPages = Math.ceil(this.totalItems / this.pageSize);
     this.currentPage = Math.min(this.currentPage, Math.max(1, this.totalPages));
     this.render();
+    
+    // Trigger page change callback to render first page
+    if (this.config.onPageChange) {
+      this.config.onPageChange(this.getCurrentPageItems());
+    }
   }
   
   setSearchQuery(query) {
