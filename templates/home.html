@@ -9,55 +9,120 @@
 
 {% block content %}
   <div class="home-container">
-    <div class="home-header">
-      <img src="{% static 'logo.svg' %}" alt="NOV-RECO Logo" class="home-logo">
-      <h1>Chào mừng đến với NOV-RECO</h1>
-      <p class="home-subtitle">Hệ thống Check-in thông minh</p>
+    <div class="hero-section">
+      <div class="hero-content">
+        <div class="hero-header">
+          <img src="{% static 'logo.svg' %}" alt="NOV-RECO Logo" class="hero-logo">
+          <h1 class="hero-title">Chào mừng đến với NOV-RECO</h1>
+          <p class="hero-subtitle">Hệ thống Check-in thông minh và hiện đại</p>
+        </div>
+
+        <div class="hero-description">
+          <p>Hệ thống quản lý check-in tiên tiến, giúp theo dõi vị trí và thời gian làm việc của nhân viên một cách chính xác, tiện lợi và bảo mật cao.</p>
+        </div>
+
+        <div class="hero-actions">
+          {% if user.is_authenticated %}
+            <a href="/checkin/" class="btn btn-lg btn-primary">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Bắt đầu Check-in
+            </a>
+            <a href="/checkin/history/" class="btn btn-lg btn-outline">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Xem lịch sử
+            </a>
+          {% else %}
+            <a href="/accounts/login/" class="btn btn-lg btn-primary">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+              </svg>
+              Đăng nhập
+            </a>
+            <a href="/accounts/signup/" class="btn btn-lg btn-outline">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+              </svg>
+              Đăng ký
+            </a>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
-    <div class="home-content">
-      <p class="home-description">
-        Hệ thống quản lý check-in hiện đại, giúp theo dõi vị trí và thời gian làm việc của nhân viên một cách chính xác và tiện lợi.
-      </p>
+    <div class="features-section">
+      <div class="container">
+        <div class="features-header">
+          <h2>Tính năng nổi bật</h2>
+          <p>Những tính năng tiên tiến giúp quản lý hiệu quả</p>
+        </div>
 
-      <div class="home-actions">
-        {% if user.is_authenticated %}
-          <a href="/checkin/" class="home-btn">
-            📍 Bắt đầu Check-in
-          </a>
-          <a href="/checkin/history/" class="home-btn secondary">
-            📋 Xem lịch sử
-          </a>
-        {% else %}
-          <a href="/accounts/login/" class="home-btn">
-            🔐 Đăng nhập
-          </a>
-          <a href="/accounts/signup/" class="home-btn secondary">
-            📝 Đăng ký
-          </a>
-        {% endif %}
-      </div>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+            </div>
+            <h3>Check-in GPS chính xác</h3>
+            <p>Theo dõi vị trí chính xác với công nghệ GPS tiên tiến</p>
+          </div>
 
-      <div class="home-features">
-        <h3>✨ Tính năng nổi bật</h3>
-        <ul class="feature-list">
-          <li>
-            <span class="feature-icon">📍</span>
-            <span>Check-in bằng GPS chính xác</span>
-          </li>
-          <li>
-            <span class="feature-icon">📷</span>
-            <span>Chụp ảnh trực tiếp từ camera</span>
-          </li>
-          <li>
-            <span class="feature-icon">📊</span>
-            <span>Báo cáo và thống kê chi tiết</span>
-          </li>
-          <li>
-            <span class="feature-icon">👥</span>
-            <span>Quản lý nhân viên dễ dàng</span>
-          </li>
-        </ul>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+            </div>
+            <h3>Chụp ảnh trực tiếp</h3>
+            <p>Chụp ảnh check-in trực tiếp từ camera thiết bị</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <h3>Báo cáo chi tiết</h3>
+            <p>Báo cáo và thống kê đầy đủ về hoạt động nhân viên</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+              </svg>
+            </div>
+            <h3>Quản lý nhân viên</h3>
+            <p>Quản lý thông tin nhân viên và phân quyền dễ dàng</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+            </div>
+            <h3>Quản lý khu vực</h3>
+            <p>Thiết lập và quản lý các khu vực check-in linh hoạt</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+            </div>
+            <h3>Bảo mật cao</h3>
+            <p>Hệ thống bảo mật tiên tiến đảm bảo an toàn dữ liệu</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
