@@ -53,10 +53,15 @@ def manager_required(view_func):
     return role_required([UserRole.ADMIN, UserRole.MANAGER])(view_func)
 
 
+def hcns_required(view_func):
+    """Decorator cho HCNS, Admin và Superuser"""
+    return role_required([UserRole.ADMIN, UserRole.HCNS])(view_func)
+
+
 def employee_required(view_func):
     """Decorator cho tất cả người dùng đã đăng nhập"""
     return role_required(
-        [UserRole.ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE]
+        [UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS, UserRole.EMPLOYEE]
     )(view_func)
 
 
@@ -92,6 +97,6 @@ def check_permission(user, permission):
     elif permission == "manage_locations":
         return user.can_manage_locations()
     elif permission == "checkin":
-        return user.is_employee() or user.is_manager() or user.is_admin()
+        return user.is_employee() or user.is_manager() or user.is_admin() or user.is_hcns()
 
     return False

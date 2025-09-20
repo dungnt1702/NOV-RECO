@@ -41,6 +41,7 @@ class Department(models.Model):
 class UserRole(models.TextChoices):
     ADMIN = "admin", "Admin"
     MANAGER = "manager", "Quản lý"
+    HCNS = "hcns", "Hành chính nhân sự"
     EMPLOYEE = "employee", "Nhân viên"
 
 
@@ -73,6 +74,9 @@ class User(AbstractUser):
     def is_manager(self):
         return self.role == UserRole.MANAGER
 
+    def is_hcns(self):
+        return self.role == UserRole.HCNS
+
     def is_employee(self):
         return self.role == UserRole.EMPLOYEE
     
@@ -86,6 +90,10 @@ class User(AbstractUser):
         return self.is_manager()
     
     @property
+    def is_hcns_user(self):
+        return self.is_hcns()
+    
+    @property
     def is_employee_user(self):
         return self.is_employee()
 
@@ -93,7 +101,7 @@ class User(AbstractUser):
         return self.is_superuser or self.is_admin() or self.is_manager()
 
     def can_manage_users(self):
-        return self.is_superuser or self.is_admin()
+        return self.is_superuser or self.is_admin() or self.is_hcns()
 
     def can_manage_locations(self):
         return self.is_superuser or self.is_admin() or self.is_manager()

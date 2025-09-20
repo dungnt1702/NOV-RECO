@@ -16,16 +16,20 @@ NC='\033[0m' # No Color
 # Di chuyển đến thư mục gốc của dự án
 cd "$(dirname "$0")/../.."
 
-echo -e "${BLUE}[1/3] Setting up user groups and permissions...${NC}"
+echo -e "${BLUE}[1/4] Setting up user groups and permissions...${NC}"
 python3 manage.py setup_user_groups
 echo
 
-echo -e "${BLUE}[2/3] Creating sample users...${NC}"
-python3 manage.py create_sample_users
+echo -e "${BLUE}[2/4] Creating superuser...${NC}"
+python3 manage.py create_admin
 echo
 
-echo -e "${BLUE}[3/3] Creating sample areas...${NC}"
-python3 manage.py create_sample_areas
+echo -e "${BLUE}[3/4] Creating complete sample data...${NC}"
+python3 manage.py create_sample_data --clear
+echo
+
+echo -e "${BLUE}[4/4] Collecting static files...${NC}"
+python3 manage.py collectstatic --noinput
 echo
 
 echo -e "${GREEN}===============================================${NC}"
@@ -36,24 +40,36 @@ echo
 echo -e "${YELLOW}THÔNG TIN ĐĂNG NHẬP:${NC}"
 echo
 
-echo -e "${RED}🔴 Super Admin: superadmin / admin123${NC}"
+echo -e "${RED}🔴 Super Admin: admin / admin123${NC}"
 echo "   - Toàn quyền hệ thống"
 echo
 
-echo -e "${YELLOW}🟡 Quản lý: quanly / quanly123${NC}"
-echo "   - Xem và sửa toàn bộ"
+echo -e "${YELLOW}🟡 Manager IT: manager_it / password123${NC}"
+echo "   - Quản lý IT, xem check-ins"
 echo
 
-echo -e "${GREEN}🟢 Thư ký: thuky / thuky123${NC}"
-echo "   - Xem và sửa toàn bộ (trừ user management)"
+echo -e "${YELLOW}🟡 Manager HR: manager_hr / password123${NC}"
+echo "   - Quản lý nhân sự, xem check-ins"
 echo
 
-echo -e "${BLUE}🔵 Nhân viên 1: nhanvien1 / nhanvien123${NC}"
-echo "   - Xem và checkin"
+echo -e "${GREEN}🟢 HCNS: hcns_main / password123${NC}"
+echo "   - Quản lý users, xem check-ins"
 echo
 
-echo -e "${BLUE}🔵 Nhân viên 2: nhanvien2 / nhanvien123${NC}"
-echo "   - Xem và checkin"
+echo -e "${GREEN}🟢 HCNS Recruit: hcns_recruit / password123${NC}"
+echo "   - Quản lý users, tuyển dụng"
+echo
+
+echo -e "${BLUE}🔵 Developer: dev_001 / password123${NC}"
+echo "   - Nhân viên IT, check-in"
+echo
+
+echo -e "${BLUE}🔵 Accountant: accountant_001 / password123${NC}"
+echo "   - Nhân viên kế toán, check-in"
+echo
+
+echo -e "${BLUE}🔵 Sales: sales_001 / password123${NC}"
+echo "   - Nhân viên kinh doanh, check-in"
 echo
 
 echo -e "${GREEN}===============================================${NC}"
