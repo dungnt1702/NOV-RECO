@@ -234,11 +234,6 @@
     margin-bottom: 15px;
 }
 
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
 
 .user-avatar {
     width: 40px;
@@ -384,39 +379,9 @@
 }
 
 /* Pagination */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+/* History specific pagination overrides */
+.history-pagination {
     margin: 30px 15px 0 15px;
-}
-
-.pagination button {
-    padding: 8px 12px;
-    border: 1px solid #e2e8f0;
-    background: white;
-    color: #4a5568;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.pagination button:hover:not(:disabled) {
-    background: #f7fafc;
-    border-color: #0A5597;
-    color: #0A5597;
-}
-
-.pagination button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.pagination .current {
-    background: #0A5597;
-    color: white;
-    border-color: #0A5597;
 }
 
 /* Responsive design */
