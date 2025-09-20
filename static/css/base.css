@@ -398,16 +398,19 @@ svg {
         visibility: visible;
         transform: none;
         box-shadow: none;
-        background: transparent;
-        border: none;
-        padding: 0;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        padding: var(--spacing-sm) 0;
         margin: var(--spacing-sm) 0 0 var(--spacing-lg);
-        border-radius: 0;
+        border-radius: var(--radius-md);
         display: none;
+        z-index: 1000;
     }
 
     .dropdown-menu.active {
-        display: block;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
     }
 
     .dropdown-menu li a {
@@ -422,6 +425,12 @@ svg {
         background: var(--bg-tertiary);
         transform: none;
         padding-left: var(--spacing-md);
+    }
+    
+    /* Debug: Make sure dropdown is visible when active */
+    .dropdown-menu.active {
+        background: var(--bg-secondary) !important;
+        border: 1px solid var(--primary-color) !important;
     }
 
     .user-info {

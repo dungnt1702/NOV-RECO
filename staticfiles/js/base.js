@@ -49,12 +49,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle dropdown toggle on mobile
     const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-    dropdownToggles.forEach(toggle => {
+    console.log('Found dropdown toggles:', dropdownToggles.length);
+    
+    dropdownToggles.forEach((toggle, index) => {
+        console.log(`Setting up dropdown ${index}:`, toggle);
         toggle.addEventListener('click', function(e) {
+            console.log('Dropdown clicked, window width:', window.innerWidth);
             if (window.innerWidth <= 768) {
                 e.preventDefault();
                 const dropdown = this.closest('.dropdown');
                 const menu = dropdown.querySelector('.dropdown-menu');
+                
+                console.log('Dropdown:', dropdown);
+                console.log('Menu:', menu);
                 
                 // Close other dropdowns
                 dropdownToggles.forEach(otherToggle => {
@@ -67,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Toggle current dropdown
                 menu.classList.toggle('active');
+                console.log('Menu classes after toggle:', menu.className);
             }
         });
     });
