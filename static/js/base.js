@@ -126,7 +126,7 @@ function showAlert(message, type = 'info') {
     const colors = {
         success: '#28a745',
         error: '#dc3545',
-        warning: '#ffc107',
+        warning: '#fd7e14',
         info: '#17a2b8'
     };
     alert.style.backgroundColor = colors[type] || colors.info;

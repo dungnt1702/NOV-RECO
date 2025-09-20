@@ -7,6 +7,12 @@ let totalPages = 1;
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('History page DOM loaded, initializing...');
+    
+    // Check if elements exist
+    const checkinList = document.getElementById('checkin-list');
+    console.log('Checkin list container found:', !!checkinList);
+    
     loadCheckins();
     setupEventListeners();
 });
@@ -52,11 +58,16 @@ async function loadCheckins() {
             loadAreas();
             updateFilterCount();
         } else {
-            showError('Không thể tải dữ liệu check-in');
+            console.error('API error loading checkins:', response.status, response.statusText);
+            // Show error but still try to render empty state
+            renderCheckins([]);
+            showAlert('Lỗi tải lịch sử check-in. Vui lòng đăng nhập để xem dữ liệu.', 'error');
         }
     } catch (error) {
         console.error('Error loading checkins:', error);
-        showError('Lỗi tải dữ liệu check-in');
+        // Show error but still try to render empty state
+        renderCheckins([]);
+        showAlert('Lỗi tải lịch sử check-in. Vui lòng kiểm tra kết nối mạng.', 'error');
     }
 }
 
@@ -231,11 +242,18 @@ function updateFilterCount() {
 }
 
 // Render check-ins
-function renderCheckins() {
+function renderCheckins(checkins = null) {
     const container = document.getElementById('checkin-list');
-    if (!container) return;
+    if (!container) {
+        console.error('checkin-list container not found');
+        return;
+    }
     
-    if (filteredCheckins.length === 0) {
+    // Use provided checkins or filtered checkins
+    const checkinsToRender = checkins || filteredCheckins;
+    console.log('Rendering history checkins, count:', checkinsToRender.length);
+    
+    if (checkinsToRender.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">📝</div>
@@ -246,7 +264,7 @@ function renderCheckins() {
         return;
     }
     
-    container.innerHTML = filteredCheckins.map(checkin => `
+    container.innerHTML = checkinsToRender.map(checkin => `
         <div class="checkin-item">
             <div class="checkin-header">
                 <div class="user-info">
