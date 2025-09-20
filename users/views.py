@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import User, UserRole
+from django.db.models import Count
 from .forms import UserCreateForm, UserUpdateForm
 from .serializers import (
     UserSerializer,
@@ -118,6 +119,20 @@ def user_delete_view(request, user_id):
         return redirect("users:user_list")
 
     return render(request, "users/user_confirm_delete.html", {"user": user})
+
+
+@admin_required
+def department_list_view(request):
+    """Trang quản lý phòng ban"""
+    # Lấy danh sách các phòng ban từ users
+    departments = User.objects.exclude(department__isnull=True).exclude(department__exact='').values('department').annotate(
+        user_count=Count('id')
+    ).order_by('department')
+    
+    context = {
+        "departments": departments,
+    }
+    return render(request, "users/department_list.html", context)
 
 
 # API Views

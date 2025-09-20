@@ -28,23 +28,33 @@
             
             <ul class="nav-menu" id="nav-menu">
                 {% if user.is_authenticated %}
-                    <li><a href="/checkin/">📍 Check-in</a></li>
-                    <li><a href="/checkin/history/">📋 Lịch sử</a></li>
+                    <!-- Quản lý Check-in -->
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">📋 Quản lý Check-in <i class="fas fa-chevron-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/checkin/">📍 Check-in</a></li>
+                            <li><a href="/checkin/history/">📋 Lịch sử</a></li>
+                            {% if user.is_superuser or user.is_admin_user or user.is_manager_user or user.role == 'employee' and user.is_staff %}
+                                <li><a href="/checkin/list-view/">📊 Danh sách</a></li>
+                                <li><a href="/checkin/area-management/">🗺️ Khu vực</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
                     
+                    <!-- Quản lý Nhân sự -->
                     {% if user.is_superuser or user.is_admin_user %}
-                        <li><a href="/users/">👥 Quản lý người dùng</a></li>
-                        <li><a href="/checkin/area-management/">🗺️ Quản lý khu vực</a></li>
-                        <li><a href="/checkin/list-view/">📊 Danh sách Check-in</a></li>
-                        {% if user.is_superuser %}
-                            <li><a href="/admin/">⚙️ Admin Panel</a></li>
-                        {% endif %}
-                    {% elif user.is_manager_user %}
-                        <li><a href="/checkin/area-management/">🗺️ Quản lý khu vực</a></li>
-                        <li><a href="/checkin/list-view/">📊 Danh sách Check-in</a></li>
-                    {% elif user.role == 'employee' and user.is_staff %}
-                        <!-- Thư ký -->
-                        <li><a href="/checkin/area-management/">🗺️ Quản lý khu vực</a></li>
-                        <li><a href="/checkin/list-view/">📊 Danh sách Check-in</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle">👥 Quản lý Nhân sự <i class="fas fa-chevron-down"></i></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/users/">👤 Nhân viên</a></li>
+                                <li><a href="/users/departments/">🏢 Phòng ban</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                    
+                    <!-- Admin Panel -->
+                    {% if user.is_superuser %}
+                        <li><a href="/admin/">⚙️ Admin Panel</a></li>
                     {% endif %}
                 {% endif %}
             </ul>
