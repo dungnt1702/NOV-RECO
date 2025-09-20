@@ -1,12 +1,12 @@
 /* Area Management Specific Styles */
-.area-management-page {
+.area-management-page .area-management-page {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
 }
 
-.area-management-container {
+.area-management-page .area-management-container {
     max-width: 1400px;
     margin: 0 auto;
     background: white;
@@ -15,36 +15,36 @@
     overflow: hidden;
 }
 
-.area-management-header {
+.area-management-page .area-management-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 30px;
     text-align: center;
 }
 
-.area-management-title {
+.area-management-page .area-management-title {
     font-size: 2.5rem;
     margin-bottom: 10px;
     font-weight: 700;
 }
 
-.area-management-subtitle {
+.area-management-page .area-management-subtitle {
     font-size: 1.1rem;
     opacity: 0.9;
 }
 
-.area-management-content {
+.area-management-page .area-management-content {
     padding: 30px;
 }
 
-.area-management-grid {
+.area-management-page .area-management-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 30px;
     margin-bottom: 30px;
 }
 
-.area-management-section {
+.area-management-page .area-management-section {
     background: #f8f9fa;
     border-radius: 15px;
     padding: 25px;
@@ -58,7 +58,7 @@
     font-weight: 600;
 }
 
-.form-group {
+.area-management-page .form-group {
     margin-bottom: 20px;
 }
 
@@ -69,7 +69,7 @@
     color: #495057;
 }
 
-.form-control {
+.area-management-page .form-control {
     width: 100%;
     padding: 12px 15px;
     border: 2px solid #e9ecef;
@@ -86,7 +86,7 @@
 
 
 
-.map-container {
+.area-management-page .map-container {
     height: 400px;
     border-radius: 15px;
     overflow: hidden;
@@ -94,12 +94,12 @@
     margin-bottom: 20px;
 }
 
-.areas-list {
+.area-management-page .areas-list {
     max-height: 400px;
     overflow-y: auto;
 }
 
-.area-item {
+.area-management-page .area-item {
     background: white;
     border: 1px solid #e9ecef;
     border-radius: 10px;
@@ -113,20 +113,20 @@
     transform: translateY(-2px);
 }
 
-.area-item-header {
+.area-management-page .area-item-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
 }
 
-.area-name {
+.area-management-page .area-name {
     font-weight: 600;
     color: #495057;
     font-size: 1.1rem;
 }
 
-.area-status {
+.area-management-page .area-status {
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 0.8rem;
@@ -143,45 +143,45 @@
     color: #721c24;
 }
 
-.area-details {
+.area-management-page .area-details {
     color: #6c757d;
     font-size: 0.9rem;
     line-height: 1.4;
 }
 
-.area-actions {
+.area-management-page .area-actions {
     margin-top: 10px;
     display: flex;
     gap: 10px;
 }
 
-.alert {
+.area-management-page .alert {
     padding: 15px 20px;
     border-radius: 10px;
     margin-bottom: 20px;
     border: 1px solid transparent;
 }
 
-.alert-success {
+.area-management-page .alert-success {
     background: #d4edda;
     border-color: #c3e6cb;
     color: #155724;
 }
 
-.alert-danger {
+.area-management-page .alert-danger {
     background: #f8d7da;
     border-color: #f5c6cb;
     color: #721c24;
 }
 
-.alert-info {
+.area-management-page .alert-info {
     background: #d1ecf1;
     border-color: #bee5eb;
     color: #0c5460;
 }
 
 /* Get Current Location Button */
-#getCurrentLocationBtn {
+.area-management-page #getCurrentLocationBtn {
     background: linear-gradient(135deg, #17a2b8, #138496);
     border: none;
     color: white;
@@ -209,7 +209,7 @@
     margin-right: 5px;
 }
 
-.loading {
+.area-management-page .loading {
     text-align: center;
     padding: 20px;
     color: #6c757d;

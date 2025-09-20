@@ -1,5 +1,5 @@
 /* Authentication Pages Styles */
-.auth-page {
+.auth-page .auth-page {
     min-height: 100vh;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
@@ -8,7 +8,7 @@
     padding: 20px;
 }
 
-.auth-container {
+.auth-page .auth-container {
     background: white;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -29,14 +29,14 @@
     }
 }
 
-.auth-header {
+.auth-page .auth-header {
     background: linear-gradient(135deg, #0A5597 0%, #1e3c72 100%);
     color: white;
     padding: 40px 30px;
     text-align: center;
 }
 
-.auth-logo {
+.auth-page .auth-logo {
     width: 60px;
     height: 60px;
     margin-bottom: 20px;
@@ -55,19 +55,19 @@
     margin: 0;
 }
 
-.auth-form-container {
+.auth-page .auth-form-container {
     padding: 40px 30px;
 }
 
-.auth-form {
+.auth-page .auth-form {
     margin-bottom: 30px;
 }
 
-.form-group {
+.auth-page .form-group {
     margin-bottom: 20px;
 }
 
-.form-row {
+.auth-page .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
@@ -106,11 +106,11 @@
     box-shadow: 0 0 0 3px rgba(10, 85, 151, 0.1);
 }
 
-.checkbox-group {
+.auth-page .checkbox-group {
     margin-bottom: 25px;
 }
 
-.checkbox-label {
+.auth-page .checkbox-label {
     display: flex;
     align-items: flex-start;
     gap: 10px;
@@ -125,11 +125,11 @@
     transform: scale(1.2);
 }
 
-.checkbox-text {
+.auth-page .checkbox-text {
     color: #4a5568;
 }
 
-.terms-link {
+.auth-page .terms-link {
     color: #0A5597;
     text-decoration: none;
     font-weight: 600;
@@ -139,19 +139,19 @@
     text-decoration: underline;
 }
 
-.form-actions {
+.auth-page .form-actions {
     margin-bottom: 25px;
 }
 
 
-.auth-links {
+.auth-page .auth-links {
     display: flex;
     flex-direction: column;
     gap: 12px;
     text-align: center;
 }
 
-.auth-link {
+.auth-page .auth-link {
     color: #0A5597;
     text-decoration: none;
     font-weight: 500;
@@ -170,12 +170,12 @@
     color: #1e3c72;
 }
 
-.social-login {
+.auth-page .social-login {
     border-top: 1px solid #e2e8f0;
     padding-top: 30px;
 }
 
-.divider {
+.auth-page .divider {
     text-align: center;
     margin-bottom: 20px;
     position: relative;
@@ -199,7 +199,7 @@
     position: relative;
 }
 
-.btn-social {
+.auth-page .btn-social {
     width: 100%;
     margin-bottom: 10px;
     background: white;
@@ -213,7 +213,7 @@
     transform: translateY(-1px);
 }
 
-.btn-google {
+.auth-page .btn-google {
     border-color: #db4437;
     color: #db4437;
 }
@@ -223,7 +223,7 @@
     color: white;
 }
 
-.alert {
+.auth-page .alert {
     padding: 15px 20px;
     border-radius: 10px;
     margin-bottom: 20px;
@@ -233,7 +233,7 @@
     font-size: 14px;
 }
 
-.alert-error {
+.auth-page .alert-error {
     background: #fed7d7;
     color: #c53030;
     border: 1px solid #feb2b2;

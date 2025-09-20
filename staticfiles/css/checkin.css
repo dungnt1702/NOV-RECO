@@ -1,5 +1,5 @@
 /* Check-in page specific styles */
-.checkin-page {
+.checkin-page .checkin-page {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -7,7 +7,7 @@
     padding: 20px;
 }
 
-.checkin-container {
+.checkin-page .checkin-container {
     background: white;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -28,7 +28,7 @@
     background: linear-gradient(90deg, #0A5597, #F5831F);
 }
 
-.checkin-header {
+.checkin-page .checkin-header {
     text-align: center;
     margin-bottom: 30px;
 }
@@ -40,14 +40,14 @@
     margin-bottom: 10px;
 }
 
-.checkin-subtitle {
+.checkin-page .checkin-subtitle {
     color: #666;
     font-size: 16px;
     margin-bottom: 20px;
 }
 
 /* Permissions check section */
-.permissions-check-section {
+.checkin-page .permissions-check-section {
   background: #f8f9fa;
   border: 2px solid #e9ecef;
   border-radius: 12px;
@@ -55,7 +55,7 @@
   margin-bottom: 20px;
 }
 
-.permissions-title {
+.checkin-page .permissions-title {
   font-size: 18px;
   font-weight: 600;
   color: #495057;
@@ -63,14 +63,14 @@
   text-align: center;
 }
 
-.permissions-grid {
+.checkin-page .permissions-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 15px;
   margin-bottom: 15px;
 }
 
-.permission-item {
+.checkin-page .permission-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -82,14 +82,14 @@
   gap: 10px;
 }
 
-.permission-label {
+.checkin-page .permission-label {
   font-weight: 500;
   color: #495057;
   flex: 1;
   min-width: 120px;
 }
 
-.permission-status {
+.checkin-page .permission-status {
   font-size: 14px;
   padding: 4px 8px;
   border-radius: 4px;
@@ -112,7 +112,7 @@
   color: #212529;
 }
 
-.btn-test-permission {
+.checkin-page .btn-test-permission {
   background: #007bff;
   color: white;
   border: none;
@@ -128,7 +128,7 @@
   background: #0056b3;
 }
 
-.permissions-help {
+.checkin-page .permissions-help {
   background: #e7f3ff;
   border: 1px solid #b3d9ff;
   border-radius: 6px;
@@ -139,7 +139,7 @@
 }
 
 /* User info section */
-.user-info-section {
+.checkin-page .user-info-section {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
@@ -147,57 +147,57 @@
     margin-bottom: 25px;
 }
 
-.user-info-title {
+.checkin-page .user-info-title {
     font-size: 14px;
     font-weight: 600;
     color: #4a5568;
     margin-bottom: 10px;
 }
 
-.user-info-grid {
+.checkin-page .user-info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
 }
 
-.user-info-item {
+.checkin-page .user-info-item {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
 
-.user-info-label {
+.checkin-page .user-info-label {
     font-size: 12px;
     color: #718096;
     font-weight: 500;
 }
 
-.user-info-value {
+.checkin-page .user-info-value {
     font-size: 14px;
     color: #2d3748;
     font-weight: 600;
 }
 
 /* Form styles */
-.checkin-form {
+.checkin-page .checkin-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-.form-group {
+.checkin-page .form-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.form-label {
+.checkin-page .form-label {
     font-size: 14px;
     font-weight: 600;
     color: #2d3748;
 }
 
-.form-input {
+.checkin-page .form-input {
     padding: 12px 16px;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
@@ -211,7 +211,7 @@
     box-shadow: 0 0 0 3px rgba(10, 85, 151, 0.1);
 }
 
-.form-textarea {
+.checkin-page .form-textarea {
     padding: 12px 16px;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
@@ -228,12 +228,12 @@
 }
 
 /* Map styles */
-.map-container {
+.checkin-page .map-container {
     position: relative;
     margin-bottom: 20px;
 }
 
-.map-controls {
+.checkin-page .map-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -242,13 +242,13 @@
 }
 
 
-.map-label {
+.checkin-page .map-label {
     font-size: 14px;
     font-weight: 600;
     color: #2d3748;
 }
 
-.btn-get-location {
+.checkin-page .btn-get-location {
     background: #0A5597;
     color: white;
     border: none;
@@ -272,13 +272,13 @@
 }
 
 
-.coordinates {
+.checkin-page .coordinates {
     font-size: 12px;
     color: #718096;
     font-family: monospace;
 }
 
-#map {
+.checkin-page #map {
     width: 100%;
     height: 250px;
     border-radius: 8px;
@@ -286,13 +286,13 @@
 }
 
 /* Camera styles */
-.camera-container {
+.checkin-page .camera-container {
     position: relative;
     margin-bottom: 20px;
     margin-top: 10px;
 }
 
-.camera-preview {
+.checkin-page .camera-preview {
     width: 100%;
     min-height: 200px;
     height: 200px;
@@ -319,26 +319,26 @@
     background: #f0fff4;
 }
 
-.camera-icon {
+.checkin-page .camera-icon {
     font-size: 48px;
     margin-bottom: 10px;
     color: #a0aec0;
 }
 
-.camera-text {
+.checkin-page .camera-text {
     font-size: 14px;
     color: #718096;
     font-weight: 500;
 }
 
-.camera-controls {
+.checkin-page .camera-controls {
     display: flex;
     gap: 10px;
     margin-top: 10px;
 }
 
 /* Video element styles */
-#video {
+.checkin-page #video {
     width: 100%;
     min-height: 200px;
     height: 200px;
@@ -359,7 +359,7 @@
     display: none;
 }
 
-.btn-camera {
+.checkin-page .btn-camera {
     flex: 1;
     padding: 10px 16px;
     border: 2px solid #0A5597;
@@ -388,7 +388,7 @@
 }
 
 /* Submit button */
-.btn-checkin {
+.checkin-page .btn-checkin {
     background: linear-gradient(135deg, #0A5597 0%, #F5831F 100%);
     color: white;
     border: none;
