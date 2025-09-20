@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Location, Checkin, Area
+from .models import Checkin, Area
 
 
 @admin.register(Area)
@@ -31,39 +31,29 @@ class AreaAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-@admin.register(Location)
-class LocationAdmin(admin.ModelAdmin):
-    list_display = ("name", "lat", "lng", "radius_m", "is_active")
-    list_filter = ("is_active",)
-    search_fields = ("name",)
-    ordering = ("name",)
-
-
 @admin.register(Checkin)
 class CheckinAdmin(admin.ModelAdmin):
     list_display = (
         "user",
-        "get_location_name",
+        "get_area_name",
         "area",
-        "location",
         "created_at",
         "distance_m",
         "note",
     )
-    list_filter = ("area", "location", "created_at", "user__role")
+    list_filter = ("area", "created_at", "user__role")
     search_fields = (
         "user__email",
         "user__first_name",
         "user__last_name",
         "area__name",
-        "location__name",
         "note",
     )
     ordering = ("-created_at",)
     readonly_fields = ("created_at", "distance_m", "ip", "user_agent")
 
     fieldsets = (
-        (None, {"fields": ("user", "area", "location")}),
+        (None, {"fields": ("user", "area")}),
         (
             "Check-in Details",
             {"fields": ("lat", "lng", "distance_m", "photo", "note")},
@@ -71,7 +61,7 @@ class CheckinAdmin(admin.ModelAdmin):
         ("System Info", {"fields": ("created_at", "ip", "user_agent")}),
     )
 
-    def get_location_name(self, obj):
-        return obj.get_location_name()
+    def get_area_name(self, obj):
+        return obj.get_area_name()
 
-    get_location_name.short_description = "Vị trí"
+    get_area_name.short_description = "Khu vực"

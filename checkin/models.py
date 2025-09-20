@@ -39,26 +39,12 @@ class Area(models.Model):
         return distance <= self.radius_m
 
 
-class Location(models.Model):
-    name = models.CharField(max_length=120)
-    lat = models.FloatField()
-    lng = models.FloatField()
-    radius_m = models.PositiveIntegerField(default=150)
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.name
-
-
 class Checkin(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
     )
     area = models.ForeignKey(
         Area, on_delete=models.CASCADE, null=True, blank=True
-    )
-    location = models.ForeignKey(
-        Location, on_delete=models.CASCADE, null=True, blank=True
     )
     lat = models.FloatField()
     lng = models.FloatField()
@@ -69,10 +55,8 @@ class Checkin(models.Model):
     ip = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.CharField(max_length=255, blank=True)
 
-    def get_location_name(self):
-        """Lấy tên vị trí từ area hoặc location"""
+    def get_area_name(self):
+        """Lấy tên khu vực"""
         if self.area:
             return self.area.name
-        elif self.location:
-            return self.location.name
-        return "Vị trí không xác định"
+        return "Khu vực không xác định"

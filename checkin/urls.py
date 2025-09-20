@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     dashboard,
     checkin_page,
-    LocationListView,
+    AreaListView,
     checkin_submit_view,
     checkin_list_api,
     user_info_api,
@@ -24,7 +24,7 @@ urlpatterns = [
     path("dashboard/", dashboard, name="dashboard"),
     # Check-in
     path("", checkin_page, name="checkin_page"),
-    path("locations/", LocationListView.as_view(), name="locations"),
+    path("areas-list/", AreaListView.as_view(), name="areas_list"),
     path("submit/", checkin_submit_view, name="checkin_submit"),
     path("list/", checkin_list_api, name="checkin_list"),
     path("list-view/", checkin_list_view, name="checkin_list_view"),

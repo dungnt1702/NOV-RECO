@@ -8,7 +8,7 @@ from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.decorators import api_view, permission_classes
-from .models import Location, Checkin, Area
+from .models import Checkin, Area
 from users.models import User, UserRole
 from .serializers import (
     CheckinCreateSerializer,
@@ -42,10 +42,9 @@ def admin_dashboard(request):
     context = {
         "total_users": User.objects.count(),
         "total_checkins": Checkin.objects.count(),
-        "total_locations": Location.objects.count(),
         "total_areas": Area.objects.count(),
         "recent_checkins": Checkin.objects.select_related(
-            "user", "area", "location"
+            "user", "area"
         ).order_by("-created_at")[:10],
         "users_by_role": {
             "admin": User.objects.filter(role=UserRole.ADMIN).count(),
@@ -63,7 +62,7 @@ def manager_dashboard(request):
         "total_employees": User.objects.filter(role=UserRole.EMPLOYEE).count(),
         "total_checkins": Checkin.objects.count(),
         "recent_checkins": Checkin.objects.select_related(
-            "user", "location"
+            "user", "area"
         ).order_by("-created_at")[:10],
         "employees": User.objects.filter(role=UserRole.EMPLOYEE).order_by(
             "first_name"
@@ -78,7 +77,7 @@ def employee_dashboard(request):
     user = request.user
     context = {
         "user_checkins": Checkin.objects.filter(user=user)
-        .select_related("location")
+        .select_related("area")
         .order_by("-created_at")[:10],
         "total_checkins": Checkin.objects.filter(user=user).count(),
         "recent_checkin": Checkin.objects.filter(user=user)
@@ -96,7 +95,7 @@ def checkin_page(request):
 
 # API Views
 @method_decorator(login_required, name="dispatch")
-class LocationListView(ListAPIView):
+class AreaListView(ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
@@ -107,15 +106,8 @@ class LocationListView(ListAPIView):
             )
         )
 
-        # Lấy danh sách locations
-        locations = list(
-            Location.objects.filter(is_active=True).values(
-                "id", "name", "lat", "lng", "radius_m"
-            )
-        )
-
-        # Kết hợp và trả về
-        data = {"areas": areas, "locations": locations}
+        # Trả về danh sách areas
+        data = {"areas": areas}
         return Response(data)
 
 
@@ -168,7 +160,7 @@ def checkin_submit_view(request):
                     "user_email": checkin.user.email,
                     "user_department": checkin.user.department or "N/A",
                     "user_employee_id": checkin.user.employee_id or "N/A",
-                    "location_name": checkin.get_location_name(),
+                    "area_name": checkin.get_area_name(),
                     "coordinates": f"{checkin.lat:.6f}, {checkin.lng:.6f}",
                     "checkin_time": checkin.created_at.strftime(
                         "%d/%m/%Y %H:%M:%S"
@@ -211,13 +203,13 @@ def checkin_list_api(request):
     if user.can_view_all_checkins():
         # Admin và Manager có thể xem tất cả check-in
         checkins = Checkin.objects.select_related(
-            "user", "area", "location"
+            "user", "area"
         ).order_by("-created_at")
     else:
         # Nhân viên chỉ xem được check-in của mình
         checkins = (
             Checkin.objects.filter(user=user)
-            .select_related("area", "location")
+            .select_related("area")
             .order_by("-created_at")
         )
 
@@ -275,7 +267,7 @@ def user_history_api(request):
     page = int(request.GET.get("page", 1))
     from_date = request.GET.get("from_date")
     to_date = request.GET.get("to_date")
-    location_id = request.GET.get("location")
+    area_id = request.GET.get("area")
 
     # Base queryset
     checkins = (
@@ -299,13 +291,10 @@ def user_history_api(request):
         except ValueError:
             pass
 
-    if location_id:
+    if area_id:
         try:
-            # Filter by area or location
-            checkins = checkins.filter(
-                models.Q(area_id=int(location_id))
-                | models.Q(location_id=int(location_id))
-            )
+            # Filter by area
+            checkins = checkins.filter(area_id=int(area_id))
         except ValueError:
             pass
 
@@ -333,7 +322,7 @@ def user_history_api(request):
                 "created_at": checkin.created_at.isoformat(),
                 "lat": float(checkin.lat),
                 "lng": float(checkin.lng),
-                "location_name": checkin.get_location_name(),
+                "area_name": checkin.get_area_name(),
                 "distance_m": checkin.distance_m,
                 "note": checkin.note,
                 "photo_url": checkin.photo.url if checkin.photo else None,
@@ -362,7 +351,7 @@ def last_checkin_api(request):
     try:
         last_checkin = (
             Checkin.objects.filter(user=user)
-            .select_related("area", "location")
+            .select_related("area")
             .order_by("-created_at")
             .first()
         )
@@ -375,7 +364,7 @@ def last_checkin_api(request):
                 "id": last_checkin.id,
                 "lat": float(last_checkin.lat),
                 "lng": float(last_checkin.lng),
-                "location_name": last_checkin.get_location_name(),
+                "area_name": last_checkin.get_area_name(),
                 "coordinates": (
                     f"{last_checkin.lat:.6f}, {last_checkin.lng:.6f}"
                 ),

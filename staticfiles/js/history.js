@@ -32,9 +32,9 @@ function setupEventListeners() {
     }
     
     // Location filter
-    const locationFilter = document.getElementById('location-filter');
-    if (locationFilter) {
-        locationFilter.addEventListener('change', applyFilters);
+    const areaFilter = document.getElementById('area-filter');
+    if (areaFilter) {
+        areaFilter.addEventListener('change', applyFilters);
     }
 }
 
@@ -49,7 +49,7 @@ async function loadCheckins() {
             
             updatePagination(data);
             renderCheckins();
-            loadLocations();
+            loadAreas();
         } else {
             showError('Không thể tải dữ liệu check-in');
         }
@@ -59,29 +59,29 @@ async function loadCheckins() {
     }
 }
 
-// Load locations for filter
-async function loadLocations() {
+// Load areas for filter
+async function loadAreas() {
     try {
-        const response = await api('/checkin/locations/');
+        const response = await api('/checkin/areas-list/');
         if (response.ok) {
             const data = await response.json();
-            const allLocations = [...(data.areas || []), ...(data.locations || [])];
+            const areas = data.areas || [];
             
-            const locationSelect = document.getElementById('location-filter');
-            if (locationSelect) {
+            const areaSelect = document.getElementById('area-filter');
+            if (areaSelect) {
                 // Clear existing options except first one
-                locationSelect.innerHTML = '<option value="">Tất cả địa điểm</option>';
+                areaSelect.innerHTML = '<option value="">Tất cả khu vực</option>';
                 
-                allLocations.forEach(location => {
+                areas.forEach(area => {
                     const option = document.createElement('option');
-                    option.value = location.name;
-                    option.textContent = location.name;
-                    locationSelect.appendChild(option);
+                    option.value = area.id;
+                    option.textContent = area.name;
+                    areaSelect.appendChild(option);
                 });
             }
         }
     } catch (error) {
-        console.error('Error loading locations:', error);
+        console.error('Error loading areas:', error);
     }
 }
 
@@ -147,11 +147,11 @@ function applyFilters() {
     const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
     const dateFrom = document.getElementById('date-from')?.value || '';
     const dateTo = document.getElementById('date-to')?.value || '';
-    const location = document.getElementById('location-filter')?.value || '';
+    const area = document.getElementById('area-filter')?.value || '';
     
     filteredCheckins = allCheckins.filter(checkin => {
         // Search filter
-        if (searchTerm && !checkin.location_name.toLowerCase().includes(searchTerm) &&
+        if (searchTerm && !checkin.area_name.toLowerCase().includes(searchTerm) &&
             !(checkin.note && checkin.note.toLowerCase().includes(searchTerm))) {
             return false;
         }
@@ -170,8 +170,8 @@ function applyFilters() {
             if (checkinDate > toDate) return false;
         }
         
-        // Location filter
-        if (location && checkin.location_name !== location) {
+        // Area filter
+        if (area && checkin.area && checkin.area.toString() !== area) {
             return false;
         }
         
@@ -219,7 +219,7 @@ function renderCheckins() {
                     <div class="detail-row">
                         <span class="detail-icon">📍</span>
                         <span class="detail-label">Địa điểm:</span>
-                        <span class="detail-value location-badge">${checkin.location_name || 'N/A'}</span>
+                        <span class="detail-value area-badge">${checkin.area_name || 'N/A'}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-icon">📏</span>
