@@ -42,6 +42,58 @@ function renderCheckinsTable() {
       </td>
     </tr>
   `).join('');
+  
+  // Also render mobile cards
+  renderMobileCards();
+}
+
+function renderMobileCards() {
+  const mobileCards = document.getElementById('mobile-cards');
+  if (!mobileCards) return;
+  
+  mobileCards.innerHTML = filteredCheckins.map(checkin => `
+    <div class="mobile-card">
+      <div class="mobile-card-header">
+        <h3 class="mobile-card-title">${checkin.user_name}</h3>
+        <span class="mobile-card-id">#${checkin.id}</span>
+      </div>
+      
+      <div class="mobile-card-content">
+        <div class="mobile-card-row">
+          <span class="mobile-card-label">📍 Địa điểm:</span>
+          <span class="mobile-card-value">${checkin.location_name}</span>
+        </div>
+        
+        <div class="mobile-card-row">
+          <span class="mobile-card-label">🗺️ Tọa độ:</span>
+          <span class="mobile-card-value">${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}</span>
+        </div>
+        
+        <div class="mobile-card-row">
+          <span class="mobile-card-label">📅 Thời gian:</span>
+          <span class="mobile-card-value">${formatDate(checkin.created_at)}</span>
+        </div>
+        
+        ${checkin.note && checkin.note !== 'N/A' ? `
+        <div class="mobile-card-row">
+          <span class="mobile-card-label">📝 Ghi chú:</span>
+          <span class="mobile-card-value">${checkin.note}</span>
+        </div>
+        ` : ''}
+        
+        ${checkin.photo ? `
+        <div class="mobile-card-row">
+          <img src="${checkin.photo}" alt="Check-in photo" class="mobile-card-photo">
+        </div>
+        ` : ''}
+      </div>
+      
+      <div class="mobile-card-badges">
+        <span class="mobile-card-badge location">${checkin.location_name}</span>
+        <span class="mobile-card-badge distance">${formatDistance(checkin.distance_m || 0)}</span>
+      </div>
+    </div>
+  `).join('');
 }
 
 async function loadUsers() {

@@ -118,6 +118,11 @@
     border: 1px solid #e2e8f0;
 }
 
+/* Mobile cards - hidden by default */
+.mobile-cards {
+    display: none;
+}
+
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -311,12 +316,110 @@
         justify-content: center;
     }
     
+    /* Hide table on mobile, show cards */
     .table-container {
-        overflow-x: auto;
+        display: none;
     }
     
-    .table {
-        min-width: 600px;
+    /* Mobile cards layout */
+    .mobile-cards {
+        display: block;
+    }
+    
+    .mobile-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .mobile-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .mobile-card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0;
+    }
+    
+    .mobile-card-id {
+        font-size: 12px;
+        color: #718096;
+        background: #edf2f7;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+    
+    .mobile-card-content {
+        display: grid;
+        gap: 8px;
+    }
+    
+    .mobile-card-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+    
+    .mobile-card-label {
+        font-weight: 600;
+        color: #4a5568;
+        min-width: 80px;
+        flex-shrink: 0;
+    }
+    
+    .mobile-card-value {
+        color: #2d3748;
+        flex: 1;
+    }
+    
+    .mobile-card-photo {
+        width: 100%;
+        max-width: 200px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-top: 10px;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .mobile-card-badges {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .mobile-card-badge {
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+    
+    .mobile-card-badge.location {
+        background: #0A5597;
+        color: white;
+    }
+    
+    .mobile-card-badge.distance {
+        background: #F5831F;
+        color: white;
     }
 }
 
