@@ -9,13 +9,32 @@
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-page">
-{% csrf_token %}
-<div class="dashboard-container">
-    <div class="dashboard-header">
-      <h1>Danh sách Check-in</h1>
-      <p class="dashboard-subtitle">Xem tất cả check-in trong hệ thống</p>
-    </div>
+  <div class="dashboard-page">
+    {% csrf_token %}
+    <div class="dashboard-container">
+      <div class="dashboard-header">
+        <h1>Danh sách Check-in</h1>
+        <p class="dashboard-subtitle">Xem tất cả check-in trong hệ thống</p>
+      </div>
+
+      <!-- Search and Filter -->
+      <div class="search-filter-section">
+        <form class="search-form">
+          <div class="search-input-group">
+            <input type="text" id="search-input" placeholder="Tìm kiếm theo tên, khu vực, ghi chú..." class="form-control search-input">
+            <select id="page-size-select" class="form-control page-size-select">
+              <option value="10">10/trang</option>
+              <option value="20" selected>20/trang</option>
+              <option value="50">50/trang</option>
+              <option value="100">100/trang</option>
+            </select>
+            <button type="button" onclick="clearFilters()" class="btn btn-secondary">
+              <i class="fas fa-times"></i>
+              Xóa bộ lọc
+            </button>
+          </div>
+        </form>
+      </div>
 
     <div class="dashboard-content">
       <!-- Filters -->

@@ -3,6 +3,8 @@ let allCheckins = [];
 let filteredCheckins = [];
 let currentPage = 1;
 let totalPages = 1;
+let pageSize = 20;
+let searchQuery = '';
 
 console.log('Checkin list JS loaded');
 
@@ -16,9 +18,8 @@ async function loadCheckins() {
       const data = await response.json();
       console.log('Data received:', data);
       allCheckins = data.results || [];
-      filteredCheckins = [...allCheckins];
+      applyFilters();
       console.log('Checkins loaded:', allCheckins.length);
-      renderCheckinsTable();
       loadUsers();
     } else {
       console.error('API error:', response.status, response.statusText);
@@ -31,12 +32,21 @@ async function loadCheckins() {
 
 function renderCheckinsTable() {
   console.log('Rendering checkins table, count:', filteredCheckins.length);
+  
+  // Calculate pagination
+  totalPages = Math.ceil(filteredCheckins.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const pageCheckins = filteredCheckins.slice(startIndex, endIndex);
+  
+  console.log(`Page ${currentPage} of ${totalPages}, showing ${pageCheckins.length} items`);
+  
   const tbody = document.getElementById('checkins-table');
   if (!tbody) {
     console.error('checkins-table element not found');
     return;
   }
-  tbody.innerHTML = filteredCheckins.map(checkin => `
+  tbody.innerHTML = pageCheckins.map(checkin => `
     <tr>
       <td>${checkin.id}</td>
       <td>${checkin.user_name}</td>
@@ -53,6 +63,9 @@ function renderCheckinsTable() {
   
   // Also render mobile cards
   renderMobileCards();
+  
+  // Render pagination
+  renderPagination();
 }
 
 function renderMobileCards() {
@@ -62,9 +75,13 @@ function renderMobileCards() {
     console.error('mobile-cards element not found');
     return;
   }
-  if (!mobileCards) return;
   
-  mobileCards.innerHTML = filteredCheckins.map(checkin => `
+  // Calculate pagination for mobile cards
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const pageCheckins = filteredCheckins.slice(startIndex, endIndex);
+  
+  mobileCards.innerHTML = pageCheckins.map(checkin => `
     <div class="mobile-card">
       <div class="mobile-card-header">
         <h3 class="mobile-card-title">${checkin.user_name}</h3>
@@ -156,6 +173,70 @@ function applyFilters() {
   renderCheckinsTable();
 }
 
+// Clear all filters
+function clearFilters() {
+  document.getElementById('search-input').value = '';
+  searchQuery = '';
+  applyFilters();
+}
+
+// Render pagination
+function renderPagination() {
+  const paginationDiv = document.getElementById('pagination');
+  if (!paginationDiv) return;
+  
+  if (totalPages <= 1) {
+    paginationDiv.innerHTML = '';
+    return;
+  }
+  
+  const startIndex = (currentPage - 1) * pageSize + 1;
+  const endIndex = Math.min(currentPage * pageSize, filteredCheckins.length);
+  
+  let paginationHTML = `
+    <div class="pagination-info">
+      <span class="info-text">
+        Hiển thị ${startIndex}-${endIndex} trong tổng số ${filteredCheckins.length} check-in
+      </span>
+    </div>
+    
+    <div class="page-numbers">
+  `;
+  
+  // Previous button
+  if (currentPage > 1) {
+    paginationHTML += `<a href="#" class="page-link page-prev" onclick="changePage(${currentPage - 1})">‹</a>`;
+  }
+  
+  // Page numbers
+  const startPage = Math.max(1, currentPage - 2);
+  const endPage = Math.min(totalPages, currentPage + 2);
+  
+  for (let i = startPage; i <= endPage; i++) {
+    if (i === currentPage) {
+      paginationHTML += `<span class="page-link active">${i}</span>`;
+    } else {
+      paginationHTML += `<a href="#" class="page-link" onclick="changePage(${i})">${i}</a>`;
+    }
+  }
+  
+  // Next button
+  if (currentPage < totalPages) {
+    paginationHTML += `<a href="#" class="page-link page-next" onclick="changePage(${currentPage + 1})">›</a>`;
+  }
+  
+  paginationHTML += '</div>';
+  paginationDiv.innerHTML = paginationHTML;
+}
+
+// Change page
+function changePage(page) {
+  if (page >= 1 && page <= totalPages) {
+    currentPage = page;
+    renderCheckinsTable();
+  }
+}
+
 // Debounce function for search input
 function debounce(func, wait) {
   let timeout;
@@ -174,8 +255,33 @@ document.addEventListener('DOMContentLoaded', function() {
   loadCheckins();
   
   // Add event listeners
-  document.getElementById('search-input').addEventListener('input', debounce(applyFilters, 300));
-  document.getElementById('date-from').addEventListener('change', applyFilters);
-  document.getElementById('date-to').addEventListener('change', applyFilters);
-  document.getElementById('user-filter').addEventListener('change', applyFilters);
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', debounce(applyFilters, 300));
+  }
+  
+  const pageSizeSelect = document.getElementById('page-size-select');
+  if (pageSizeSelect) {
+    pageSizeSelect.addEventListener('change', function() {
+      pageSize = parseInt(this.value);
+      currentPage = 1;
+      renderCheckinsTable();
+    });
+  }
+  
+  // Optional: Add other filters if they exist
+  const dateFrom = document.getElementById('date-from');
+  if (dateFrom) {
+    dateFrom.addEventListener('change', applyFilters);
+  }
+  
+  const dateTo = document.getElementById('date-to');
+  if (dateTo) {
+    dateTo.addEventListener('change', applyFilters);
+  }
+  
+  const userFilter = document.getElementById('user-filter');
+  if (userFilter) {
+    userFilter.addEventListener('change', applyFilters);
+  }
 });
