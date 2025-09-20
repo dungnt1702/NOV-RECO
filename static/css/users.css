@@ -24,16 +24,29 @@
     margin: 0;
 }
 
-/* Search and Filter Section */
+/* Modern Search and Filter Section */
 .users-page .search-filter-section {
     margin-bottom: var(--spacing-xl);
 }
 
 .users-page .search-form {
-    background: var(--bg-primary);
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.users-page .search-form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
 }
 
 .users-page .search-input-group {
@@ -358,6 +371,42 @@
     }
 }
 
+@media (max-width: 768px) {
+    .users-page .search-input-group {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+    
+    .users-page .search-form {
+        padding: var(--spacing-lg);
+    }
+    
+    .users-page .search-input,
+    .users-page .form-control {
+        width: 100%;
+        padding: var(--spacing-md);
+        font-size: 1rem;
+        border-radius: var(--radius-lg);
+        border: 2px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+    
+    .users-page .search-input:focus,
+    .users-page .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
+    }
+    
+    .users-page .btn-search {
+        width: 100%;
+        padding: var(--spacing-md);
+        font-size: 1rem;
+        border-radius: var(--radius-lg);
+        margin-top: var(--spacing-sm);
+    }
+}
+
 @media (max-width: 480px) {
     .users-page {
         padding: 0;
@@ -365,6 +414,8 @@
     
     .search-form {
         padding: var(--spacing-md);
+        margin: 0 var(--spacing-sm);
+        border-radius: var(--radius-lg);
     }
     
     .page-header {
@@ -381,13 +432,13 @@
         gap: var(--spacing-md);
     }
     
-    
     .card-actions {
         flex-direction: column;
     }
     
     .pagination {
         gap: var(--spacing-xs);
+        margin: var(--spacing-lg) var(--spacing-sm);
     }
     
     .page-link {

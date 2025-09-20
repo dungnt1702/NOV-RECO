@@ -191,14 +191,13 @@
 
   <!-- Pagination -->
   {% if page_obj.has_other_pages %}
-  <div class="pagination-wrapper">
-    <div class="pagination-info">
-      <span class="pagination-text">
-        Hiển thị {{ page_obj.start_index }}-{{ page_obj.end_index }} trong tổng số {{ page_obj.paginator.count }} kết quả
-      </span>
-    </div>
-    
     <div class="pagination">
+      <div class="pagination-info">
+        <span class="info-text">
+          Hiển thị {{ page_obj.start_index }}-{{ page_obj.end_index }} trong tổng số {{ page_obj.paginator.count }} người dùng
+        </span>
+      </div>
+      
       {% if page_obj.has_previous %}
         <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}{% if page_size %}&page_size={{ page_size }}{% endif %}" 
            class="page-link page-first">
@@ -217,7 +216,7 @@
       <div class="page-numbers">
         {% for num in page_obj.paginator.page_range %}
           {% if page_obj.number == num %}
-            <span class="page-link page-current">{{ num }}</span>
+            <span class="page-link active">{{ num }}</span>
           {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
             <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}{% if page_size %}&page_size={{ page_size }}{% endif %}" 
                class="page-link">{{ num }}</a>
