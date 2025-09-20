@@ -434,7 +434,7 @@
 
 @media (max-width: 480px) {
     .users-page {
-        padding: 0 var(--spacing-sm);
+        padding: 0;
     }
     
     .search-form {

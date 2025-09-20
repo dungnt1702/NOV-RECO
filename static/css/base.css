@@ -334,9 +334,7 @@ svg {
     }
 
     .nav-toggle {
-        display: block !important;
-        background: red !important;
-        opacity: 1 !important;
+        display: block;
     }
 
     .nav-menu {

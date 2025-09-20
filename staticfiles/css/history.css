@@ -277,7 +277,7 @@
 /* Responsive design */
 @media (max-width: 768px) {
     .history-container {
-        padding: 20px;
+        padding: 0;
     }
     
     .filters {
@@ -305,7 +305,7 @@
 
 @media (max-width: 480px) {
     .history-container {
-        padding: 15px;
+        padding: 0;
     }
     
     .history-header {
