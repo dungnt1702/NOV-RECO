@@ -55,7 +55,7 @@ function quickCheckin() {
   };
   
   const params = new URLSearchParams(quickData);
-  window.location.href = `/checkin/quick-checkin/?${params.toString()}`;
+  window.location.href = `/checkin/quick/?${params.toString()}`;
 }
 
 // View history function

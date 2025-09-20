@@ -177,7 +177,7 @@ def checkin_submit_view(request):
                 return redirect(success_url)
             else:
                 messages.error(request, f"Lỗi: {serializer.errors}")
-                return redirect("/checkin/")
+                return redirect("/checkin/action/")
 
         except Exception as e:
             print(f"DEBUG: Exception occurred: {str(e)}")
@@ -188,9 +188,9 @@ def checkin_submit_view(request):
 
             print(f"DEBUG: Traceback: {traceback.format_exc()}")
             messages.error(request, f"Có lỗi xảy ra: {str(e)}")
-            return redirect("/checkin/")
+            return redirect("/checkin/action/")
 
-    return redirect("/checkin/")
+    return redirect("/checkin/action/")
 
 
 # Check-in list API

@@ -143,7 +143,7 @@
         <span class="nav-label">Trang chủ</span>
     </a>
     
-    <a href="{% url 'checkin_page' %}" class="nav-item {% if 'checkin' in request.resolver_match.url_name and request.resolver_match.url_name != 'user_history' %}active{% endif %}">
+    <a href="{% url 'checkin_page' %}" class="nav-item {% if request.resolver_match.url_name == 'checkin_page' %}active{% endif %}">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
         </svg>

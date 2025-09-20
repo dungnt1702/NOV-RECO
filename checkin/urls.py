@@ -23,7 +23,7 @@ urlpatterns = [
     # Dashboard
     path("dashboard/", dashboard, name="dashboard"),
     # Check-in
-    path("", checkin_page, name="checkin_page"),
+    path("action/", checkin_page, name="checkin_page"),
     path("areas-list/", AreaListView.as_view(), name="areas_list"),
     path("submit/", checkin_submit_view, name="checkin_submit"),
     path("list/", checkin_list_api, name="checkin_list"),
