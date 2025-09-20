@@ -17,12 +17,12 @@ from .serializers import (
     UserCreateSerializer,
     UserUpdateSerializer,
 )
-from checkin.decorators import admin_required
+from checkin.decorators import admin_required, user_management_required
 
 
-@admin_required
+@user_management_required
 def user_list_view(request):
-    """Trang danh sách người dùng cho Admin"""
+    """Trang danh sách người dùng cho Admin và HCNS"""
     search_query = request.GET.get("search", "")
     role_filter = request.GET.get("role", "")
     department_filter = request.GET.get("department", "")
@@ -69,9 +69,9 @@ def user_list_view(request):
     return render(request, "users/user_list.html", context)
 
 
-@admin_required
+@user_management_required
 def user_create_view(request):
-    """Trang tạo người dùng mới"""
+    """Trang tạo người dùng mới cho Admin và HCNS"""
     if request.method == "POST":
         form = UserCreateForm(request.POST)
         if form.is_valid():
@@ -94,9 +94,9 @@ def user_create_view(request):
     )
 
 
-@admin_required
+@user_management_required
 def user_update_view(request, user_id):
-    """Trang cập nhật thông tin người dùng"""
+    """Trang cập nhật thông tin người dùng cho Admin và HCNS"""
     user = get_object_or_404(User, id=user_id)
 
     if request.method == "POST":
@@ -122,9 +122,9 @@ def user_update_view(request, user_id):
     )
 
 
-@admin_required
+@user_management_required
 def user_delete_view(request, user_id):
-    """Xóa người dùng"""
+    """Xóa người dùng cho Admin và HCNS"""
     user = get_object_or_404(User, id=user_id)
 
     if request.method == "POST":
@@ -136,9 +136,9 @@ def user_delete_view(request, user_id):
     return render(request, "users/user_confirm_delete.html", {"user": user})
 
 
-@admin_required
+@user_management_required
 def department_list_view(request):
-    """Trang quản lý phòng ban"""
+    """Trang quản lý phòng ban cho Admin và HCNS"""
     # Lấy danh sách các phòng ban từ model Department
     departments = Department.objects.all().annotate(
         user_count=Count('employees')

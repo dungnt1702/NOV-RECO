@@ -58,6 +58,11 @@ def hcns_required(view_func):
     return role_required([UserRole.ADMIN, UserRole.HCNS])(view_func)
 
 
+def user_management_required(view_func):
+    """Decorator cho quản lý users - Admin và HCNS"""
+    return role_required([UserRole.ADMIN, UserRole.HCNS])(view_func)
+
+
 def employee_required(view_func):
     """Decorator cho tất cả người dùng đã đăng nhập"""
     return role_required(
