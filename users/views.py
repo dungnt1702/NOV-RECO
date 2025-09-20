@@ -44,8 +44,16 @@ def user_list_view(request):
     if department_filter:
         users = users.filter(department_id=department_filter)
 
-    # Pagination
-    paginator = Paginator(users, 20)
+    # Pagination with page size
+    page_size = request.GET.get("page_size", "20")
+    try:
+        page_size = int(page_size)
+        if page_size not in [10, 20, 50, 100]:
+            page_size = 20
+    except (ValueError, TypeError):
+        page_size = 20
+    
+    paginator = Paginator(users, page_size)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
@@ -54,6 +62,7 @@ def user_list_view(request):
         "search_query": search_query,
         "role_filter": role_filter,
         "department_filter": department_filter,
+        "page_size": page_size,
         "role_choices": UserRole.choices,
         "departments": Department.objects.all().order_by('name'),
     }

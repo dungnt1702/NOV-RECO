@@ -10,18 +10,53 @@
 {% block content %}
 <div class="container">
     <div class="page-header">
-        <h1>🏢 Quản lý Phòng ban</h1>
-        <p>Danh sách các phòng ban và số lượng nhân viên</p>
+        <div class="header-content">
+            <div class="header-text">
+                <h1>🏢 Quản lý Phòng ban</h1>
+                <p>Danh sách các phòng ban và số lượng nhân viên</p>
+            </div>
+            <div class="header-actions">
+                <a href="/admin/users/department/add/" class="btn btn-primary">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Tạo phòng ban
+                </a>
+            </div>
+        </div>
     </div>
 
     <div class="content-card">
         {% if departments %}
-            <div class="table-container">
+            <!-- Desktop Table View -->
+            <div class="table-container desktop-view">
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Tên phòng ban</th>
-                            <th>Số lượng nhân viên</th>
+                            <th>
+                                <div class="table-header">
+                                    <span>Tên phòng ban</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="table-header">
+                                    <span>Số lượng nhân viên</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="table-header">
+                                    <span>Trưởng phòng</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                    </svg>
+                                </div>
+                            </th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
@@ -30,14 +65,36 @@
                         <tr>
                             <td>
                                 <div class="dept-info">
-                                    <span class="dept-name">{{ dept.name }}</span>
-                                    {% if dept.description %}
-                                        <small class="dept-description">{{ dept.description }}</small>
-                                    {% endif %}
+                                    <div class="dept-icon">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="dept-details">
+                                        <span class="dept-name">{{ dept.name }}</span>
+                                        {% if dept.description %}
+                                            <small class="dept-description">{{ dept.description }}</small>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </td>
                             <td>
-                                <span class="user-count">{{ dept.user_count }} nhân viên</span>
+                                <div class="employee-count">
+                                    <span class="count-number">{{ dept.user_count }}</span>
+                                    <span class="count-label">nhân viên</span>
+                                </div>
+                            </td>
+                            <td>
+                                {% if dept.manager %}
+                                    <div class="manager-info">
+                                        <div class="manager-avatar">
+                                            {{ dept.manager.first_name|first|default:dept.manager.username|first|upper }}
+                                        </div>
+                                        <span class="manager-name">{{ dept.manager.get_display_name }}</span>
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted">Chưa có</span>
+                                {% endif %}
                             </td>
                             <td>
                                 <div class="action-buttons">
@@ -47,12 +104,77 @@
                                         </svg>
                                         Xem nhân viên
                                     </a>
+                                    <a href="/admin/users/department/{{ dept.id }}/change/" class="btn btn-sm btn-outline">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                        Sửa
+                                    </a>
                                 </div>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="mobile-view">
+                {% for dept in departments %}
+                <div class="department-card">
+                    <div class="card-header">
+                        <div class="dept-info">
+                            <div class="dept-icon">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                            <div class="dept-details">
+                                <h3 class="dept-name">{{ dept.name }}</h3>
+                                {% if dept.description %}
+                                    <p class="dept-description">{{ dept.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="card-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">{{ dept.user_count }}</span>
+                                <span class="stat-label">Nhân viên</span>
+                            </div>
+                            {% if dept.manager %}
+                            <div class="stat-item">
+                                <div class="manager-info">
+                                    <div class="manager-avatar">
+                                        {{ dept.manager.first_name|first|default:dept.manager.username|first|upper }}
+                                    </div>
+                                    <span class="manager-name">{{ dept.manager.get_display_name }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <div class="card-actions">
+                            <a href="/users/?department={{ dept.id }}" class="btn btn-primary">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                </svg>
+                                Xem nhân viên
+                            </a>
+                            <a href="/admin/users/department/{{ dept.id }}/change/" class="btn btn-outline">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                Sửa
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         {% else %}
             <div class="empty-state">
@@ -87,64 +209,329 @@
 </div>
 
 <style>
+/* Page Header */
+.page-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+}
+
+.header-text h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.header-text p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.header-actions {
+    flex-shrink: 0;
+}
+
+/* Table Styles */
+.table-container {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-primary);
+}
+
+.data-table th {
+    background: var(--bg-secondary);
+    padding: var(--spacing-md) var(--spacing-lg);
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.table-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.table-header svg {
+    color: var(--text-muted);
+}
+
+.data-table td {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.data-table tbody tr:hover {
+    background: var(--bg-secondary);
+}
+
+/* Department Info */
 .dept-info {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--spacing-md);
+}
+
+.dept-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.dept-details {
+    flex: 1;
 }
 
 .dept-name {
     font-weight: 600;
-    color: #2d3748;
+    color: var(--text-primary);
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: var(--spacing-xs);
+    font-size: 1rem;
 }
 
 .dept-description {
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 0.875rem;
     display: block;
+    line-height: 1.4;
 }
 
-.user-count {
-    background: #e2e8f0;
-    color: #4a5568;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.85rem;
+/* Employee Count */
+.employee-count {
+    text-align: center;
+}
+
+.count-number {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.count-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* Manager Info */
+.manager-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.manager-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--success-color), var(--accent-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.manager-name {
     font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.875rem;
 }
 
+/* Action Buttons */
 .action-buttons {
     display: flex;
-    gap: 8px;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
 }
 
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 0.85rem;
+/* Mobile View */
+.mobile-view {
+    display: none;
 }
 
+.department-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-lg);
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.department-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+}
+
+.card-body {
+    padding: var(--spacing-lg);
+}
+
+.card-footer {
+    padding: var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+}
+
+.card-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.card-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+}
+
+/* Empty State */
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
-    color: #6b7280;
+    padding: var(--spacing-2xl) var(--spacing-lg);
+    color: var(--text-muted);
 }
 
-.empty-state i {
-    font-size: 4rem;
-    color: #d1d5db;
-    margin-bottom: 20px;
+.empty-state svg {
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-lg);
 }
 
 .empty-state h3 {
-    margin-bottom: 10px;
-    color: #374151;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+    font-size: 1.25rem;
 }
 
+.empty-state p {
+    margin-bottom: var(--spacing-lg);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.empty-state .space-x-2 {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Page Actions */
 .page-actions {
-    margin-top: 30px;
+    margin-top: var(--spacing-xl);
     text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .desktop-view {
+        display: none;
+    }
+    
+    .mobile-view {
+        display: block;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-md);
+    }
+    
+    .header-actions {
+        align-self: stretch;
+    }
+    
+    .header-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .card-stats {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .card-actions {
+        flex-direction: column;
+    }
+    
+    .card-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .header-text h1 {
+        font-size: 1.5rem;
+    }
+    
+    .dept-icon {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .dept-name {
+        font-size: 0.95rem;
+    }
+    
+    .dept-description {
+        font-size: 0.8rem;
+    }
 }
 </style>
 {% endblock %}
