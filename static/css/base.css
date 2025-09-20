@@ -203,6 +203,7 @@ body {
 
 .nav-toggle {
     display: none;
+    z-index: 1002;
     background: none;
     border: none;
     font-size: 1.5rem;
@@ -333,7 +334,9 @@ svg {
     }
 
     .nav-toggle {
-        display: block;
+        display: block !important;
+        background: red !important;
+        opacity: 1 !important;
     }
 
     .nav-menu {
@@ -352,7 +355,7 @@ svg {
         transition: left 0.3s ease;
         box-shadow: var(--shadow-xl);
         border-right: 1px solid var(--border-color);
-        z-index: 1001;
+        z-index: 1003;
         overflow-y: auto;
     }
 

@@ -6,10 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const navMenu = document.getElementById('nav-menu');
     const navOverlay = document.getElementById('nav-overlay');
 
+    console.log('Nav toggle found:', !!navToggle);
+    console.log('Nav menu found:', !!navMenu);
+
     if (navToggle && navMenu) {
         // Toggle mobile menu
-        navToggle.addEventListener('click', function() {
+        navToggle.addEventListener('click', function(e) {
+            console.log('Nav toggle clicked');
+            e.preventDefault();
             navMenu.classList.toggle('active');
+            console.log('Nav menu classes:', navMenu.className);
             if (navOverlay) {
                 navOverlay.classList.toggle('active');
             }
