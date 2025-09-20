@@ -138,18 +138,27 @@ function setLoading(element, loading = true) {
     }
 }
 
-// Format date for display
-function formatDate(dateString) {
+// Format date for display - Global function
+window.formatDate = function(dateString) {
     if (!dateString) return 'N/A';
     
     try {
-        // Parse the date string directly (format: YYYY-MM-DD HH:MM:SS)
-        const [datePart, timePart] = dateString.split(' ');
-        const [year, month, day] = datePart.split('-');
-        const [hour, minute, second] = timePart.split(':');
+        let date;
         
-        // Create date object with Vietnam timezone
-        const date = new Date(year, month - 1, day, hour, minute, second);
+        // Check if it's ISO format with timezone
+        if (dateString.includes('T') && dateString.includes('+')) {
+            // ISO format: 2025-09-20T05:27:43.642447+00:00
+            date = new Date(dateString);
+        } else if (dateString.includes(' ')) {
+            // Format: YYYY-MM-DD HH:MM:SS
+            const [datePart, timePart] = dateString.split(' ');
+            const [year, month, day] = datePart.split('-');
+            const [hour, minute, second] = timePart.split(':');
+            date = new Date(year, month - 1, day, hour, minute, second);
+        } else {
+            // Try to parse as date directly
+            date = new Date(dateString);
+        }
         
         // Check if date is valid
         if (isNaN(date.getTime())) {
@@ -164,7 +173,8 @@ function formatDate(dateString) {
             day: '2-digit',
             hour: '2-digit',
             minute: '2-digit',
-            second: '2-digit'
+            second: '2-digit',
+            timeZone: 'Asia/Ho_Chi_Minh'
         });
     } catch (error) {
         console.error('Error formatting date:', error, 'Input:', dateString);
