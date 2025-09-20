@@ -60,15 +60,15 @@
 
       <!-- Actions -->
       <div class="actions">
-        <a href="/checkin/" class="action-button">
+        <a href="{% url 'checkin_page' %}" class="action-button">
           <i class="fas fa-map-marker-alt"></i>
           Check-in ngay
         </a>
-        <a href="/checkin/history/" class="action-button">
+        <a href="{% url 'user_history' %}" class="action-button">
           <i class="fas fa-history"></i>
           Lịch sử của tôi
         </a>
-        <a href="/checkin/quick-checkin/" class="action-button secondary">
+        <a href="{% url 'quick_checkin' %}" class="action-button secondary">
           <i class="fas fa-bolt"></i>
           Check-in nhanh
         </a>

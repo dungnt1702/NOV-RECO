@@ -56,19 +56,19 @@
 
       <!-- Actions -->
       <div class="actions">
-        <a href="/checkin/users/" class="action-button">
+        <a href="{% url 'users:user_list' %}" class="action-button">
           <i class="fas fa-users"></i>
           Quản lý người dùng
         </a>
-        <a href="/checkin/area-management/" class="action-button">
+        <a href="{% url 'area_management' %}" class="action-button">
           <i class="fas fa-map"></i>
           Quản lý khu vực
         </a>
-        <a href="/checkin/list-view/" class="action-button">
+        <a href="{% url 'checkin_list_view' %}" class="action-button">
           <i class="fas fa-list"></i>
           Danh sách Check-in
         </a>
-        <a href="/checkin/history/" class="action-button secondary">
+        <a href="{% url 'user_history' %}" class="action-button secondary">
           <i class="fas fa-history"></i>
           Lịch sử
         </a>

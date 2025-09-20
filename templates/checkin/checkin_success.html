@@ -282,10 +282,10 @@
     </div>
     
     <div class="actions">
-      <a href="/checkin/" class="btn btn-primary">📝 Check-in Mới</a>
-      <a href="/checkin/history/" class="btn btn-secondary">📋 Lịch sử Check-in</a>
-      <a href="/checkin/quick/" class="btn btn-accent">⚡ Check-in Lại</a>
-      <a href="/checkin/dashboard/" class="btn btn-outline">📊 Dashboard</a>
+      <a href="{% url 'checkin_page' %}" class="btn btn-primary">📝 Check-in Mới</a>
+      <a href="{% url 'user_history' %}" class="btn btn-secondary">📋 Lịch sử Check-in</a>
+      <a href="{% url 'quick_checkin' %}" class="btn btn-accent">⚡ Check-in Lại</a>
+      <a href="{% url 'dashboard' %}" class="btn btn-outline">📊 Dashboard</a>
     </div>
   </div>
 {% endblock %}
