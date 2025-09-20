@@ -1,0 +1,496 @@
+/* Check-in page specific styles */
+.checkin-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 60px);
+    padding: 20px;
+}
+
+.checkin-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    overflow: hidden;
+}
+
+.checkin-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0A5597, #F5831F);
+}
+
+.checkin-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.checkin-header h1 {
+    color: #0A5597;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.checkin-subtitle {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* Permissions check section */
+.permissions-check-section {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.permissions-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.permissions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.permission-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.permission-label {
+  font-weight: 500;
+  color: #495057;
+  flex: 1;
+  min-width: 120px;
+}
+
+.permission-status {
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #6c757d;
+  color: white;
+  text-align: center;
+  min-width: 100px;
+}
+
+.permission-status.granted {
+  background: #28a745;
+}
+
+.permission-status.denied {
+  background: #dc3545;
+}
+
+.permission-status.prompt {
+  background: #ffc107;
+  color: #212529;
+}
+
+.btn-test-permission {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s;
+  white-space: nowrap;
+}
+
+.btn-test-permission:hover {
+  background: #0056b3;
+}
+
+.permissions-help {
+  background: #e7f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 14px;
+  color: #0056b3;
+  text-align: center;
+}
+
+/* User info section */
+.user-info-section {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.user-info-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 10px;
+}
+
+.user-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.user-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.user-info-label {
+    font-size: 12px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.user-info-value {
+    font-size: 14px;
+    color: #2d3748;
+    font-weight: 600;
+}
+
+/* Form styles */
+.checkin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.form-input {
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #0A5597;
+    box-shadow: 0 0 0 3px rgba(10, 85, 151, 0.1);
+}
+
+.form-textarea {
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: #0A5597;
+    box-shadow: 0 0 0 3px rgba(10, 85, 151, 0.1);
+}
+
+/* Map styles */
+.map-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.map-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+
+.map-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.btn-get-location {
+    background: #0A5597;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-get-location:hover {
+    background: #1D5795;
+    transform: translateY(-1px);
+}
+
+.btn-get-location:disabled {
+    background: #a0aec0;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+.coordinates {
+    font-size: 12px;
+    color: #718096;
+    font-family: monospace;
+}
+
+#map {
+    width: 100%;
+    height: 250px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Camera styles */
+.camera-container {
+    position: relative;
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.camera-preview {
+    width: 100%;
+    min-height: 200px;
+    height: 200px;
+    background: #f8fafc;
+    border: 2px dashed #cbd5e0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+.camera-preview:hover {
+    border-color: #0A5597;
+    background: #f7fafc;
+}
+
+.camera-preview.has-photo {
+    border-style: solid;
+    border-color: #48bb78;
+    background: #f0fff4;
+}
+
+.camera-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    color: #a0aec0;
+}
+
+.camera-text {
+    font-size: 14px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.camera-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Video element styles */
+#video {
+    width: 100%;
+    min-height: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    background: #000;
+}
+
+/* Camera preview when showing video */
+.camera-preview.showing-video {
+    padding: 0;
+    background: #000;
+    border: 2px solid #0A5597;
+}
+
+.camera-preview.showing-video .camera-icon,
+.camera-preview.showing-video .camera-text {
+    display: none;
+}
+
+.btn-camera {
+    flex: 1;
+    padding: 10px 16px;
+    border: 2px solid #0A5597;
+    background: white;
+    color: #0A5597;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-camera:hover {
+    background: #0A5597;
+    color: white;
+}
+
+.btn-camera.danger {
+    border-color: #e53e3e;
+    color: #e53e3e;
+}
+
+.btn-camera.danger:hover {
+    background: #e53e3e;
+    color: white;
+}
+
+/* Submit button */
+.btn-checkin {
+    background: linear-gradient(135deg, #0A5597 0%, #F5831F 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-checkin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(10, 85, 151, 0.3);
+}
+
+.btn-checkin:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-checkin .btn-text {
+    display: block;
+}
+
+.btn-checkin .loading {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-checkin.loading .btn-text {
+    display: none;
+}
+
+.btn-checkin.loading .loading {
+    display: flex;
+}
+
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .checkin-page {
+        padding: 15px;
+    }
+    
+    .checkin-container {
+        padding: 30px 20px;
+        border-radius: 16px;
+    }
+    
+    .checkin-header h1 {
+        font-size: 24px;
+    }
+    
+    .user-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #map {
+        height: 200px;
+    }
+    
+    .camera-preview {
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .checkin-page {
+        padding: 10px;
+    }
+    
+    .checkin-container {
+        padding: 20px;
+        border-radius: 16px;
+    }
+    
+    .checkin-header h1 {
+        font-size: 20px;
+    }
+    
+    #map {
+        height: 180px;
+    }
+    
+    .camera-preview {
+        height: 120px;
+    }
+    
+    .camera-icon {
+        font-size: 36px;
+    }
+}
+
+/* Desktop view - keep mobile-like appearance */
+@media (min-width: 768px) {
+    .checkin-container {
+        max-width: 400px;
+    }
+}
