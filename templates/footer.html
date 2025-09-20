@@ -36,7 +36,7 @@
                 <h4 class="footer-title">Liên kết nhanh</h4>
                 <ul class="footer-links">
                     <li><a href="{% url 'home' %}" class="footer-link">Trang chủ</a></li>
-                    <li><a href="{% url 'checkin' %}" class="footer-link">Check-in</a></li>
+                    <li><a href="{% url 'checkin_page' %}" class="footer-link">Check-in</a></li>
                     <li><a href="{% url 'user_history' %}" class="footer-link">Lịch sử</a></li>
                     <li><a href="{% url 'checkin_list_view' %}" class="footer-link">Danh sách check-in</a></li>
                     <li><a href="{% url 'area_management' %}" class="footer-link">Quản lý khu vực</a></li>
@@ -47,8 +47,8 @@
             <div class="footer-section">
                 <h4 class="footer-title">Quản lý</h4>
                 <ul class="footer-links">
-                    <li><a href="{% url 'user_management' %}" class="footer-link">Quản lý người dùng</a></li>
-                    <li><a href="{% url 'department_list_view' %}" class="footer-link">Quản lý phòng ban</a></li>
+                    <li><a href="{% url 'users:user_list' %}" class="footer-link">Quản lý người dùng</a></li>
+                    <li><a href="{% url 'users:department_list' %}" class="footer-link">Quản lý phòng ban</a></li>
                     <li><a href="/admin/" class="footer-link">Quản trị hệ thống</a></li>
                 </ul>
             </div>
