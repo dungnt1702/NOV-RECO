@@ -30,7 +30,10 @@
                         <tr>
                             <td>
                                 <div class="dept-info">
-                                    <span class="dept-name">{{ dept.department }}</span>
+                                    <span class="dept-name">{{ dept.name }}</span>
+                                    {% if dept.description %}
+                                        <small class="dept-description">{{ dept.description }}</small>
+                                    {% endif %}
                                 </div>
                             </td>
                             <td>
@@ -38,8 +41,11 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="/users/?department={{ dept.department }}" class="btn btn-sm btn-primary">
-                                        <i class="fas fa-users"></i> Xem nhân viên
+                                    <a href="/users/?department={{ dept.id }}" class="btn btn-sm btn-primary">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                        </svg>
+                                        Xem nhân viên
                                     </a>
                                 </div>
                             </td>
@@ -50,12 +56,25 @@
             </div>
         {% else %}
             <div class="empty-state">
-                <i class="fas fa-building"></i>
+                <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
                 <h3>Chưa có phòng ban nào</h3>
-                <p>Hãy thêm thông tin phòng ban cho các nhân viên trong hệ thống.</p>
-                <a href="/users/" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Quản lý nhân viên
-                </a>
+                <p>Hãy tạo dữ liệu mẫu cho phòng ban hoặc thêm thông tin phòng ban cho các nhân viên trong hệ thống.</p>
+                <div class="mt-4 space-x-2">
+                    <a href="/admin/users/department/add/" class="btn btn-primary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Tạo phòng ban
+                    </a>
+                    <a href="/users/" class="btn btn-outline">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        Quản lý nhân viên
+                    </a>
+                </div>
             </div>
         {% endif %}
     </div>
@@ -77,6 +96,14 @@
 .dept-name {
     font-weight: 600;
     color: #2d3748;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.dept-description {
+    color: #64748b;
+    font-size: 0.875rem;
+    display: block;
 }
 
 .user-count {

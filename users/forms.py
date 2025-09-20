@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, UserRole
+from .models import User, UserRole, Department
 
 
 class UserCreateForm(UserCreationForm):
@@ -9,7 +9,11 @@ class UserCreateForm(UserCreationForm):
     last_name = forms.CharField(max_length=30, required=True)
     role = forms.ChoiceField(choices=UserRole.choices, required=True)
     phone = forms.CharField(max_length=15, required=False)
-    department = forms.CharField(max_length=100, required=False)
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        required=False,
+        empty_label="Chọn phòng ban"
+    )
     employee_id = forms.CharField(max_length=20, required=False)
 
     class Meta:
@@ -40,7 +44,7 @@ class UserCreateForm(UserCreationForm):
         user.last_name = self.cleaned_data["last_name"]
         user.role = self.cleaned_data["role"]
         user.phone = self.cleaned_data["phone"]
-        user.department = self.cleaned_data["department"]
+        user.department = self.cleaned_data.get("department")
         user.employee_id = self.cleaned_data["employee_id"]
 
         if commit:

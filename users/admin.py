@@ -1,6 +1,27 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User
+from .models import User, Department
+
+
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'manager', 'employee_count', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('name', 'description')
+    ordering = ('name',)
+    
+    fieldsets = (
+        ('Thông tin cơ bản', {
+            'fields': ('name', 'description')
+        }),
+        ('Quản lý', {
+            'fields': ('manager',)
+        }),
+    )
+    
+    def employee_count(self, obj):
+        return obj.employee_count
+    employee_count.short_description = 'Số nhân viên'
 
 
 @admin.register(User)

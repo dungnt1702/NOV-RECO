@@ -2,6 +2,41 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
+# Department Model
+class Department(models.Model):
+    name = models.CharField(
+        max_length=100, 
+        unique=True, 
+        help_text="Tên phòng ban"
+    )
+    description = models.TextField(
+        blank=True, 
+        help_text="Mô tả phòng ban"
+    )
+    manager = models.ForeignKey(
+        'User', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='managed_departments',
+        help_text="Trưởng phòng ban"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Phòng ban"
+        verbose_name_plural = "Phòng ban"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def employee_count(self):
+        return self.employees.count()
+
+
 # User Roles
 class UserRole(models.TextChoices):
     ADMIN = "admin", "Admin"
@@ -20,8 +55,13 @@ class User(AbstractUser):
     phone = models.CharField(
         max_length=15, blank=True, help_text="Số điện thoại"
     )
-    department = models.CharField(
-        max_length=100, blank=True, help_text="Phòng ban"
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='employees',
+        help_text="Phòng ban"
     )
     employee_id = models.CharField(
         max_length=20, blank=True, unique=True, help_text="Mã nhân viên"

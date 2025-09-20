@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import User, UserRole
+from .models import User, UserRole, Department
 from django.db.models import Count
 from .forms import UserCreateForm, UserUpdateForm
 from .serializers import (
@@ -25,8 +25,9 @@ def user_list_view(request):
     """Trang danh sách người dùng cho Admin"""
     search_query = request.GET.get("search", "")
     role_filter = request.GET.get("role", "")
+    department_filter = request.GET.get("department", "")
 
-    users = User.objects.all().order_by('username')
+    users = User.objects.all().select_related('department').order_by('username')
 
     if search_query:
         users = users.filter(
@@ -40,6 +41,9 @@ def user_list_view(request):
     if role_filter:
         users = users.filter(role=role_filter)
 
+    if department_filter:
+        users = users.filter(department_id=department_filter)
+
     # Pagination
     paginator = Paginator(users, 20)
     page_number = request.GET.get("page")
@@ -49,7 +53,9 @@ def user_list_view(request):
         "page_obj": page_obj,
         "search_query": search_query,
         "role_filter": role_filter,
+        "department_filter": department_filter,
         "role_choices": UserRole.choices,
+        "departments": Department.objects.all().order_by('name'),
     }
     return render(request, "users/user_list.html", context)
 
@@ -124,10 +130,10 @@ def user_delete_view(request, user_id):
 @admin_required
 def department_list_view(request):
     """Trang quản lý phòng ban"""
-    # Lấy danh sách các phòng ban từ users
-    departments = User.objects.exclude(department__isnull=True).exclude(department__exact='').values('department').annotate(
-        user_count=Count('id')
-    ).order_by('department')
+    # Lấy danh sách các phòng ban từ model Department
+    departments = Department.objects.all().annotate(
+        user_count=Count('employees')
+    ).order_by('name')
     
     context = {
         "departments": departments,
