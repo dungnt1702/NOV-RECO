@@ -162,7 +162,7 @@ body {
     visibility: hidden;
     transform: translateY(-8px);
     transition: all 0.2s ease;
-    z-index: 1000;
+    z-index: 1001;
     list-style: none;
     padding: var(--spacing-sm) 0;
     margin: var(--spacing-xs) 0 0 0;
@@ -392,6 +392,11 @@ svg {
         padding: 0;
         margin: var(--spacing-sm) 0 0 var(--spacing-lg);
         border-radius: 0;
+        display: none;
+    }
+
+    .dropdown-menu.active {
+        display: block;
     }
 
     .dropdown-menu li a {
