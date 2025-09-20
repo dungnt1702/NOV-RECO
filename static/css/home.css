@@ -1,6 +1,5 @@
 /* Home Page Styles */
 .home-page .home-container {
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
 }

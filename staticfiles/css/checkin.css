@@ -1,9 +1,8 @@
 /* Check-in page specific styles */
-.checkin-page .checkin-page {
+.checkin-page {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: calc(100vh - 60px);
     padding: 20px;
 }
 

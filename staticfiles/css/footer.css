@@ -4,6 +4,8 @@
     color: #e2e8f0;
     margin-top: auto;
     border-top: 1px solid #475569;
+    position: relative;
+    z-index: 10;
 }
 
 .footer-container {

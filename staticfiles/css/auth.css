@@ -1,6 +1,5 @@
 /* Authentication Pages Styles */
-.auth-page .auth-page {
-    min-height: 100vh;
+.auth-page {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
