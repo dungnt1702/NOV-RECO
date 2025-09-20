@@ -7,12 +7,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const navOverlay = document.getElementById('nav-overlay');
 
     if (navToggle && navMenu) {
-        // Toggle mobile menu
+        // Toggle mobile menu with dropdown slide animation
         navToggle.addEventListener('click', function(e) {
             e.preventDefault();
             navMenu.classList.toggle('active');
             if (navOverlay) {
                 navOverlay.classList.toggle('active');
+            }
+            
+            // Trigger dropdown slide animation when menu opens
+            if (navMenu.classList.contains('active')) {
+                setTimeout(() => {
+                    slideInDropdowns();
+                }, 100); // Small delay for menu to appear first
+            } else {
+                slideOutDropdowns();
             }
         });
 
@@ -20,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('click', function(e) {
             if (!navMenu.contains(e.target) && !navToggle.contains(e.target)) {
                 navMenu.classList.remove('active');
+                slideOutDropdowns(); // Hide dropdowns when menu closes
                 if (navOverlay) {
                     navOverlay.classList.remove('active');
                 }
@@ -30,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 navMenu.classList.remove('active');
+                slideOutDropdowns(); // Hide dropdowns when menu closes
                 if (navOverlay) {
                     navOverlay.classList.remove('active');
                 }
@@ -40,6 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.addEventListener('resize', function() {
             if (window.innerWidth > 768) {
                 navMenu.classList.remove('active');
+                slideOutDropdowns(); // Hide dropdowns when switching to desktop
                 if (navOverlay) {
                     navOverlay.classList.remove('active');
                 }
@@ -47,29 +59,48 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Dropdown slide animation functions
+    function slideInDropdowns() {
+        if (window.innerWidth <= 768) {
+            const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+            dropdownMenus.forEach((menu, index) => {
+                setTimeout(() => {
+                    menu.classList.add('active');
+                }, index * 100); // Staggered animation
+            });
+        }
+    }
+    
+    function slideOutDropdowns() {
+        const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+        dropdownMenus.forEach(menu => {
+            menu.classList.remove('active');
+        });
+    }
+    
     // Handle dropdown toggle on mobile
     const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
     
     dropdownToggles.forEach(toggle => {
         toggle.addEventListener('click', function(e) {
             if (window.innerWidth <= 768) {
+                // On mobile: prevent default click behavior
+                // Dropdowns are controlled by menu open/close
                 e.preventDefault();
-                const dropdown = this.closest('.dropdown');
-                const menu = dropdown.querySelector('.dropdown-menu');
-                
-                // Close other dropdowns
-                dropdownToggles.forEach(otherToggle => {
-                    if (otherToggle !== toggle) {
-                        const otherDropdown = otherToggle.closest('.dropdown');
-                        const otherMenu = otherDropdown.querySelector('.dropdown-menu');
-                        otherMenu.classList.remove('active');
-                    }
-                });
-                
-                // Toggle current dropdown
-                menu.classList.toggle('active');
+                return false;
             }
+            // On desktop: normal dropdown behavior
         });
+    });
+    
+    // Reset dropdown state on window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            slideOutDropdowns();
+        } else if (navMenu && navMenu.classList.contains('active')) {
+            // If mobile menu is open, show dropdowns
+            slideInDropdowns();
+        }
     });
 });
 
