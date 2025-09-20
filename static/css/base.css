@@ -469,11 +469,11 @@ svg {
     }
 
     .main-content {
-        padding: var(--spacing-md);
+        padding: 0;
     }
 
     .container {
-        padding: 0 var(--spacing-sm);
+        padding: 0;
     }
 }
 
@@ -547,6 +547,7 @@ svg {
     }
     
     .main-content {
+        padding: 0;
         padding-bottom: 80px;
     }
 }

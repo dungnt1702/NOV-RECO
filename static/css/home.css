@@ -216,7 +216,7 @@
     .features-grid {
         grid-template-columns: 1fr;
         gap: var(--spacing-lg);
-        padding: 0 var(--spacing-md);
+        padding: 0;
     }
 
     .feature-card {
