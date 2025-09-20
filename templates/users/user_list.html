@@ -189,58 +189,8 @@
     {% endfor %}
   </div>
 
-  <!-- Pagination -->
-  {% if page_obj.has_other_pages %}
-    <div class="pagination">
-      <div class="pagination-info">
-        <span class="info-text">
-          Hiển thị {{ page_obj.start_index }}-{{ page_obj.end_index }} trong tổng số {{ page_obj.paginator.count }} người dùng
-        </span>
-      </div>
-      
-      {% if page_obj.has_previous %}
-        <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}{% if page_size %}&page_size={{ page_size }}{% endif %}" 
-           class="page-link page-first">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
-          </svg>
-        </a>
-        <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}{% if page_size %}&page_size={{ page_size }}{% endif %}" 
-           class="page-link page-prev">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-          </svg>
-        </a>
-      {% endif %}
-
-      <div class="page-numbers">
-        {% for num in page_obj.paginator.page_range %}
-          {% if page_obj.number == num %}
-            <span class="page-link active">{{ num }}</span>
-          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-            <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}{% if page_size %}&page_size={{ page_size }}{% endif %}" 
-               class="page-link">{{ num }}</a>
-          {% endif %}
-        {% endfor %}
-      </div>
-
-      {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}{% if page_size %}&page_size={{ page_size }}{% endif %}" 
-           class="page-link page-next">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </a>
-        <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if department_filter %}&department={{ department_filter }}{% endif %}{% if page_size %}&page_size={{ page_size }}{% endif %}" 
-           class="page-link page-last">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
-          </svg>
-        </a>
-      {% endif %}
-    </div>
-  </div>
-  {% endif %}
+  <!-- Pagination Component -->
+  {% include 'components/pagination.html' %}
 </div>
 {% endblock %}
 

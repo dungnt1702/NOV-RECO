@@ -1,0 +1,53 @@
+{% load static %}
+
+<!-- Pagination Component -->
+<div class="pagination-component" id="pagination-component">
+  <!-- Pagination Info -->
+  <div class="pagination-info" id="pagination-info">
+    <span class="info-text" id="pagination-info-text">
+      <!-- Will be populated by JavaScript -->
+    </span>
+  </div>
+  
+  <!-- Page Navigation -->
+  <div class="page-navigation" id="page-navigation">
+    <!-- Previous Button -->
+    <button class="page-link page-prev" id="page-prev" onclick="paginationComponent.prevPage()" disabled>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      <span class="sr-only">Trang trước</span>
+    </button>
+    
+    <!-- Page Numbers -->
+    <div class="page-numbers" id="page-numbers">
+      <!-- Will be populated by JavaScript -->
+    </div>
+    
+    <!-- Next Button -->
+    <button class="page-link page-next" id="page-next" onclick="paginationComponent.nextPage()" disabled>
+      <span class="sr-only">Trang sau</span>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+      </svg>
+    </button>
+  </div>
+  
+  <!-- Page Size Selector -->
+  <div class="page-size-selector" id="page-size-selector">
+    <label for="page-size-select" class="page-size-label">Hiển thị:</label>
+    <select id="page-size-select" class="page-size-select" onchange="paginationComponent.changePageSize(this.value)">
+      <option value="10">10</option>
+      <option value="20" selected>20</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+    <span class="page-size-text">/trang</span>
+  </div>
+</div>
+
+<!-- Include Pagination CSS -->
+<link rel="stylesheet" href="{% static 'css/components/pagination.css' %}">
+
+<!-- Include Pagination JavaScript -->
+<script src="{% static 'js/components/pagination.js' %}"></script>
