@@ -272,7 +272,7 @@ def user_history_api(request):
     # Base queryset
     checkins = (
         Checkin.objects.filter(user=user)
-        .select_related("area", "location")
+        .select_related("area")
         .order_by("-created_at")
     )
 
