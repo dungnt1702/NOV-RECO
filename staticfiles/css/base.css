@@ -53,6 +53,16 @@ body {
     color: var(--text-primary);
     line-height: 1.6;
     font-size: 16px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* Navigation */
@@ -489,6 +499,7 @@ svg {
     min-height: calc(100vh - 64px);
     padding: var(--spacing-xl);
     padding-bottom: 80px; /* Space for mobile bottom nav */
+    flex: 1;
 }
 
 /* Mobile Bottom Navigation */
