@@ -143,35 +143,6 @@
     margin-bottom: 25px;
 }
 
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    min-height: 48px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #0A5597 0%, #1e3c72 100%);
-    color: white;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(10, 85, 151, 0.3);
-}
-
-.btn-full {
-    width: 100%;
-}
 
 .auth-links {
     display: flex;
