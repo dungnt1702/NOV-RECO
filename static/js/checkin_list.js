@@ -32,7 +32,7 @@ function renderCheckinsTable() {
     <tr>
       <td>${checkin.id}</td>
       <td>${checkin.user_name}</td>
-      <td>${checkin.location_name}</td>
+      <td>${checkin.area_name}</td>
       <td>${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}</td>
       <td>${formatDistance(checkin.distance_m || 0)}</td>
       <td>${formatDate(checkin.created_at)}</td>
@@ -61,7 +61,7 @@ function renderMobileCards() {
       <div class="mobile-card-content">
         <div class="mobile-card-row">
           <span class="mobile-card-label">📍 Địa điểm:</span>
-          <span class="mobile-card-value">${checkin.location_name}</span>
+          <span class="mobile-card-value">${checkin.area_name}</span>
         </div>
         
         <div class="mobile-card-row">
@@ -89,7 +89,7 @@ function renderMobileCards() {
       </div>
       
       <div class="mobile-card-badges">
-        <span class="mobile-card-badge location">${checkin.location_name}</span>
+        <span class="mobile-card-badge location">${checkin.area_name}</span>
         <span class="mobile-card-badge distance">${formatDistance(checkin.distance_m || 0)}</span>
       </div>
     </div>
