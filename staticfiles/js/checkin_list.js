@@ -30,7 +30,12 @@ async function loadCheckins() {
 }
 
 function renderCheckinsTable() {
+  console.log('Rendering checkins table, count:', filteredCheckins.length);
   const tbody = document.getElementById('checkins-table');
+  if (!tbody) {
+    console.error('checkins-table element not found');
+    return;
+  }
   tbody.innerHTML = filteredCheckins.map(checkin => `
     <tr>
       <td>${checkin.id}</td>
@@ -51,7 +56,12 @@ function renderCheckinsTable() {
 }
 
 function renderMobileCards() {
+  console.log('Rendering mobile cards, count:', filteredCheckins.length);
   const mobileCards = document.getElementById('mobile-cards');
+  if (!mobileCards) {
+    console.error('mobile-cards element not found');
+    return;
+  }
   if (!mobileCards) return;
   
   mobileCards.innerHTML = filteredCheckins.map(checkin => `
