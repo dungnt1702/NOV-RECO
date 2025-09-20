@@ -23,6 +23,17 @@ from checkin.decorators import admin_required, user_management_required
 @user_management_required
 def user_list_view(request):
     """Trang danh sách người dùng cho Admin và HCNS"""
+    context = {
+        "role_choices": UserRole.choices,
+        "departments": Department.objects.all().order_by('name'),
+    }
+    return render(request, "users/user_list.html", context)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_list_api(request):
+    """API endpoint để lấy danh sách users cho client-side pagination"""
     search_query = request.GET.get("search", "")
     role_filter = request.GET.get("role", "")
     department_filter = request.GET.get("department", "")
@@ -44,29 +55,9 @@ def user_list_view(request):
     if department_filter:
         users = users.filter(department_id=department_filter)
 
-    # Pagination with page size
-    page_size = request.GET.get("page_size", "20")
-    try:
-        page_size = int(page_size)
-        if page_size not in [10, 20, 50, 100]:
-            page_size = 20
-    except (ValueError, TypeError):
-        page_size = 20
-    
-    paginator = Paginator(users, page_size)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        "page_obj": page_obj,
-        "search_query": search_query,
-        "role_filter": role_filter,
-        "department_filter": department_filter,
-        "page_size": page_size,
-        "role_choices": UserRole.choices,
-        "departments": Department.objects.all().order_by('name'),
-    }
-    return render(request, "users/user_list.html", context)
+    # Serialize users data
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
 
 
 @user_management_required

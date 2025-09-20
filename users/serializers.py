@@ -9,6 +9,9 @@ class UserSerializer(serializers.ModelSerializer):
     role_display = serializers.CharField(
         source="get_role_display", read_only=True
     )
+    department_name = serializers.CharField(
+        source="department.name", read_only=True
+    )
 
     class Meta:
         model = User
@@ -23,6 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
             "role_display",
             "phone",
             "department",
+            "department_name",
             "employee_id",
             "is_active",
             "is_staff",
