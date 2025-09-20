@@ -1,7 +1,8 @@
 /* Users Page Styles */
-.users-page .users-page {
+.users-page {
     max-width: 1200px;
     margin: 0 auto;
+    padding-bottom: 40px;
 }
 
 /* Page Header */
