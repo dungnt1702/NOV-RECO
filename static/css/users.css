@@ -349,26 +349,6 @@
         gap: var(--spacing-sm);
     }
     
-    .pagination-wrapper {
-        flex-direction: column;
-        gap: var(--spacing-md);
-        align-items: stretch;
-    }
-    
-    .pagination {
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    
-    .pagination-text {
-        text-align: center;
-    }
-    
-    .page-numbers {
-        order: -1;
-        width: 100%;
-        justify-content: center;
-    }
 }
 
 @media (max-width: 768px) {
@@ -436,17 +416,6 @@
         flex-direction: column;
     }
     
-    .pagination {
-        gap: var(--spacing-xs);
-        margin: var(--spacing-lg) var(--spacing-sm);
-    }
-    
-    .page-link {
-        min-width: 36px;
-        height: 36px;
-        padding: var(--spacing-xs) var(--spacing-sm);
-        font-size: 0.875rem;
-    }
 }
 
 /* Text Utilities */
