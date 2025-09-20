@@ -4,9 +4,12 @@ let filteredCheckins = [];
 let currentPage = 1;
 let totalPages = 1;
 
+console.log('Checkin list JS loaded');
+
 async function loadCheckins() {
   try {
     console.log('Loading checkins...');
+    console.log('API function available:', typeof api);
     const response = await api('/checkin/list/');
     console.log('Response status:', response.status);
     if (response.ok) {
