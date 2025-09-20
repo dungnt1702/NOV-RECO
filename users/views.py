@@ -141,7 +141,7 @@ def department_list_view(request):
     """Trang quản lý phòng ban"""
     # Lấy danh sách các phòng ban từ model Department
     departments = Department.objects.all().annotate(
-        employee_count=Count('employees')
+        user_count=Count('employees')
     ).order_by('name')
     
     context = {
