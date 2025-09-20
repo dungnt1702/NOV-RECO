@@ -29,38 +29,182 @@
     font-size: 16px;
 }
 
-/* Filters */
+/* Modern Filters */
 .filters {
-    display: flex;
-    gap: 15px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
     margin-bottom: 30px;
-    flex-wrap: wrap;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    position: relative;
+    overflow: hidden;
+}
+
+.filters::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0A5597, #F5831F);
+}
+
+.filters-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.filters-icon {
+    font-size: 20px;
+    color: #0A5597;
+}
+
+.filters-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: end;
 }
 
 .filter-group {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    min-width: 150px;
+    gap: 8px;
 }
 
 .filter-label {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    color: #4a5568;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
 }
 
 .filter-input {
-    padding: 8px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
     font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-input:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .filter-input:focus {
     outline: none;
     border-color: #0A5597;
-    box-shadow: 0 0 0 3px rgba(10, 85, 151, 0.1);
+    box-shadow: 0 0 0 4px rgba(10, 85, 151, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.filter-input::placeholder {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+/* Special styling for select inputs */
+.filter-input select,
+.filter-input option {
+    background: white;
+    color: #374151;
+}
+
+/* Date input styling */
+.filter-input[type="date"] {
+    position: relative;
+}
+
+.filter-input[type="date"]::-webkit-calendar-picker-indicator {
+    color: #0A5597;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.filter-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    background-color: rgba(10, 85, 151, 0.1);
+}
+
+/* Search input with icon */
+.search-wrapper {
+    position: relative;
+}
+
+.search-wrapper::before {
+    content: '🔍';
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #9ca3af;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.search-wrapper .filter-input {
+    padding-left: 48px;
+}
+
+/* Filter actions */
+.filter-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.clear-filters-btn {
+    padding: 10px 20px;
+    background: transparent;
+    border: 2px solid #e5e7eb;
+    color: #6b7280;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.clear-filters-btn:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+.filter-count {
+    background: #0A5597;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: auto;
 }
 
 /* Check-in list */
@@ -281,7 +425,36 @@
     }
     
     .filters {
+        padding: 20px;
+        margin: 0 15px 20px 15px;
+    }
+    
+    .filters-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .filters-header {
         flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+    }
+    
+    .filters-title {
+        font-size: 16px;
+    }
+    
+    .filter-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .filter-count {
+        margin-left: 0;
+        text-align: center;
     }
     
     .checkin-content {

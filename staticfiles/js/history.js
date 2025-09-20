@@ -50,6 +50,7 @@ async function loadCheckins() {
             updatePagination(data);
             renderCheckins();
             loadAreas();
+            updateFilterCount();
         } else {
             showError('Không thể tải dữ liệu check-in');
         }
@@ -179,6 +180,54 @@ function applyFilters() {
     });
     
     renderCheckins();
+    updateFilterCount();
+}
+
+// Clear all filters
+function clearFilters() {
+    document.getElementById('search-input').value = '';
+    document.getElementById('date-from').value = '';
+    document.getElementById('date-to').value = '';
+    document.getElementById('area-filter').value = '';
+    
+    // Reset to all check-ins
+    filteredCheckins = [...allCheckins];
+    renderCheckins();
+    updateFilterCount();
+    
+    // Show success message
+    showAlert('Đã xóa tất cả bộ lọc', 'success');
+}
+
+// Update filter count display
+function updateFilterCount() {
+    const searchTerm = document.getElementById('search-input')?.value.trim() || '';
+    const dateFrom = document.getElementById('date-from')?.value || '';
+    const dateTo = document.getElementById('date-to')?.value || '';
+    const area = document.getElementById('area-filter')?.value || '';
+    
+    let activeFilters = 0;
+    
+    if (searchTerm) activeFilters++;
+    if (dateFrom) activeFilters++;
+    if (dateTo) activeFilters++;
+    if (area) activeFilters++;
+    
+    const filterCountText = document.getElementById('filter-count-text');
+    const filterCount = document.getElementById('filter-count');
+    
+    if (filterCountText) {
+        filterCountText.textContent = activeFilters;
+    }
+    
+    if (filterCount) {
+        if (activeFilters > 0) {
+            filterCount.style.display = 'flex';
+            filterCount.style.background = '#0A5597';
+        } else {
+            filterCount.style.display = 'none';
+        }
+    }
 }
 
 // Render check-ins

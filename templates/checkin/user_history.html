@@ -15,25 +15,47 @@
     </div>
 
     <div class="history-content">
-      <!-- Filters -->
+      <!-- Modern Filters -->
       <div class="filters">
-        <div class="filter-group">
-          <label class="filter-label">Tìm kiếm</label>
-          <input type="text" id="search-input" class="filter-input" placeholder="Tìm theo địa điểm, ghi chú...">
+        <div class="filters-header">
+          <div class="filters-icon">🔍</div>
+          <h3 class="filters-title">Bộ lọc tìm kiếm</h3>
         </div>
-        <div class="filter-group">
-          <label class="filter-label">Từ ngày</label>
-          <input type="date" id="date-from" class="filter-input">
+        
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label class="filter-label">Tìm kiếm</label>
+            <div class="search-wrapper">
+              <input type="text" id="search-input" class="filter-input" placeholder="Tìm theo địa điểm, ghi chú...">
+            </div>
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">Từ ngày</label>
+            <input type="date" id="date-from" class="filter-input">
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">Đến ngày</label>
+            <input type="date" id="date-to" class="filter-input">
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">Khu vực</label>
+            <select id="area-filter" class="filter-input">
+              <option value="">Tất cả khu vực</option>
+            </select>
+          </div>
         </div>
-        <div class="filter-group">
-          <label class="filter-label">Đến ngày</label>
-          <input type="date" id="date-to" class="filter-input">
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">Khu vực</label>
-          <select id="area-filter" class="filter-input">
-            <option value="">Tất cả khu vực</option>
-          </select>
+        
+        <div class="filter-actions">
+          <button type="button" class="clear-filters-btn" onclick="clearFilters()">
+            <span>🗑️</span>
+            Xóa bộ lọc
+          </button>
+          <div class="filter-count" id="filter-count">
+            <span id="filter-count-text">0</span> bộ lọc đang áp dụng
+          </div>
         </div>
       </div>
 
