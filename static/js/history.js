@@ -15,6 +15,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     loadCheckins();
     setupEventListeners();
+    
+    // Handle window resize for responsive layout
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+            // Re-render checkins on resize to switch between mobile/desktop layout
+            renderCheckins();
+        }, 250);
+    });
 });
 
 // Setup event listeners
@@ -264,52 +274,108 @@ function renderCheckins(checkins = null) {
         return;
     }
     
-    container.innerHTML = checkinsToRender.map(checkin => `
-        <div class="checkin-item">
-            <div class="checkin-header">
-                <div class="user-info">
-                    <div class="user-avatar">
-                        ${checkin.user_name ? checkin.user_name.charAt(0).toUpperCase() : 'U'}
-                    </div>
-                    <div class="user-details">
-                        <h3>${checkin.user_name || 'N/A'}</h3>
-                        <p>${checkin.user_email || 'N/A'}</p>
-                    </div>
+    // Check if mobile view
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile) {
+        // Mobile cards layout with photo on right side
+        container.innerHTML = checkinsToRender.map(checkin => `
+            <div class="mobile-card">
+                <div class="mobile-card-header">
+                    <h3 class="mobile-card-title">${checkin.user_name || 'N/A'}</h3>
+                    <span class="mobile-card-time">${formatDate(checkin.created_at)}</span>
                 </div>
-                <div class="checkin-time">
-                    ${formatDate(checkin.created_at)}
-                </div>
-            </div>
-            
-            <div class="checkin-content">
-                <div class="checkin-details">
-                    <div class="detail-row">
-                        <span class="detail-icon">📍</span>
-                        <span class="detail-label">Địa điểm:</span>
-                        <span class="detail-value area-badge">${checkin.area_name || 'N/A'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-icon">📏</span>
-                        <span class="detail-label">Khoảng cách:</span>
-                        <span class="detail-value distance-badge">${formatDistance(checkin.distance_m || 0)}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-icon">🌐</span>
-                        <span class="detail-label">Tọa độ:</span>
-                        <span class="detail-value">${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}</span>
-                    </div>
-                    ${checkin.note ? `
-                        <div class="note">
-                            <strong>Ghi chú:</strong> ${checkin.note}
+                
+                <div class="mobile-card-content">
+                    <div class="mobile-card-details">
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">📍 Địa điểm:</span>
+                            <span class="mobile-card-value">${checkin.area_name || 'N/A'}</span>
                         </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">📏 Khoảng cách:</span>
+                            <span class="mobile-card-value">${formatDistance(checkin.distance_m || 0)}</span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">🗺️ Tọa độ:</span>
+                            <span class="mobile-card-value">${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}</span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">📅 Thời gian:</span>
+                            <span class="mobile-card-value">${formatDate(checkin.created_at)}</span>
+                        </div>
+                        
+                        ${checkin.note ? `
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">📝 Ghi chú:</span>
+                            <span class="mobile-card-value">${checkin.note}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${checkin.photo_url ? `
+                        <img src="${checkin.photo_url}" alt="Check-in photo" class="mobile-card-photo">
                     ` : ''}
                 </div>
-                ${checkin.photo_url ? `
-                    <img src="${checkin.photo_url}" alt="Check-in photo" class="checkin-photo">
-                ` : ''}
+                
+                <div class="mobile-card-badges">
+                    <span class="mobile-badge area-badge">${checkin.area_name || 'N/A'}</span>
+                    <span class="mobile-badge distance-badge">${formatDistance(checkin.distance_m || 0)}</span>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `).join('');
+    } else {
+        // Desktop layout (original)
+        container.innerHTML = checkinsToRender.map(checkin => `
+            <div class="checkin-item">
+                <div class="checkin-header">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            ${checkin.user_name ? checkin.user_name.charAt(0).toUpperCase() : 'U'}
+                        </div>
+                        <div class="user-details">
+                            <h3>${checkin.user_name || 'N/A'}</h3>
+                            <p>${checkin.user_email || 'N/A'}</p>
+                        </div>
+                    </div>
+                    <div class="checkin-time">
+                        ${formatDate(checkin.created_at)}
+                    </div>
+                </div>
+                
+                <div class="checkin-content">
+                    <div class="checkin-details">
+                        <div class="detail-row">
+                            <span class="detail-icon">📍</span>
+                            <span class="detail-label">Địa điểm:</span>
+                            <span class="detail-value area-badge">${checkin.area_name || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">📏</span>
+                            <span class="detail-label">Khoảng cách:</span>
+                            <span class="detail-value distance-badge">${formatDistance(checkin.distance_m || 0)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">🌐</span>
+                            <span class="detail-label">Tọa độ:</span>
+                            <span class="detail-value">${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}</span>
+                        </div>
+                        ${checkin.note ? `
+                            <div class="note">
+                                <strong>Ghi chú:</strong> ${checkin.note}
+                            </div>
+                        ` : ''}
+                    </div>
+                    ${checkin.photo_url ? `
+                        <img src="${checkin.photo_url}" alt="Check-in photo" class="checkin-photo">
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
 }
 
 // Show error message
