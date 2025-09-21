@@ -255,8 +255,8 @@ def checkin_success_view(request, checkin_id):
             'success_data': {
                 'user_name': checkin.user.get_display_name(),
                 'user_email': checkin.user.email,
-                'user_department': getattr(checkin.user, 'department', 'N/A'),
-                'user_employee_id': getattr(checkin.user, 'employee_id', 'N/A'),
+                'user_department': checkin.user.department.name if checkin.user.department else 'N/A',
+                'user_employee_id': checkin.user.employee_id or 'N/A',
                 'area_name': checkin.get_area_name(),
                 'coordinates': f"{checkin.lat:.6f}, {checkin.lng:.6f}",
                 'checkin_time': checkin.created_at.strftime('%d/%m/%Y %H:%M:%S'),
