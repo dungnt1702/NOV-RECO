@@ -123,6 +123,19 @@
     display: none;
 }
 
+/* Force show mobile cards on small screens (backup rule) */
+@media (max-width: 768px) {
+    .mobile-cards {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    .table-container {
+        display: none !important;
+    }
+}
+
 .dashboard-page .table {
     width: 100%;
     border-collapse: collapse;
@@ -322,7 +335,8 @@
     }
     
     /* Mobile cards layout */
-    .dashboard-page .mobile-cards {
+    .dashboard-page .mobile-cards,
+    .mobile-cards {
         display: block !important;
     }
     
