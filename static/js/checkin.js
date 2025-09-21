@@ -384,9 +384,31 @@ async function openCamera() {
         if (captureBtn) captureBtn.textContent = '📷 Chụp ảnh';
         if (retakeBtn) retakeBtn.style.display = 'none';
         if (switchBtn) {
-            switchBtn.style.display = 'inline-block';
-            switchBtn.textContent = '🔄 Đổi camera';
-            console.log('Switch camera button shown');
+            // Always show switch button on mobile, let user decide
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // On mobile, always show the button since most phones have front+back cameras
+                switchBtn.style.display = 'inline-block';
+                switchBtn.textContent = '🔄 Đổi camera';
+                console.log('Switch camera button shown - mobile device detected');
+            } else {
+                // On desktop, check for multiple cameras
+                checkMultipleCameras().then(hasMultiple => {
+                    if (hasMultiple) {
+                        switchBtn.style.display = 'inline-block';
+                        switchBtn.textContent = '🔄 Đổi camera';
+                        console.log('Switch camera button shown - multiple cameras detected');
+                    } else {
+                        switchBtn.style.display = 'none';
+                        console.log('Switch camera button hidden - only one camera detected');
+                    }
+                }).catch(error => {
+                    console.warn('Could not detect camera count, showing switch button anyway:', error);
+                    switchBtn.style.display = 'inline-block';
+                    switchBtn.textContent = '🔄 Đổi camera';
+                });
+            }
         } else {
             console.error('Switch camera button not found!');
         }
@@ -509,6 +531,28 @@ function stopCamera() {
     }
 }
 
+// Check if device has multiple cameras
+async function checkMultipleCameras() {
+    try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+            console.log('enumerateDevices not supported');
+            return true; // Assume multiple cameras if we can't check
+        }
+        
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        
+        console.log('Video devices found:', videoDevices.length, videoDevices);
+        
+        // Check if we have at least 2 cameras or if we can't determine (return true to be safe)
+        return videoDevices.length >= 2 || videoDevices.length === 0;
+        
+    } catch (error) {
+        console.error('Error checking camera devices:', error);
+        return true; // If we can't check, assume multiple cameras
+    }
+}
+
 // Switch camera (front/back)
 async function switchCamera() {
     try {
@@ -532,6 +576,11 @@ async function switchCamera() {
         if (switchBtn) {
             switchBtn.textContent = currentFacingMode === 'environment' ? '🤳 Camera trước' : '📷 Camera sau';
             switchBtn.disabled = false;
+        }
+        
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+            showAlert('✅ Đã chuyển camera!', 'success');
         }
         
         console.log(`Switched to ${currentFacingMode === 'environment' ? 'back' : 'front'} camera`);
