@@ -274,6 +274,117 @@ def checkin_success_view(request, checkin_id):
         return redirect('/checkin/action/')
 
 
+def debug_mobile_cards_view(request):
+    """Debug view for mobile cards issue"""
+    from django.http import HttpResponse
+    
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Debug Mobile Cards</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+            .error { color: red; }
+            .success { color: green; }
+            .info { color: blue; }
+        </style>
+    </head>
+    <body>
+        <h1>🔍 Debug Mobile Cards</h1>
+        
+        <div class="debug-section">
+            <h3>1. Screen Width Test</h3>
+            <p>Screen width: <span id="screen-width"></span>px</p>
+            <p>Is mobile: <span id="is-mobile"></span></p>
+        </div>
+        
+        <div class="debug-section">
+            <h3>2. JavaScript Files Test</h3>
+            <p>base.js loaded: <span id="base-js-status"></span></p>
+            <p>api function: <span id="api-function-status"></span></p>
+        </div>
+        
+        <div class="debug-section">
+            <h3>3. API Test</h3>
+            <button onclick="testAPI()">Test API</button>
+            <div id="api-result"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>4. Mobile Cards Container</h3>
+            <div class="mobile-cards" id="mobile-cards" style="border: 1px solid blue; min-height: 100px;">
+                Mobile cards will appear here...
+            </div>
+        </div>
+
+        <script>
+            // Test 1: Screen width
+            document.getElementById('screen-width').textContent = window.innerWidth;
+            document.getElementById('is-mobile').textContent = window.innerWidth <= 768 ? 'YES' : 'NO';
+            
+            // Test 2: JavaScript files
+            document.getElementById('base-js-status').textContent = typeof api !== 'undefined' ? '✅ Loaded' : '❌ Missing';
+            document.getElementById('api-function-status').textContent = typeof api === 'function' ? '✅ Function OK' : '❌ Not function';
+            
+            // Test 3: API test function
+            async function testAPI() {
+                const resultDiv = document.getElementById('api-result');
+                resultDiv.innerHTML = '<p class="info">Testing API...</p>';
+                
+                try {
+                    if (typeof api === 'undefined') {
+                        resultDiv.innerHTML = '<p class="error">❌ api() function not found! base.js not loaded?</p>';
+                        return;
+                    }
+                    
+                    const response = await api('/checkin/list/');
+                    console.log('API Response:', response);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        resultDiv.innerHTML = `
+                            <p class="success">✅ API Success!</p>
+                            <p>Data count: ${data.length}</p>
+                            <pre>${JSON.stringify(data.slice(0, 2), null, 2)}</pre>
+                        `;
+                        
+                        // Test mobile cards rendering
+                        renderTestMobileCards(data.slice(0, 3));
+                    } else {
+                        resultDiv.innerHTML = `<p class="error">❌ API Error: ${response.status} ${response.statusText}</p>`;
+                    }
+                } catch (error) {
+                    resultDiv.innerHTML = `<p class="error">❌ Exception: ${error.message}</p>`;
+                    console.error('API Test Error:', error);
+                }
+            }
+            
+            // Test mobile cards rendering
+            function renderTestMobileCards(checkins) {
+                const container = document.getElementById('mobile-cards');
+                container.innerHTML = checkins.map(checkin => `
+                    <div style="border: 1px solid green; padding: 10px; margin: 5px;">
+                        <strong>${checkin.user_name}</strong><br>
+                        Area: ${checkin.area_name}<br>
+                        Time: ${checkin.created_at}<br>
+                        Photo: ${checkin.photo_url ? '✅ Has photo' : '❌ No photo'}
+                    </div>
+                `).join('');
+            }
+        </script>
+        
+        <!-- Try to load base.js -->
+        <script src="/static/js/base.js"></script>
+    </body>
+    </html>
+    """
+    
+    return HttpResponse(html_content)
+
+
 @login_required
 def user_history_view(request):
     """Trang lịch sử check-in của user"""

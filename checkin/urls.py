@@ -17,6 +17,7 @@ from .views import (
     area_detail_api,
     area_management,
     update_checkins_areas_api,
+    debug_mobile_cards_view,
 )
 
 urlpatterns = [
@@ -44,4 +45,6 @@ urlpatterns = [
         update_checkins_areas_api,
         name="update_checkins_areas",
     ),
+    # Debug
+    path("debug-mobile-cards/", debug_mobile_cards_view, name="debug_mobile_cards"),
 ]
