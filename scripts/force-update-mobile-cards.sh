@@ -26,25 +26,34 @@ print_status "🚀 Force updating mobile cards on server..."
 
 cd "$PROJECT_DIR"
 
-# 1. Stop service
+# 1. Fix permissions first (before stopping service)
+print_status "Fixing permissions first..."
+sudo mkdir -p logs data staticfiles media
+sudo chown -R www-data:www-data logs/ data/ staticfiles/ media/
+sudo chmod -R 755 logs/ data/ staticfiles/ media/
+sudo touch logs/django.log
+sudo chown www-data:www-data logs/django.log
+sudo chmod 666 logs/django.log
+
+# 2. Stop service
 print_status "Stopping Django service..."
 sudo systemctl stop checkin-taylaibui-test
 
-# 2. Pull latest code
+# 3. Pull latest code
 print_status "Pulling latest code..."
 git stash || true
 git pull origin master
 
-# 3. Copy environment
+# 4. Copy environment
 print_status "Setting test environment..."
 cp config/test.env .env
 
-# 4. Force clear all static files and rebuild
+# 5. Force clear all static files and rebuild
 print_status "Force clearing and rebuilding static files..."
 sudo rm -rf staticfiles/*
 sudo -u www-data DJANGO_ENVIRONMENT=test ./venv/bin/python manage.py collectstatic --noinput
 
-# 5. Verify critical CSS files exist and have content
+# 6. Verify critical CSS files exist and have content
 print_status "Verifying CSS files..."
 for css_file in "staticfiles/css/base.css" "staticfiles/css/checkin_list.css"; do
     if [ -f "$css_file" ]; then
@@ -59,7 +68,7 @@ for css_file in "staticfiles/css/base.css" "staticfiles/css/checkin_list.css"; d
     fi
 done
 
-# 6. Verify JavaScript files
+# 7. Verify JavaScript files
 print_status "Verifying JS files..."
 for js_file in "staticfiles/js/base.js" "staticfiles/js/checkin_list.js"; do
     if [ -f "$js_file" ]; then
@@ -74,7 +83,7 @@ for js_file in "staticfiles/js/base.js" "staticfiles/js/checkin_list.js"; do
     fi
 done
 
-# 7. Check mobile cards CSS specifically
+# 8. Check mobile cards CSS specifically
 print_status "Checking mobile cards CSS..."
 if grep -q "mobile-card" staticfiles/css/checkin_list.css; then
     print_success "✅ Mobile cards CSS found in checkin_list.css"
@@ -82,12 +91,14 @@ else
     print_error "❌ Mobile cards CSS missing from checkin_list.css"
 fi
 
-# 8. Fix permissions
-print_status "Fixing permissions..."
+# 9. Fix permissions again after collectstatic
+print_status "Fixing permissions after collectstatic..."
 sudo chown -R www-data:www-data staticfiles/ media/ data/ logs/
 sudo chmod -R 755 staticfiles/ media/ data/ logs/
+sudo chmod 666 data/*.sqlite3 2>/dev/null || true
+sudo chmod 666 logs/django.log 2>/dev/null || true
 
-# 9. Start service
+# 10. Start service
 print_status "Starting Django service..."
 sudo systemctl start checkin-taylaibui-test
 
