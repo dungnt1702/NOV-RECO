@@ -2,33 +2,64 @@
 
 ## 📋 Tổng quan
 
-Dự án này được cấu hình để chạy trên cả **Local Development** và **Production** mà không cần cài đặt gì thêm.
+Dự án NOV-RECO được thiết kế với **3 môi trường riêng biệt** để phát triển và triển khai an toàn:
 
-## 🏠 Local Development
+### 🏠 **Local Development** (Bryan's MacBook)
+- **URL**: http://localhost:3000
+- **Environment**: `local` (DEBUG=True, SQLite)
+- **Database**: `data/db_local.sqlite3`
+- **Mục đích**: Phát triển và test trên máy local
 
-### Cách 1: Sử dụng script tự động
+### 🧪 **Test Server** (checkin.taylaibui.vn)
+- **URL**: http://checkin.taylaibui.vn
+- **Server IP**: 103.15.51.66
+- **Environment**: `test` (DEBUG=True, SQLite)
+- **Database**: `data/db_test.sqlite3`
+- **Mục đích**: Test trên server thực, staging environment
+
+### 🌐 **Production Server** (reco.qly.vn)
+- **URL**: https://reco.qly.vn
+- **Environment**: `production` (DEBUG=False, PostgreSQL)
+- **Database**: PostgreSQL production database
+- **Mục đích**: Production environment cho end users
+
+## 🚀 Quick Start Commands
+
+### 🏠 Local Development (Bryan's MacBook)
 ```bash
-# Chạy local development server
-./scripts/run-local.sh
-```
-
-### Cách 2: Manual setup
-```bash
-# Set environment variables
-export DJANGO_ENVIRONMENT=local
-export SERVER_PORT=3000
+# Switch to local environment
+./scripts/switch-environment.sh local
 
 # Install dependencies
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 
 # Run migrations
 python manage.py migrate
 
-# Start server
+# Start development server
 python manage.py runserver 3000
 ```
-
 **URL**: http://localhost:3000
+
+### 🧪 Test Server Deployment (checkin.taylaibui.vn)
+```bash
+# On server checkin.taylaibui.vn (103.15.51.66)
+cd /var/www/checkin.taylaibui.vn
+git pull origin master
+sudo ./deploy/deploy-test-server.sh
+```
+**URL**: http://checkin.taylaibui.vn
+
+### 🌐 Production Server Deployment (reco.qly.vn)
+```bash
+# On production server reco.qly.vn
+git clone https://github.com/dungnt1702/NOV-RECO.git /var/www/reco.qly.vn
+cd /var/www/reco.qly.vn
+sudo ./deploy/deploy-production-reco-qly.sh
+```
+**URL**: https://reco.qly.vn
 
 ## 🧪 Test/Staging Environment
 
@@ -129,99 +160,183 @@ DATABASE_HOST=localhost
 DATABASE_PORT=5432
 ```
 
-## ⚙️ Environment Variables
+## ⚙️ Environment Management
 
-### 🏠 Local Development (`config/local.env`)
+### 🔧 Environment Switcher
+```bash
+# Switch between environments locally
+./scripts/switch-environment.sh [local|test|production]
+
+# Examples:
+./scripts/switch-environment.sh local      # For localhost development
+./scripts/switch-environment.sh test       # For test server config  
+./scripts/switch-environment.sh production # For production config
+```
+
+### 📁 Environment Configurations
+
+#### 🏠 Local Development (`config/local.env`)
 - `DJANGO_DEBUG=1`
-- `SERVER_PORT=3000`
-- SQLite database
+- `SERVER_PORT=3000` 
+- `DATABASE_NAME=data/db_local.sqlite3`
 - Console email backend
 - Relaxed security settings
+- **URL**: http://localhost:3000
 
-### 🌐 Production (`config/production.env`)
+#### 🧪 Test Server (`config/test.env`)
+- `DJANGO_DEBUG=1` (for detailed error messages)
+- `SERVER_PORT=8000`
+- `DATABASE_NAME=/var/www/checkin.taylaibui.vn/data/db_test.sqlite3`
+- Console email backend
+- Relaxed security for testing
+- **URL**: http://checkin.taylaibui.vn
+
+#### 🌐 Production Server (`config/production-reco-qly.env`)
 - `DJANGO_DEBUG=0`
 - `SERVER_PORT=8000`
-- PostgreSQL/SQLite database
+- PostgreSQL database
 - SMTP email backend
 - Strict security settings
+- SSL required
+- **URL**: https://reco.qly.vn
 
 ## 🔧 Configuration Files
 
 ```
 config/
-├── local.env          # Local development settings
-└── production.env     # Production settings
+├── local.env                    # Local development (localhost:3000)
+├── test.env                     # Test server (checkin.taylaibui.vn)
+├── production.env               # Legacy production config
+└── production-reco-qly.env      # Production server (reco.qly.vn)
 
 deploy/
-├── deploy.sh          # Full production deployment (PostgreSQL)
-└── deploy-simple.sh   # Simple deployment (SQLite)
+├── deploy-test-server.sh        # Test server deployment
+├── deploy-production-reco-qly.sh # Production server deployment
+├── deploy.sh                    # Legacy deployment
+└── deploy-simple.sh             # Legacy simple deployment
 
 scripts/
-├── run-local.sh       # Local development runner
-└── run-production.sh  # Production runner (for testing)
+├── switch-environment.sh        # Switch between environments
+├── update-server-from-git.sh    # Update server from Git
+├── manage-environments.sh       # Environment management commands
+├── run-local.sh                 # Local development runner
+└── run-production.sh            # Legacy production runner
 ```
 
-## 🚀 Quick Start Commands
+## 🚀 Environment Management Commands
 
-### Local Development:
+### 🔧 Environment Switcher
 ```bash
-./scripts/run-local.sh
+# Switch environment configuration locally
+./scripts/switch-environment.sh [local|test|production]
+
+# Environment management
+./scripts/manage-environments.sh help              # Show all commands
+./scripts/manage-environments.sh deploy test       # Deploy to test server
+./scripts/manage-environments.sh deploy production # Deploy to production
+./scripts/manage-environments.sh status test       # Check test server status
+./scripts/manage-environments.sh logs test         # View test server logs
+```
+
+### 🏠 Local Development Commands
+```bash
+./scripts/switch-environment.sh local
+python manage.py runserver 3000
 # → http://localhost:3000
 ```
 
-### Production Test:
+### 🧪 Test Server Commands
 ```bash
-./scripts/run-production.sh
-# → http://localhost:8000
+# On checkin.taylaibui.vn server:
+sudo ./deploy/deploy-test-server.sh
+# → http://checkin.taylaibui.vn
 ```
 
-### Production Deployment:
+### 🌐 Production Server Commands
 ```bash
-sudo ./deploy/deploy-simple.sh
-# → http://yourdomain.com
+# On reco.qly.vn server:
+sudo ./deploy/deploy-production-reco-qly.sh
+# → https://reco.qly.vn
 ```
 
 ## 🔐 Security Checklist
 
-### Production Setup:
-- [ ] Change `DJANGO_SECRET_KEY`
-- [ ] Update `ALLOWED_HOSTS` with your domain
+### 🧪 Test Server Setup (checkin.taylaibui.vn):
+- [x] Domain configured: checkin.taylaibui.vn → 103.15.51.66
+- [x] SSL certificate uploaded
+- [ ] Test all functionality
+- [ ] Verify user roles and permissions
+- [ ] Test check-in features
+
+### 🌐 Production Server Setup (reco.qly.vn):
+- [ ] Configure DNS: reco.qly.vn → production server IP
+- [ ] Change `DJANGO_SECRET_KEY` in production-reco-qly.env
+- [ ] Update database credentials
 - [ ] Change default admin password
 - [ ] Set up SSL certificate (Let's Encrypt)
-- [ ] Configure proper email settings
+- [ ] Configure SMTP email settings
 - [ ] Set up Google OAuth credentials
 - [ ] Configure firewall rules
+- [ ] Setup monitoring and backups
 
 ## 📊 Service Management
 
-### Check status:
+### 🧪 Test Server (checkin.taylaibui.vn):
 ```bash
-sudo systemctl status nov-reco
+# Check status
+sudo systemctl status checkin-taylaibui-test
 sudo systemctl status nginx
-```
 
-### Restart services:
-```bash
-sudo systemctl restart nov-reco
+# Restart services
+sudo systemctl restart checkin-taylaibui-test
 sudo systemctl restart nginx
+
+# View logs
+sudo journalctl -u checkin-taylaibui-test -f
+sudo tail -f /var/log/nginx/error.log
+
+# Update from Git
+sudo ./scripts/update-server-from-git.sh test
 ```
 
-### View logs:
+### 🌐 Production Server (reco.qly.vn):
 ```bash
-sudo journalctl -u nov-reco -f
+# Check status
+sudo systemctl status reco-qly-production
+sudo systemctl status nginx
+
+# Restart services
+sudo systemctl restart reco-qly-production
+sudo systemctl restart nginx
+
+# View logs
+sudo journalctl -u reco-qly-production -f
 sudo tail -f /var/log/nginx/access.log
+
+# Update from Git
+sudo ./scripts/update-server-from-git.sh production
 ```
+
+## 🌐 Environment URLs
+
+| Environment | URL | Purpose | Status |
+|-------------|-----|---------|--------|
+| 🏠 **Local** | http://localhost:3000 | Development on MacBook | ✅ Active |
+| 🧪 **Test** | http://checkin.taylaibui.vn | Testing on server | 🔄 Setup in progress |
+| 🌐 **Production** | https://reco.qly.vn | Live production | ⏳ Future deployment |
 
 ## 🎯 Features
 
+- ✅ **3-tier environment system**
 - ✅ **Zero-config local development**
-- ✅ **One-command production deployment**
+- ✅ **One-command server deployment**
 - ✅ **Automatic database setup**
 - ✅ **SSL-ready configuration**
 - ✅ **Multi-environment support**
 - ✅ **Systemd service integration**
 - ✅ **Nginx reverse proxy**
 - ✅ **Static files optimization**
+- ✅ **Git-based deployment workflow**
 
 ## 🆘 Troubleshooting
 
