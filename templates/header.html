@@ -2,11 +2,13 @@
 {% load static %}
 <nav class="navbar">
     <div class="nav-container">
+        {% if user.is_authenticated %}
         <button class="nav-toggle" id="nav-toggle">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
         </button>
+        {% endif %}
         
         <a href="/" class="nav-logo">
             <img src="{% static 'logo.svg' %}" alt="NOV-RECO Logo">
@@ -135,6 +137,7 @@
 </nav>
 
 <!-- Mobile Bottom Navigation -->
+{% if user.is_authenticated %}
 <nav class="mobile-bottom-nav">
     <a href="/" class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,3 +178,4 @@
     </a>
     {% endif %}
 </nav>
+{% endif %}
