@@ -1,0 +1,360 @@
+/* Checkin List Page Styles */
+
+.dashboard-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px 0;
+}
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.dashboard-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.dashboard-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Filters and Controls */
+.filters-section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filters-row {
+    display: flex;
+    gap: 15px;
+    align-items: end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 150px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.filter-group select,
+.filter-group input {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.btn-filter {
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    height: fit-content;
+}
+
+.btn-filter:hover {
+    background: #2563eb;
+}
+
+/* Table Container */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.checkin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.checkin-table th {
+    background: #f8fafc;
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.checkin-table td {
+    padding: 15px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.checkin-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.user-email {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.area-badge {
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.distance-badge {
+    background: #d1fae5;
+    color: #065f46;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.checkin-photo {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Mobile Cards - hidden by default */
+.mobile-cards {
+    display: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 0 15px;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2rem;
+    }
+    
+    .filters-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-group {
+        min-width: unset;
+    }
+    
+    /* Hide table, show mobile cards */
+    .table-container {
+        display: none !important;
+    }
+    
+    .mobile-cards {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    /* Mobile Card Styles */
+    .mobile-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    .mobile-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .mobile-card-title {
+        font-weight: 700;
+        color: #1f2937;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+    
+    .mobile-card-time {
+        font-size: 0.85rem;
+        color: #6b7280;
+        text-align: right;
+    }
+    
+    .mobile-card-content {
+        display: flex !important;
+        gap: 15px !important;
+        align-items: flex-start !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+    }
+    
+    .mobile-card-details {
+        flex: 1 !important;
+        display: grid !important;
+        gap: 8px !important;
+        min-width: 0 !important;
+    }
+    
+    .mobile-card-photo-container {
+        flex-shrink: 0 !important;
+        width: 80px !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+    }
+    
+    .mobile-card-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 0;
+    }
+    
+    .mobile-card-label {
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.9rem;
+    }
+    
+    .mobile-card-value {
+        color: #6b7280;
+        font-size: 0.9rem;
+        text-align: right;
+    }
+    
+    .mobile-card-photo {
+        width: 80px !important;
+        height: 100px !important;
+        object-fit: cover !important;
+        border-radius: 8px !important;
+        margin: 0 !important;
+        display: block !important;
+    }
+    
+    .mobile-card-photo-placeholder {
+        width: 80px;
+        height: 100px;
+        background: #f3f4f6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+        font-size: 0.8rem;
+        text-align: center;
+    }
+    
+    .mobile-card-badges {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+    
+    .mobile-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .mobile-badge.area-badge {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+    
+    .mobile-badge.distance-badge {
+        background: #d1fae5;
+        color: #065f46;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-container {
+        padding: 0 10px;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .mobile-card {
+        padding: 15px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .mobile-card-content {
+        gap: 12px !important;
+    }
+    
+    .mobile-card-photo-container {
+        width: 70px !important;
+    }
+    
+    .mobile-card-photo,
+    .mobile-card-photo-placeholder {
+        width: 70px !important;
+        height: 90px !important;
+    }
+}
+
+/* Loading and Empty States */
+.loading-state {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+}
+
+.empty-state h3 {
+    margin-bottom: 10px;
+    color: #374151;
+}
