@@ -150,11 +150,17 @@ function renderMobileCards(items = null) {
   }
   
   console.log('Rendering mobile cards, count:', checkinsToRender.length);
+  console.log('Sample checkin data:', checkinsToRender[0]);
+  console.log('Screen width:', window.innerWidth);
+  console.log('Is mobile view:', window.innerWidth <= 768);
+  
   const mobileCards = document.getElementById('mobile-cards');
   if (!mobileCards) {
     console.error('mobile-cards element not found');
     return;
   }
+  
+  console.log('Mobile cards container found:', mobileCards);
   
   if (checkinsToRender.length === 0) {
     mobileCards.innerHTML = '<div style="text-align: center; padding: 40px; color: #6c757d;">Không có dữ liệu check-in</div>';
@@ -206,6 +212,20 @@ function renderMobileCards(items = null) {
         </div>
       </div>
     `).join('');
+    
+    console.log('Mobile cards HTML generated, length:', mobileCards.innerHTML.length);
+    console.log('Mobile cards container display:', window.getComputedStyle(mobileCards).display);
+    console.log('Mobile cards container visibility:', window.getComputedStyle(mobileCards).visibility);
+    
+    // Force visibility check
+    setTimeout(() => {
+      const renderedCards = mobileCards.querySelectorAll('.mobile-card');
+      console.log('Rendered mobile cards count:', renderedCards.length);
+      if (renderedCards.length > 0) {
+        console.log('First card display:', window.getComputedStyle(renderedCards[0]).display);
+        console.log('First card visibility:', window.getComputedStyle(renderedCards[0]).visibility);
+      }
+    }, 100);
   }
 }
 
