@@ -169,8 +169,8 @@ def checkin_submit_view(request):
                     "photo_url": checkin.photo.url if checkin.photo else "",
                 }
 
-                # Redirect đến trang success chỉ với checkin ID (secure)
-                success_url = f"/checkin/success/?checkin_id={checkin.id}"
+                # Redirect đến trang success với professional URL pattern
+                success_url = f"/checkin/success/{checkin.id}/"
                 print(f"DEBUG: Redirecting to: {success_url}")
                 return redirect(success_url)
             else:
@@ -236,10 +236,8 @@ def checkin_list_view(request):
 
 
 @login_required
-def checkin_success_view(request):
+def checkin_success_view(request, checkin_id):
     """Trang kết quả check-in thành công"""
-    checkin_id = request.GET.get('checkin_id')
-    
     if not checkin_id:
         messages.error(request, "Không tìm thấy thông tin check-in")
         return redirect('/checkin/action/')
