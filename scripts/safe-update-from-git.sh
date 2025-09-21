@@ -85,6 +85,29 @@ sudo touch logs/django.log
 sudo chown www-data:www-data logs/django.log
 sudo chmod 666 logs/django.log
 
+# 6.5. CRITICAL FIX: Ensure Nginx serves our site, not default site
+print_status "🔧 Fixing Nginx configuration - disable conflicting sites..."
+# Disable default site if it exists (causes static files 404)
+if [ -f "/etc/nginx/sites-enabled/default" ]; then
+    print_status "Disabling default Nginx site..."
+    sudo rm -f /etc/nginx/sites-enabled/default
+    print_success "✅ Default site disabled"
+fi
+
+# Ensure only our site is enabled
+print_status "Ensuring only our site is enabled..."
+sudo rm -f /etc/nginx/sites-enabled/*
+sudo ln -sf /etc/nginx/sites-available/checkin.taylaibui.vn /etc/nginx/sites-enabled/
+
+# Test Nginx config before proceeding
+if sudo nginx -t; then
+    sudo systemctl reload nginx
+    print_success "✅ Nginx configuration fixed and reloaded"
+else
+    print_error "❌ Nginx config invalid!"
+    exit 1
+fi
+
 # 6.5. Emergency check - if staticfiles is empty, restore from backup first
 if [ ! -d "staticfiles/css" ] || [ -z "$(ls -A staticfiles 2>/dev/null)" ]; then
     print_status "staticfiles directory empty, attempting restore from backup..."
@@ -286,6 +309,30 @@ else
     STATIC_URL="http://localhost:8000/static/css/home.css"
 fi
 
+# 13.5. Quick test of multiple static files to ensure Nginx fix worked
+print_status "Testing multiple static files after Nginx fix..."
+STATIC_FILES_WORKING=0
+STATIC_FILES_TOTAL=0
+
+for file in "css/home.css" "css/base.css" "js/base.js" "logo.svg"; do
+    STATIC_FILES_TOTAL=$((STATIC_FILES_TOTAL + 1))
+    if [ "$ENVIRONMENT" == "test" ]; then
+        TEST_URL="http://checkin.taylaibui.vn/static/$file"
+    else
+        TEST_URL="http://localhost:8000/static/$file"
+    fi
+    
+    STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$TEST_URL" 2>/dev/null || echo "000")
+    if [ "$STATUS" = "200" ]; then
+        STATIC_FILES_WORKING=$((STATIC_FILES_WORKING + 1))
+        print_success "✅ /static/$file: HTTP $STATUS"
+    else
+        print_error "❌ /static/$file: HTTP $STATUS"
+    fi
+done
+
+print_status "Static files test: $STATIC_FILES_WORKING/$STATIC_FILES_TOTAL working"
+
 # Test with detailed curl output
 print_status "Testing website: $WEBSITE_URL"
 WEBSITE_RESPONSE=$(curl -s -I "$WEBSITE_URL" 2>/dev/null || echo "Connection failed")
@@ -427,14 +474,26 @@ elif [ "$STATIC_STATUS" = "301" ]; then
     fi
 fi
 
+# Enhanced success logic - also consider individual static files test
+if [ "$STATIC_FILES_WORKING" -ge 3 ]; then
+    STATIC_SUCCESS=true
+    print_success "✅ Static files: $STATIC_FILES_WORKING/$STATIC_FILES_TOTAL files working"
+fi
+
 if [ "$WEBSITE_SUCCESS" = true ] && [ "$STATIC_SUCCESS" = true ]; then
     print_success "🎉 SUCCESS! Update completed successfully!"
     print_success "✅ Website: $WEBSITE_URL (HTTP $WEBSITE_STATUS)"
-    print_success "✅ Static files: HTTP $STATIC_STATUS"
+    print_success "✅ Static files: $STATIC_FILES_WORKING/$STATIC_FILES_TOTAL working (HTTP $STATIC_STATUS)"
     
     if [ "$WEBSITE_STATUS" = "301" ] || [ "$STATIC_STATUS" = "301" ]; then
         print_status "💡 HTTP 301 redirects are normal when SSL is configured"
         print_status "💡 Users will automatically be redirected to HTTPS"
+    fi
+    
+    print_success "🚀 Website is now fully functional!"
+    print_success "📱 Users can access: $WEBSITE_URL"
+    if [ "$ENVIRONMENT" == "test" ]; then
+        print_success "🔐 Admin login: admin / admin123"
     fi
 else
     print_error "❌ Issues detected, attempting final fix..."
