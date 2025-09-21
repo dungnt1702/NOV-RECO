@@ -80,6 +80,7 @@ class CheckinListSerializer(serializers.ModelSerializer):
     )
     user_email = serializers.CharField(source="user.email", read_only=True)
     area_name = serializers.SerializerMethodField()
+    photo_url = serializers.SerializerMethodField()
     created_at = serializers.DateTimeField(
         format="%Y-%m-%d %H:%M:%S", read_only=True
     )
@@ -99,10 +100,17 @@ class CheckinListSerializer(serializers.ModelSerializer):
             "note",
             "created_at",
             "photo",
+            "photo_url",
         ]
 
     def get_area_name(self, obj):
         return obj.get_area_name()
+    
+    def get_photo_url(self, obj):
+        """Return photo URL if photo exists"""
+        if obj.photo:
+            return obj.photo.url
+        return None
 
 
 class AreaSerializer(serializers.ModelSerializer):
