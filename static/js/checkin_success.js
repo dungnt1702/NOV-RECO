@@ -8,7 +8,7 @@ function getUrlParams() {
     userEmail: params.get('user_email') || 'N/A',
     userDepartment: params.get('user_department') || 'N/A',
     userEmployeeId: params.get('user_employee_id') || 'N/A',
-    locationName: params.get('area_name') || 'N/A', // Fixed: use area_name
+    locationName: params.get('area_name') || 'N/A',
     coordinates: params.get('coordinates') || 'N/A',
     checkinTime: params.get('checkin_time') || 'N/A',
     note: params.get('note') || '',
