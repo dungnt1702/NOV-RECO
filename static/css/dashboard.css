@@ -333,6 +333,8 @@
         padding: 20px;
         margin-bottom: 15px;
         transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
     }
     
     .mobile-card:hover {
@@ -365,6 +367,13 @@
     }
     
     .mobile-card-content {
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .mobile-card-details {
+        flex: 1;
         display: grid;
         gap: 8px;
     }
@@ -389,13 +398,13 @@
     }
     
     .mobile-card-photo {
-        width: 100%;
-        max-width: 200px;
-        height: 120px;
+        width: 80px; /* Fixed width for right side */
+        height: 100px; /* Portrait height (5:4 ratio) */
         object-fit: cover;
         border-radius: 8px;
-        margin-top: 10px;
         border: 1px solid #e2e8f0;
+        flex-shrink: 0; /* Don't shrink */
+        margin-top: 0; /* Remove top margin */
     }
     
     .mobile-card-badges {

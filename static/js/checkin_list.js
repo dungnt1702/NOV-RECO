@@ -145,14 +145,15 @@ function renderMobileCards(items = null) {
   if (checkinsToRender.length === 0) {
     mobileCards.innerHTML = '<div style="text-align: center; padding: 40px; color: #6c757d;">Không có dữ liệu check-in</div>';
   } else {
-    mobileCards.innerHTML = checkinsToRender.map(checkin => `
-      <div class="mobile-card">
-        <div class="mobile-card-header">
-          <h3 class="mobile-card-title">${checkin.user_name}</h3>
-          <span class="mobile-card-id">#${checkin.id}</span>
-        </div>
-        
-        <div class="mobile-card-content">
+  mobileCards.innerHTML = checkinsToRender.map(checkin => `
+    <div class="mobile-card">
+      <div class="mobile-card-header">
+        <h3 class="mobile-card-title">${checkin.user_name}</h3>
+        <span class="mobile-card-id">#${checkin.id}</span>
+      </div>
+      
+      <div class="mobile-card-content">
+        <div class="mobile-card-details">
           <div class="mobile-card-row">
             <span class="mobile-card-label">📍 Địa điểm:</span>
             <span class="mobile-card-value">${checkin.area_name}</span>
@@ -174,13 +175,12 @@ function renderMobileCards(items = null) {
             <span class="mobile-card-value">${checkin.note}</span>
           </div>
           ` : ''}
-          
-          ${checkin.photo_url ? `
-          <div class="mobile-card-row">
-            <img src="${checkin.photo_url}" alt="Check-in photo" class="mobile-card-photo">
-          </div>
-          ` : ''}
         </div>
+        
+        ${checkin.photo_url ? `
+          <img src="${checkin.photo_url}" alt="Check-in photo" class="mobile-card-photo">
+        ` : ''}
+      </div>
         
         <div class="mobile-card-badges">
           <span class="mobile-card-badge location">${checkin.area_name}</span>
