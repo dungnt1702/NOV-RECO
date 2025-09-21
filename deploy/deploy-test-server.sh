@@ -197,6 +197,12 @@ print_status "👤 Test login: admin / admin123"
 print_status "👤 Manager test: manager_test / test123"
 print_status "👤 Employee test: employee_test / test123"
 
+print_warning "📝 This is TEST environment for checkin.taylaibui.vn:"
+print_warning "  - Server IP: 103.15.51.66"
+print_warning "  - Environment: TEST (DEBUG=True)"
+print_warning "  - Database: SQLite (test data)"
+print_warning "  - Security: Relaxed for testing"
+
 print_warning "📝 This is TEST environment with:"
 print_warning "- DEBUG=True (detailed error messages)"
 print_warning "- SQLite database"
