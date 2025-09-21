@@ -45,7 +45,7 @@ cp "config/$ENVIRONMENT.env" ".env"
 print_status "Installing dependencies..."
 sudo -u www-data ./venv/bin/pip install -r requirements.txt
 
-# 4. Fix permissions
+# 4. Fix permissions (comprehensive fix from force-update script)
 print_status "Fixing permissions..."
 sudo mkdir -p staticfiles logs media data
 sudo chown -R www-data:www-data staticfiles/ static/ media/ data/ logs/
@@ -62,6 +62,35 @@ sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py mig
 # 6. Collect static files (exactly like working manual command)
 print_status "Collecting static files..."
 sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py collectstatic --noinput
+
+# 6.5. Verify critical files (from force-update script)
+print_status "Verifying static files..."
+for css_file in "staticfiles/css/base.css" "staticfiles/css/checkin_list.css"; do
+    if [ -f "$css_file" ]; then
+        size=$(wc -c < "$css_file")
+        if [ "$size" -gt 1000 ]; then
+            print_success "✅ $css_file ($size bytes)"
+        else
+            print_error "❌ $css_file too small ($size bytes)"
+        fi
+    else
+        print_error "❌ $css_file missing"
+    fi
+done
+
+# Check mobile cards CSS specifically
+if grep -q "mobile-card" staticfiles/css/checkin_list.css 2>/dev/null; then
+    print_success "✅ Mobile cards CSS found in checkin_list.css"
+else
+    print_error "❌ Mobile cards CSS missing from checkin_list.css"
+fi
+
+# 6.6. Fix permissions again after collectstatic
+print_status "Final permissions fix..."
+sudo chown -R www-data:www-data staticfiles/ media/ data/ logs/
+sudo chmod -R 755 staticfiles/ media/ data/ logs/
+sudo chmod 666 data/*.sqlite3 2>/dev/null || true
+sudo chmod 666 logs/django.log 2>/dev/null || true
 
 # 7. Restart service (exactly like working manual command)
 print_status "Restarting service..."
