@@ -342,8 +342,8 @@ async function openCamera() {
         stream = await navigator.mediaDevices.getUserMedia({
             video: { 
                 facingMode: currentFacingMode,
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
+                width: { ideal: 720 }, // Portrait width (smaller)
+                height: { ideal: 960 } // Portrait height (larger) - 3:4 ratio
             }
         });
         

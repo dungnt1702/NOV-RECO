@@ -339,11 +339,15 @@
 /* Video element styles */
 .checkin-page #video {
     width: 100%;
-    min-height: 200px;
-    height: 200px;
+    max-width: 280px; /* Reduced width for portrait */
+    aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
+    min-height: 300px; /* Increased height for portrait */
+    height: auto; /* Auto height based on aspect ratio */
     object-fit: cover;
     border-radius: 12px;
     background: #000;
+    margin: 0 auto; /* Center the video */
+    display: block; /* Ensure block display for centering */
 }
 
 /* Camera preview when showing video */
@@ -351,6 +355,17 @@
     padding: 0;
     background: #000;
     border: 2px solid #0A5597;
+}
+
+/* Canvas element for captured photo - same portrait aspect ratio */
+.checkin-page canvas {
+    width: 100%;
+    max-width: 280px; /* Same as video */
+    aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 0 auto;
+    display: block;
 }
 
 .camera-preview.showing-video .camera-icon,
