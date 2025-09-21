@@ -253,29 +253,82 @@ print_status "=== Test Results ==="
 print_status "Website status: HTTP $WEBSITE_STATUS"
 print_status "Static files status: HTTP $STATIC_STATUS"
 
-# Show response headers if there are redirects
+# Show response headers if there are redirects and attempt to fix
 if [ "$WEBSITE_STATUS" = "301" ] || [ "$WEBSITE_STATUS" = "302" ]; then
     print_error "❌ Website redirect detected (HTTP $WEBSITE_STATUS):"
     echo "$WEBSITE_RESPONSE" | head -5
+    
+    # Check if it's redirecting to HTTPS
+    REDIRECT_LOCATION=$(echo "$WEBSITE_RESPONSE" | grep -i "location:" | head -1)
+    if echo "$REDIRECT_LOCATION" | grep -q "https://"; then
+        print_status "🔧 Detected HTTPS redirect. Checking Nginx config..."
+        
+        # Check if Nginx has SSL redirect
+        if grep -q "return 301 https" /etc/nginx/sites-available/checkin.taylaibui.vn 2>/dev/null; then
+            print_status "Found SSL redirect in Nginx. This is normal if SSL is configured."
+            print_status "Testing HTTPS instead..."
+            HTTPS_URL="${WEBSITE_URL/http:/https:}"
+            HTTPS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HTTPS_URL" 2>/dev/null || echo "000")
+            print_status "HTTPS status: HTTP $HTTPS_STATUS"
+            
+            if [ "$HTTPS_STATUS" = "200" ]; then
+                print_success "✅ Website working on HTTPS: $HTTPS_URL"
+            fi
+        fi
+    fi
 fi
 
 if [ "$STATIC_STATUS" = "301" ] || [ "$STATIC_STATUS" = "302" ]; then
     print_error "❌ Static files redirect detected (HTTP $STATIC_STATUS):"
     echo "$STATIC_RESPONSE" | head -5
+    
+    # Test HTTPS version of static files
+    HTTPS_STATIC_URL="${STATIC_URL/http:/https:}"
+    HTTPS_STATIC_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HTTPS_STATIC_URL" 2>/dev/null || echo "000")
+    print_status "HTTPS static files status: HTTP $HTTPS_STATIC_STATUS"
+    
+    if [ "$HTTPS_STATIC_STATUS" = "200" ]; then
+        print_success "✅ Static files working on HTTPS: $HTTPS_STATIC_URL"
+    fi
 fi
 
-# Final verdict
-if [ "$WEBSITE_STATUS" = "200" ] && [ "$STATIC_STATUS" = "200" ]; then
+# Final verdict - Accept both HTTP 200 and HTTPS redirects as success
+WEBSITE_SUCCESS=false
+STATIC_SUCCESS=false
+
+if [ "$WEBSITE_STATUS" = "200" ]; then
+    WEBSITE_SUCCESS=true
+elif [ "$WEBSITE_STATUS" = "301" ] && [ -n "${HTTPS_STATUS:-}" ] && [ "$HTTPS_STATUS" = "200" ]; then
+    WEBSITE_SUCCESS=true
+    print_status "Website working via HTTPS redirect (normal with SSL)"
+fi
+
+if [ "$STATIC_STATUS" = "200" ]; then
+    STATIC_SUCCESS=true
+elif [ "$STATIC_STATUS" = "301" ] && [ -n "${HTTPS_STATIC_STATUS:-}" ] && [ "$HTTPS_STATIC_STATUS" = "200" ]; then
+    STATIC_SUCCESS=true
+    print_status "Static files working via HTTPS redirect (normal with SSL)"
+fi
+
+if [ "$WEBSITE_SUCCESS" = true ] && [ "$STATIC_SUCCESS" = true ]; then
     print_success "🎉 SUCCESS! Update completed successfully!"
-    print_success "✅ Website: $WEBSITE_URL (HTTP 200)"
-    print_success "✅ Static files: HTTP 200"
+    if [ "$WEBSITE_STATUS" = "200" ]; then
+        print_success "✅ Website: $WEBSITE_URL (HTTP 200)"
+    else
+        print_success "✅ Website: HTTPS version working (redirected from HTTP)"
+    fi
+    if [ "$STATIC_STATUS" = "200" ]; then
+        print_success "✅ Static files: HTTP 200"
+    else
+        print_success "✅ Static files: HTTPS version working (redirected from HTTP)"
+    fi
 else
     print_error "❌ Issues detected after update:"
-    if [ "$WEBSITE_STATUS" != "200" ]; then
-        print_error "Website: HTTP $WEBSITE_STATUS (expected 200)"
+    if [ "$WEBSITE_SUCCESS" != true ]; then
+        print_error "Website not accessible on HTTP or HTTPS"
     fi
-    if [ "$STATIC_STATUS" != "200" ]; then
-        print_error "Static files: HTTP $STATIC_STATUS (expected 200)"
+    if [ "$STATIC_SUCCESS" != true ]; then
+        print_error "Static files not accessible on HTTP or HTTPS"
     fi
     
     print_status "Recent service logs:"
