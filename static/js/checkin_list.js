@@ -33,7 +33,21 @@ async function loadCheckins() {
   try {
     console.log('Loading checkins...');
     console.log('API function available:', typeof api);
-    const response = await api('/checkin/list/');
+    
+    let response;
+    if (typeof api === 'function') {
+      response = await api('/checkin/list/');
+    } else {
+      // Fallback to fetch if api() not available
+      console.warn('api() function not found, using fetch fallback');
+      response = await fetch('/checkin/list/', {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json'
+        }
+      });
+    }
     console.log('Response status:', response.status);
     if (response.ok) {
       const data = await response.json();
@@ -197,7 +211,18 @@ function renderMobileCards(items = null) {
 
 async function loadUsers() {
   try {
-    const response = await api('/checkin/users-api/');
+    let response;
+    if (typeof api === 'function') {
+      response = await api('/checkin/users-api/');
+    } else {
+      response = await fetch('/checkin/users-api/', {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json'
+        }
+      });
+    }
     if (response.ok) {
       const users = await response.json();
       populateUserFilter(users);

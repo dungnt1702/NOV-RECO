@@ -329,26 +329,41 @@ def debug_mobile_cards_view(request):
             document.getElementById('base-js-status').textContent = typeof api !== 'undefined' ? '✅ Loaded' : '❌ Missing';
             document.getElementById('api-function-status').textContent = typeof api === 'function' ? '✅ Function OK' : '❌ Not function';
             
-            // Test 3: API test function
+            // Test 3: API test function with fallback fetch
             async function testAPI() {
                 const resultDiv = document.getElementById('api-result');
                 resultDiv.innerHTML = '<p class="info">Testing API...</p>';
                 
                 try {
-                    if (typeof api === 'undefined') {
-                        resultDiv.innerHTML = '<p class="error">❌ api() function not found! base.js not loaded?</p>';
-                        return;
+                    let response;
+                    
+                    if (typeof api === 'function') {
+                        response = await api('/checkin/list/');
+                    } else {
+                        // Fallback to fetch if api() not available
+                        response = await fetch('/checkin/list/', {
+                            method: 'GET',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Content-Type': 'application/json'
+                            }
+                        });
                     }
                     
-                    const response = await api('/checkin/list/');
                     console.log('API Response:', response);
                     
                     if (response.ok) {
-                        const data = await response.json();
+                        const responseData = await response.json();
+                        console.log('Response data:', responseData);
+                        
+                        // Handle both array format (local) and object format (server)
+                        const data = Array.isArray(responseData) ? responseData : responseData.results || [];
+                        
                         resultDiv.innerHTML = `
                             <p class="success">✅ API Success!</p>
+                            <p>Response type: ${Array.isArray(responseData) ? 'Array' : 'Object'}</p>
                             <p>Data count: ${data.length}</p>
-                            <pre>${JSON.stringify(data.slice(0, 2), null, 2)}</pre>
+                            <pre>${JSON.stringify(responseData, null, 2).substring(0, 500)}...</pre>
                         `;
                         
                         // Test mobile cards rendering
@@ -376,8 +391,9 @@ def debug_mobile_cards_view(request):
             }
         </script>
         
-        <!-- Try to load base.js -->
-        <script src="/static/js/base.js"></script>
+        <!-- Try multiple ways to load base.js -->
+        <script src="/static/js/base.js" onerror="console.error('Failed to load base.js from /static/js/base.js')"></script>
+        <script src="{% static 'js/base.js' %}" onerror="console.error('Failed to load base.js from Django static')"></script>
     </body>
     </html>
     """
