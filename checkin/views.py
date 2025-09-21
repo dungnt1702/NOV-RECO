@@ -169,10 +169,8 @@ def checkin_submit_view(request):
                     "photo_url": checkin.photo.url if checkin.photo else "",
                 }
 
-                # Redirect đến trang success với dữ liệu
-                from urllib.parse import urlencode
-
-                success_url = f"/checkin/success/?{urlencode(success_data)}"
+                # Redirect đến trang success chỉ với checkin ID (secure)
+                success_url = f"/checkin/success/?checkin_id={checkin.id}"
                 print(f"DEBUG: Redirecting to: {success_url}")
                 return redirect(success_url)
             else:
@@ -237,10 +235,43 @@ def checkin_list_view(request):
     return render(request, "checkin/checkin_list.html")
 
 
-# @login_required  # Temporarily disabled for testing
+@login_required
 def checkin_success_view(request):
     """Trang kết quả check-in thành công"""
-    return render(request, "checkin/checkin_success.html")
+    checkin_id = request.GET.get('checkin_id')
+    
+    if not checkin_id:
+        messages.error(request, "Không tìm thấy thông tin check-in")
+        return redirect('/checkin/action/')
+    
+    try:
+        # Lookup checkin data from database
+        checkin = Checkin.objects.select_related('user', 'area').get(
+            id=checkin_id, 
+            user=request.user  # Security: only show user's own checkin
+        )
+        
+        # Pass data to template context instead of URL
+        context = {
+            'checkin': checkin,
+            'success_data': {
+                'user_name': checkin.user.get_display_name(),
+                'user_email': checkin.user.email,
+                'user_department': getattr(checkin.user, 'department', 'N/A'),
+                'user_employee_id': getattr(checkin.user, 'employee_id', 'N/A'),
+                'area_name': checkin.get_area_name(),
+                'coordinates': f"{checkin.lat:.6f}, {checkin.lng:.6f}",
+                'checkin_time': checkin.created_at.strftime('%d/%m/%Y %H:%M:%S'),
+                'note': checkin.note or '',
+                'photo_url': checkin.photo.url if checkin.photo else ''
+            }
+        }
+        
+        return render(request, "checkin/checkin_success.html", context)
+        
+    except Checkin.DoesNotExist:
+        messages.error(request, "Check-in không tồn tại hoặc bạn không có quyền xem")
+        return redirect('/checkin/action/')
 
 
 @login_required

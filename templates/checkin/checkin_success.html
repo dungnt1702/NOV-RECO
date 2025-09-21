@@ -71,5 +71,19 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
+// Pass checkin data to JavaScript securely via template context
+window.checkinSuccessData = {
+  userName: "{{ success_data.user_name|escapejs }}",
+  userEmail: "{{ success_data.user_email|escapejs }}",
+  userDepartment: "{{ success_data.user_department|escapejs }}",
+  userEmployeeId: "{{ success_data.user_employee_id|escapejs }}",
+  locationName: "{{ success_data.area_name|escapejs }}",
+  coordinates: "{{ success_data.coordinates|escapejs }}",
+  checkinTime: "{{ success_data.checkin_time|escapejs }}",
+  note: "{{ success_data.note|escapejs }}",
+  photoUrl: "{{ success_data.photo_url|escapejs }}"
+};
+</script>
 <script src="{% static 'js/checkin_success.js' %}"></script>
 {% endblock %}

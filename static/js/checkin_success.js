@@ -1,24 +1,24 @@
 // Check-in success page JavaScript
 
-// Get check-in data from URL parameters
-function getUrlParams() {
-  const params = new URLSearchParams(window.location.search);
-  return {
-    userName: params.get('user_name') || 'N/A',
-    userEmail: params.get('user_email') || 'N/A',
-    userDepartment: params.get('user_department') || 'N/A',
-    userEmployeeId: params.get('user_employee_id') || 'N/A',
-    locationName: params.get('area_name') || 'N/A',
-    coordinates: params.get('coordinates') || 'N/A',
-    checkinTime: params.get('checkin_time') || 'N/A',
-    note: params.get('note') || '',
-    photoUrl: params.get('photo_url') || ''
+// Get check-in data from template context (passed from Django view)
+function getCheckinData() {
+  // Data is now passed via template context, not URL parameters
+  return window.checkinSuccessData || {
+    userName: 'N/A',
+    userEmail: 'N/A',
+    userDepartment: 'N/A',
+    userEmployeeId: 'N/A',
+    locationName: 'N/A',
+    coordinates: 'N/A',
+    checkinTime: 'N/A',
+    note: '',
+    photoUrl: ''
   };
 }
 
 // Display check-in data
 function displayCheckinData() {
-  const data = getUrlParams();
+  const data = getCheckinData();
   
   document.getElementById('user-name').textContent = data.userName;
   document.getElementById('user-email').textContent = data.userEmail;
