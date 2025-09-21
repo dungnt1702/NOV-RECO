@@ -375,9 +375,21 @@ async function openCamera() {
         const retakeBtn = document.getElementById('btn-retake');
         const switchBtn = document.getElementById('btn-switch-camera');
         
+        console.log('Camera buttons found:', {
+            capture: !!captureBtn,
+            retake: !!retakeBtn,
+            switch: !!switchBtn
+        });
+        
         if (captureBtn) captureBtn.textContent = '📷 Chụp ảnh';
         if (retakeBtn) retakeBtn.style.display = 'none';
-        if (switchBtn) switchBtn.style.display = 'inline-block';
+        if (switchBtn) {
+            switchBtn.style.display = 'inline-block';
+            switchBtn.textContent = '🔄 Đổi camera';
+            console.log('Switch camera button shown');
+        } else {
+            console.error('Switch camera button not found!');
+        }
         
         updateSubmitButtonState();
         console.log('Camera opened successfully');

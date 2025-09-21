@@ -468,6 +468,18 @@
     .camera-preview {
         height: 150px;
     }
+    
+    /* Ensure camera controls are visible on mobile */
+    .camera-controls {
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .btn-camera {
+        min-width: 100px;
+        font-size: 12px !important;
+    }
 }
 
 @media (max-width: 480px) {
