@@ -45,50 +45,64 @@ sudo bash /var/backups/nov-reco/latest/restore.sh
 
 ## 🚀 Deployment Workflow
 
-### Step 1: Development
+### Step 1: Development (📍 Localhost - MacBook)
 ```bash
 # Code trên localhost
+source venv/bin/activate
 python manage.py runserver 3000
+
+# Thực hiện thay đổi code...
+# Test trên http://localhost:3000
 ```
 
-### Step 2: Commit Changes
+### Step 2: Commit Changes (📍 Localhost - MacBook)
 ```bash
-# Commit code changes (not server configs)
+# Commit code changes (KHÔNG commit server configs)
 git add .
 git commit -m "Feature: Add new functionality"
 git push origin master
 ```
 
-### Step 3: Update Test Server
+### Step 3: Update Test Server (📍 Server - 103.15.51.66)
 ```bash
-# Trên server test (checkin.taylaibui.vn)
+# SSH vào server
+ssh root@103.15.51.66
+
+# Chuyển đến project directory
 cd /var/www/checkin.taylaibui.vn
 
-# Backup trước khi update
+# Backup trước khi update (QUAN TRỌNG!)
 sudo ./scripts/backup-server-configs.sh
 
-# Update an toàn
+# Update an toàn từ Git
 sudo ./scripts/safe-update-from-git.sh test
 
-# Hoặc manual:
-sudo git pull origin master
-sudo systemctl restart checkin-taylaibui-test nginx
+# Hoặc manual (không khuyến khích):
+# sudo git pull origin master
+# sudo systemctl restart checkin-taylaibui-test nginx
 ```
 
-### Step 4: Test và Verify
+### Step 4: Test và Verify (📍 Server - 103.15.51.66)
 ```bash
-# Test website
+# Test website (vẫn trên server)
 curl -I http://103.15.51.66
 curl -I http://103.15.51.66/admin/
 
 # Test static files
 curl -I http://103.15.51.66/static/css/home.css
+
+# Hoặc test từ browser (📍 Localhost)
+# Mở http://103.15.51.66 trên browser
 ```
 
-## 🆘 Emergency Recovery
+## 🆘 Emergency Recovery (📍 Server - 103.15.51.66)
 
 ### Nếu update bị lỗi:
 ```bash
+# SSH vào server
+ssh root@103.15.51.66
+cd /var/www/checkin.taylaibui.vn
+
 # Khôi phục từ backup gần nhất
 sudo bash /var/backups/nov-reco/latest/restore.sh
 
@@ -98,6 +112,10 @@ sudo systemctl restart checkin-taylaibui-test nginx
 
 ### Nếu Git bị conflict:
 ```bash
+# Trên server
+ssh root@103.15.51.66
+cd /var/www/checkin.taylaibui.vn
+
 # Reset về commit gần nhất
 git stash
 git reset --hard origin/master
