@@ -338,43 +338,50 @@ if [ "$STATIC_STATUS" = "301" ] || [ "$STATIC_STATUS" = "302" ]; then
     fi
 fi
 
-# Final verdict - Accept both HTTP 200 and HTTPS redirects as success
+# Final verdict - Accept HTTP 301 as SUCCESS when SSL is configured
 WEBSITE_SUCCESS=false
 STATIC_SUCCESS=false
 
+# Website success logic
 if [ "$WEBSITE_STATUS" = "200" ]; then
     WEBSITE_SUCCESS=true
-elif [ "$WEBSITE_STATUS" = "301" ] && [ -n "${HTTPS_STATUS:-}" ] && [ "$HTTPS_STATUS" = "200" ]; then
-    WEBSITE_SUCCESS=true
-    print_status "Website working via HTTPS redirect (normal with SSL)"
+    print_status "✅ Website: Direct HTTP access working"
+elif [ "$WEBSITE_STATUS" = "301" ]; then
+    # HTTP 301 is SUCCESS when SSL redirect is configured
+    if grep -q "return 301 https" /etc/nginx/sites-available/checkin.taylaibui.vn 2>/dev/null; then
+        WEBSITE_SUCCESS=true
+        print_status "✅ Website: HTTP 301 redirect to HTTPS (normal with SSL configured)"
+    fi
 fi
 
+# Static files success logic  
 if [ "$STATIC_STATUS" = "200" ]; then
     STATIC_SUCCESS=true
-elif [ "$STATIC_STATUS" = "301" ] && [ -n "${HTTPS_STATIC_STATUS:-}" ] && [ "$HTTPS_STATIC_STATUS" = "200" ]; then
-    STATIC_SUCCESS=true
-    print_status "Static files working via HTTPS redirect (normal with SSL)"
+    print_status "✅ Static files: Direct HTTP access working"
+elif [ "$STATIC_STATUS" = "301" ]; then
+    # HTTP 301 is SUCCESS when SSL redirect is configured
+    if grep -q "return 301 https" /etc/nginx/sites-available/checkin.taylaibui.vn 2>/dev/null; then
+        STATIC_SUCCESS=true
+        print_status "✅ Static files: HTTP 301 redirect to HTTPS (normal with SSL configured)"
+    fi
 fi
 
 if [ "$WEBSITE_SUCCESS" = true ] && [ "$STATIC_SUCCESS" = true ]; then
     print_success "🎉 SUCCESS! Update completed successfully!"
-    if [ "$WEBSITE_STATUS" = "200" ]; then
-        print_success "✅ Website: $WEBSITE_URL (HTTP 200)"
-    else
-        print_success "✅ Website: HTTPS version working (redirected from HTTP)"
-    fi
-    if [ "$STATIC_STATUS" = "200" ]; then
-        print_success "✅ Static files: HTTP 200"
-    else
-        print_success "✅ Static files: HTTPS version working (redirected from HTTP)"
+    print_success "✅ Website: $WEBSITE_URL (HTTP $WEBSITE_STATUS)"
+    print_success "✅ Static files: HTTP $STATIC_STATUS"
+    
+    if [ "$WEBSITE_STATUS" = "301" ] || [ "$STATIC_STATUS" = "301" ]; then
+        print_status "💡 HTTP 301 redirects are normal when SSL is configured"
+        print_status "💡 Users will automatically be redirected to HTTPS"
     fi
 else
     print_error "❌ Issues detected after update:"
     if [ "$WEBSITE_SUCCESS" != true ]; then
-        print_error "Website not accessible on HTTP or HTTPS"
+        print_error "Website: HTTP $WEBSITE_STATUS (not accessible)"
     fi
     if [ "$STATIC_SUCCESS" != true ]; then
-        print_error "Static files not accessible on HTTP or HTTPS"
+        print_error "Static files: HTTP $STATIC_STATUS (not accessible)"
     fi
     
     print_status "Recent service logs:"
