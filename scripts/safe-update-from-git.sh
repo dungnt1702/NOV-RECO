@@ -135,11 +135,33 @@ fi
 print_status "Key static files status:"
 for file in "staticfiles/css/base.css" "staticfiles/css/checkin.css" "staticfiles/js/base.js"; do
     if [ -f "$file" ]; then
-        echo "✅ $file"
+        echo "✅ $file ($(wc -c < "$file") bytes)"
     else
         echo "❌ $file (missing)"
     fi
 done
+
+# Test actual CSS content (not just HTTP status)
+print_status "Testing actual CSS content..."
+if [ -f "staticfiles/css/home.css" ]; then
+    CSS_SIZE=$(wc -c < "staticfiles/css/home.css")
+    if [ "$CSS_SIZE" -gt 100 ]; then
+        print_success "✅ home.css has content ($CSS_SIZE bytes)"
+        
+        # Test if CSS contains expected content
+        if grep -q "body\|html\|\.container" "staticfiles/css/home.css"; then
+            print_success "✅ home.css contains valid CSS rules"
+        else
+            print_error "❌ home.css exists but contains no valid CSS"
+            head -5 "staticfiles/css/home.css"
+        fi
+    else
+        print_error "❌ home.css is too small ($CSS_SIZE bytes) - likely empty or corrupted"
+        cat "staticfiles/css/home.css"
+    fi
+else
+    print_error "❌ home.css file not found"
+fi
 
 # 9. Fix permissions (including logs) - BEFORE Django operations
 print_status "Fixing permissions..."
@@ -248,6 +270,20 @@ WEBSITE_STATUS=$(echo "$WEBSITE_RESPONSE" | head -1 | grep -o '[0-9][0-9][0-9]' 
 print_status "Testing static files: $STATIC_URL"
 STATIC_RESPONSE=$(curl -s -I "$STATIC_URL" 2>/dev/null || echo "Connection failed")
 STATIC_STATUS=$(echo "$STATIC_RESPONSE" | head -1 | grep -o '[0-9][0-9][0-9]' || echo "000")
+
+# Also test actual CSS content via HTTP
+if [ "$STATIC_STATUS" = "200" ]; then
+    CSS_CONTENT=$(curl -s "$STATIC_URL" 2>/dev/null | head -200)
+    CSS_CONTENT_SIZE=$(echo "$CSS_CONTENT" | wc -c)
+    
+    if [ "$CSS_CONTENT_SIZE" -gt 100 ] && echo "$CSS_CONTENT" | grep -q "body\|html\|\.container"; then
+        print_success "✅ CSS content verified via HTTP ($CSS_CONTENT_SIZE chars)"
+    else
+        print_error "❌ CSS content invalid via HTTP (size: $CSS_CONTENT_SIZE)"
+        echo "First 200 chars of CSS response:"
+        echo "$CSS_CONTENT" | head -5
+    fi
+fi
 
 print_status "=== Test Results ==="
 print_status "Website status: HTTP $WEBSITE_STATUS"
