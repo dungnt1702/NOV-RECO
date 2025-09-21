@@ -81,9 +81,11 @@ python manage.py runserver 0.0.0.0:8000
 
 ## 🌐 Access URLs
 
-- **Website**: http://checkin.taylaibui.vn:8000
-- **Admin**: http://checkin.taylaibui.vn:8000/admin
+- **Website**: https://checkin.taylaibui.vn
+- **Admin**: https://checkin.taylaibui.vn/admin
 - **Login**: admin/admin123
+
+**Note**: Server chạy trên port 8000 internal, nhưng domain sẽ proxy qua HTTPS
 
 ## 🛠️ Management Commands
 
