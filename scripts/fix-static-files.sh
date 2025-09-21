@@ -24,6 +24,15 @@ cd $PROJECT_DIR
 print_status "Collecting static files..."
 sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py collectstatic --noinput
 
+# Check if Django is working
+print_status "Checking Django configuration..."
+sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py check
+
+if [ $? -ne 0 ]; then
+    print_error "Django configuration error! Aborting..."
+    exit 1
+fi
+
 # Fix permissions
 print_status "Fixing permissions..."
 sudo chown -R www-data:www-data staticfiles/
@@ -35,12 +44,22 @@ if [ -d "static" ]; then
     sudo -u www-data cp -r static/* staticfiles/ 2>/dev/null || true
 fi
 
-# Restart services
+# Restart services carefully
 print_status "Restarting services..."
-sudo systemctl restart checkin-taylaibui-test nginx
-
-# Wait for services
+sudo systemctl stop checkin-taylaibui-test
+sleep 2
+sudo systemctl start checkin-taylaibui-test
 sleep 3
+
+# Check if service started successfully
+if ! systemctl is-active --quiet checkin-taylaibui-test; then
+    print_error "Django service failed to start!"
+    print_status "Checking logs..."
+    sudo journalctl -u checkin-taylaibui-test -n 10
+    exit 1
+fi
+
+sudo systemctl reload nginx
 
 # Test static files
 print_status "Testing static files..."
