@@ -138,7 +138,7 @@ sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py mig
 
 # 8. Collect static files properly
 print_status "Collecting static files..."
-sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py collectstatic --noinput --clear
+sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py collectstatic --noinput
 
 # 8.5. Verify static files were collected
 if [ ! -f "staticfiles/css/home.css" ]; then
