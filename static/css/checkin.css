@@ -386,6 +386,16 @@
     color: white;
 }
 
+.btn-camera.secondary {
+    border-color: #718096;
+    color: #718096;
+}
+
+.btn-camera.secondary:hover {
+    background: #718096;
+    color: white;
+}
+
 /* Submit button */
 .checkin-page .btn-checkin {
     background: linear-gradient(135deg, #0A5597 0%, #F5831F 100%);
