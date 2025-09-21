@@ -244,10 +244,11 @@ body {
 }
 
 .user-info {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    flex-wrap: nowrap;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-wrap: nowrap !important;
+    flex-direction: row !important;
 }
 
 .user-avatar {
@@ -263,6 +264,8 @@ body {
     font-size: 0.875rem;
     box-shadow: var(--shadow-md);
     transition: all 0.2s ease;
+    flex-shrink: 0;
+    text-transform: uppercase;
 }
 
 .user-avatar:hover {
@@ -289,6 +292,7 @@ body {
     align-items: center;
     justify-content: center;
     box-shadow: var(--shadow-md);
+    flex-shrink: 0;
 }
 
 .logout-btn:hover {
@@ -464,7 +468,8 @@ svg {
     }
 
     .user-info {
-        gap: var(--spacing-sm);
+        gap: 8px !important;
+        flex-direction: row !important;
     }
 
     .user-avatar {
@@ -518,7 +523,8 @@ svg {
     }
 
     .user-info {
-        gap: var(--spacing-xs);
+        gap: 6px !important;
+        flex-direction: row !important;
     }
 
     .user-avatar {
