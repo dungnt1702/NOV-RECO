@@ -143,3 +143,20 @@ media/
 # OS
 .DS_Store
 Thumbs.db
+
+# Server-specific configurations (don't commit these)
+config/server-*.env
+deploy/server-*.sh
+nginx-*.conf
+systemd-*.service
+
+# Server temporary scripts (don't commit these)
+debug_*.sh
+fix_*.sh
+test_*.sh
+enable_*.sh
+check_*.sh
+start_*.sh
+update_*.sh
+*_server_*.sh
+backup_*.sh
