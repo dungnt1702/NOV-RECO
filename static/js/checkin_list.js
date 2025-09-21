@@ -177,9 +177,13 @@ function renderMobileCards(items = null) {
           ` : ''}
         </div>
         
-        ${checkin.photo_url ? `
-          <img src="${checkin.photo_url}" alt="Check-in photo" class="mobile-card-photo">
-        ` : ''}
+        <div class="mobile-card-photo-container">
+          ${checkin.photo_url ? `
+            <img src="${checkin.photo_url}" alt="Check-in photo" class="mobile-card-photo">
+          ` : `
+            <div class="mobile-card-photo-placeholder">📷</div>
+          `}
+        </div>
       </div>
         
         <div class="mobile-card-badges">
