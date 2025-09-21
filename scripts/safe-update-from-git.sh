@@ -75,15 +75,39 @@ cp "config/$ENVIRONMENT.env" ".env"
 print_status "Installing Python dependencies..."
 sudo -u www-data ./venv/bin/pip install -r requirements.txt
 
-# 6. Fix permissions FIRST - before any Django operations
-print_status "Fixing permissions..."
-sudo mkdir -p logs
-sudo chown -R www-data:www-data staticfiles/ media/ data/ logs/
-sudo chmod -R 755 staticfiles/ media/ data/ logs/
+# 6. Fix permissions and ensure directories exist FIRST
+print_status "Creating directories and fixing permissions..."
+sudo mkdir -p staticfiles logs media data
+sudo chown -R www-data:www-data staticfiles/ static/ media/ data/ logs/
+sudo chmod -R 755 staticfiles/ static/ media/ data/ logs/
 sudo chmod 666 data/*.sqlite3 2>/dev/null || true  # Write permissions for database
 sudo touch logs/django.log
 sudo chown www-data:www-data logs/django.log
 sudo chmod 666 logs/django.log
+
+# 6.5. Emergency check - if staticfiles is empty, restore from backup first
+if [ ! -d "staticfiles/css" ] || [ -z "$(ls -A staticfiles 2>/dev/null)" ]; then
+    print_status "staticfiles directory empty, attempting restore from backup..."
+    
+    # Try local backup first
+    LATEST_BACKUP=$(ls -t staticfiles.backup.* 2>/dev/null | head -1)
+    if [ -n "$LATEST_BACKUP" ] && [ -d "$LATEST_BACKUP" ]; then
+        print_status "Restoring from local backup: $LATEST_BACKUP"
+        sudo -u www-data cp -r "$LATEST_BACKUP"/* staticfiles/ 2>/dev/null || true
+    fi
+    
+    # Try system backup
+    if [ ! -d "staticfiles/css" ] && [ -d "/var/backups/nov-reco/latest/staticfiles.backup" ]; then
+        print_status "Restoring from system backup..."
+        sudo -u www-data cp -r /var/backups/nov-reco/latest/staticfiles.backup/* staticfiles/ 2>/dev/null || true
+    fi
+    
+    # If still empty, copy from static/ as emergency fallback
+    if [ ! -d "staticfiles/css" ] && [ -d "static/css" ]; then
+        print_status "Emergency fallback: copying from static/ to staticfiles/..."
+        sudo -u www-data cp -r static/* staticfiles/ 2>/dev/null || true
+    fi
+fi
 
 # 7. Run migrations
 print_status "Running database migrations..."
@@ -365,12 +389,13 @@ if [ "$STATIC_STATUS" = "301" ] || [ "$STATIC_STATUS" = "302" ]; then
         NEW_HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$WEBSITE_URL" 2>/dev/null || echo "000")
         NEW_STATIC_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$STATIC_URL" 2>/dev/null || echo "000")
         
-        if [ "$NEW_HTTP_STATUS" = "200" ] && [ "$NEW_STATIC_STATUS" = "200" ]; then
-            print_success "✅ Website working on HTTP after disabling SSL redirect"
-            print_status "💡 SSL certificate needs to be fixed for HTTPS to work"
-            WEBSITE_SUCCESS=true
-            STATIC_SUCCESS=true
-        fi
+            if [ "$NEW_HTTP_STATUS" = "200" ] && [ "$NEW_STATIC_STATUS" = "200" ]; then
+                print_success "✅ Website working on HTTP after disabling SSL redirect"
+                print_status "💡 SSL certificate needs to be fixed for HTTPS to work"
+                print_status "💡 For test environment, HTTP access is acceptable"
+                WEBSITE_SUCCESS=true
+                STATIC_SUCCESS=true
+            fi
     fi
 fi
 
@@ -412,19 +437,44 @@ if [ "$WEBSITE_SUCCESS" = true ] && [ "$STATIC_SUCCESS" = true ]; then
         print_status "💡 Users will automatically be redirected to HTTPS"
     fi
 else
-    print_error "❌ Issues detected after update:"
-    if [ "$WEBSITE_SUCCESS" != true ]; then
-        print_error "Website: HTTP $WEBSITE_STATUS (not accessible)"
-    fi
-    if [ "$STATIC_SUCCESS" != true ]; then
-        print_error "Static files: HTTP $STATIC_STATUS (not accessible)"
+    print_error "❌ Issues detected, attempting final fix..."
+    
+    # Final attempt: disable HTTPS redirect for test environment
+    if [ "$ENVIRONMENT" = "test" ] && [ "$WEBSITE_STATUS" = "301" ] && [ "$STATIC_STATUS" = "301" ]; then
+        print_status "🔧 Final fix: Disabling HTTPS redirect for test environment..."
+        
+        # Backup and disable HTTPS redirect
+        sudo cp /etc/nginx/sites-available/checkin.taylaibui.vn /etc/nginx/sites-available/checkin.taylaibui.vn.backup.$(date +%Y%m%d-%H%M%S)
+        sudo sed -i 's/return 301 https/#return 301 https/' /etc/nginx/sites-available/checkin.taylaibui.vn
+        
+        if sudo nginx -t; then
+            sudo systemctl reload nginx
+            sleep 3
+            
+            # Final test
+            FINAL_WEBSITE=$(curl -s -o /dev/null -w "%{http_code}" "$WEBSITE_URL" 2>/dev/null || echo "000")
+            FINAL_STATIC=$(curl -s -o /dev/null -w "%{http_code}" "$STATIC_URL" 2>/dev/null || echo "000")
+            
+            if [ "$FINAL_WEBSITE" = "200" ] && [ "$FINAL_STATIC" = "200" ]; then
+                print_success "🎉 FINAL FIX SUCCESS!"
+                print_success "✅ Website working: $WEBSITE_URL (HTTP $FINAL_WEBSITE)"
+                print_success "✅ Static files working: HTTP $FINAL_STATIC"
+                print_status "💡 HTTPS redirect disabled for test environment"
+                print_status "💡 SSL certificate should be fixed for production use"
+            else
+                print_error "❌ Final fix failed:"
+                print_error "Website: HTTP $FINAL_WEBSITE, Static: HTTP $FINAL_STATIC"
+            fi
+        fi
     fi
     
-    print_status "Recent service logs:"
-    if [ "$ENVIRONMENT" == "test" ]; then
-        sudo journalctl -u checkin-taylaibui-test -n 5 --no-pager
-    elif [ "$ENVIRONMENT" == "production" ]; then
-        sudo journalctl -u reco-qly-production -n 5 --no-pager
+    if [ "$WEBSITE_SUCCESS" != true ] || [ "$STATIC_SUCCESS" != true ]; then
+        print_status "Recent service logs:"
+        if [ "$ENVIRONMENT" == "test" ]; then
+            sudo journalctl -u checkin-taylaibui-test -n 5 --no-pager
+        elif [ "$ENVIRONMENT" == "production" ]; then
+            sudo journalctl -u reco-qly-production -n 5 --no-pager
+        fi
     fi
 fi
 
