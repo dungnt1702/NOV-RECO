@@ -370,12 +370,16 @@
         display: flex;
         gap: 15px;
         align-items: flex-start;
+        justify-content: space-between; /* Distribute space properly */
+        width: 100%; /* Ensure full width */
     }
     
     .mobile-card-details {
         flex: 1;
         display: grid;
         gap: 8px;
+        min-width: 0; /* Allow flex item to shrink */
+        max-width: calc(100% - 95px); /* Leave space for photo + gap */
     }
     
     .mobile-card-row {
@@ -404,7 +408,9 @@
         border-radius: 8px;
         border: 1px solid #e2e8f0;
         flex-shrink: 0; /* Don't shrink */
-        margin-top: 0; /* Remove top margin */
+        margin: 0; /* Remove all margins */
+        align-self: flex-start; /* Align to top of container */
+        display: block; /* Ensure proper display */
     }
     
     .mobile-card-badges {
