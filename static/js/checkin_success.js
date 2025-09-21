@@ -8,7 +8,7 @@ function getUrlParams() {
     userEmail: params.get('user_email') || 'N/A',
     userDepartment: params.get('user_department') || 'N/A',
     userEmployeeId: params.get('user_employee_id') || 'N/A',
-    locationName: params.get('location_name') || 'N/A',
+    locationName: params.get('area_name') || 'N/A', // Fixed: use area_name
     coordinates: params.get('coordinates') || 'N/A',
     checkinTime: params.get('checkin_time') || 'N/A',
     note: params.get('note') || '',
@@ -80,10 +80,10 @@ function shareCheckin() {
   
   if (navigator.clipboard) {
     navigator.clipboard.writeText(shareText).then(() => {
-      showAlert('Đã copy thông tin check-in vào clipboard!', 'success');
+      alert('Đã copy thông tin check-in vào clipboard!');
     }).catch(err => {
       console.error('Copy failed:', err);
-      showAlert('Không thể copy thông tin', 'error');
+      alert('Không thể copy thông tin');
     });
   } else {
     // Fallback for older browsers
@@ -93,9 +93,9 @@ function shareCheckin() {
     textArea.select();
     try {
       document.execCommand('copy');
-      showAlert('Đã copy thông tin check-in vào clipboard!', 'success');
+      alert('Đã copy thông tin check-in vào clipboard!');
     } catch (err) {
-      showAlert('Không thể copy thông tin', 'error');
+      alert('Không thể copy thông tin');
     }
     document.body.removeChild(textArea);
   }

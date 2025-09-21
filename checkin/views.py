@@ -237,6 +237,7 @@ def checkin_list_view(request):
     return render(request, "checkin/checkin_list.html")
 
 
+@login_required
 def checkin_success_view(request):
     """Trang kết quả check-in thành công"""
     return render(request, "checkin/checkin_success.html")
