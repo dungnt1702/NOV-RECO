@@ -470,8 +470,8 @@
         padding: 0;
     }
     
-    .checkin-container {
-        padding: 30px 20px;
+    .checkin-page .checkin-container {
+        padding: 30px 20px !important;
         border-radius: 16px;
     }
     
@@ -509,8 +509,8 @@
         padding: 0;
     }
     
-    .checkin-container {
-        padding: 20px;
+    .checkin-page .checkin-container {
+        padding: 20px !important;
         border-radius: 16px;
     }
     
