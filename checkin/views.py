@@ -265,6 +265,8 @@ def checkin_success_view(request, checkin_id):
             }
         }
         
+        print(f"DEBUG: Context data: {context['success_data']}")  # Debug output
+        
         return render(request, "checkin/checkin_success.html", context)
         
     except Checkin.DoesNotExist:
