@@ -284,7 +284,7 @@
     border: 1px solid #e2e8f0;
 }
 
-/* Camera styles - Portrait orientation for mobile */
+/* Camera styles - Portrait orientation for mobile, same width as map */
 .checkin-page .camera-container {
     position: relative;
     margin-bottom: 20px;
@@ -292,16 +292,15 @@
     display: flex;
     flex-direction: column;
     align-items: center; /* Center camera horizontally */
-    max-width: 320px; /* Limit container width for portrait */
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%; /* Same as map container - full width */
+    /* Removed max-width to match map container width */
 }
 
 .checkin-page .camera-preview {
     width: 100%;
-    max-width: 280px; /* Same as video max-width */
+    max-width: 360px; /* Wider to match map container better */
     aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
-    min-height: 300px; /* Portrait height */
+    min-height: 380px; /* Increased height for wider portrait */
     height: auto; /* Auto height based on aspect ratio */
     background: #f8fafc;
     border: 2px dashed #cbd5e0;
@@ -347,9 +346,9 @@
 /* Video element styles */
 .checkin-page #video {
     width: 100%;
-    max-width: 280px; /* Reduced width for portrait */
+    max-width: 360px; /* Wider to match map container better */
     aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
-    min-height: 300px; /* Increased height for portrait */
+    min-height: 380px; /* Increased height for wider portrait */
     height: auto; /* Auto height based on aspect ratio */
     object-fit: cover;
     border-radius: 12px;
@@ -368,7 +367,7 @@
 /* Canvas element for captured photo - same portrait aspect ratio */
 .checkin-page canvas {
     width: 100%;
-    max-width: 280px; /* Same as video */
+    max-width: 360px; /* Same as video - wider to match map */
     aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
     object-fit: cover;
     border-radius: 12px;
