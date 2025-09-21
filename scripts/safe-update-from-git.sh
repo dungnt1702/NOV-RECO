@@ -73,10 +73,14 @@ if [ ! -f "staticfiles/css/home.css" ]; then
     fi
 fi
 
-# 9. Fix permissions
+# 9. Fix permissions (including logs)
 print_status "Fixing permissions..."
-sudo chown -R www-data:www-data staticfiles/ media/ data/
-sudo chmod -R 755 staticfiles/ media/ data/
+sudo mkdir -p logs
+sudo chown -R www-data:www-data staticfiles/ media/ data/ logs/
+sudo chmod -R 755 staticfiles/ media/ data/ logs/
+sudo touch logs/django.log
+sudo chown www-data:www-data logs/django.log
+sudo chmod 644 logs/django.log
 
 # 10. Check Django configuration
 print_status "Checking Django configuration..."
