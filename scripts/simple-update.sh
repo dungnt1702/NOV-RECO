@@ -59,8 +59,9 @@ sudo chmod 666 logs/django.log
 print_status "Running migrations..."
 sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py migrate
 
-# 6. Collect static files (exactly like working manual command)
-print_status "Collecting static files..."
+# 6. Force clear and collect static files (matches working force-update logic)
+print_status "Force clearing and rebuilding static files..."
+sudo rm -rf staticfiles/*
 sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py collectstatic --noinput
 
 # 6.5. Verify critical files (from force-update script)
