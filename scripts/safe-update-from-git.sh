@@ -25,6 +25,30 @@ print_error() {
 
 cd "$PROJECT_DIR"
 
+# Error handling function
+handle_error() {
+    print_error "❌ Update failed! Attempting recovery..."
+    
+    # Try to restore from backup
+    if [ -d "/var/backups/nov-reco/latest" ]; then
+        print_status "Restoring from backup..."
+        sudo bash /var/backups/nov-reco/latest/restore.sh 2>/dev/null || true
+    fi
+    
+    # Restart services
+    if [ "$ENVIRONMENT" == "test" ]; then
+        sudo systemctl restart checkin-taylaibui-test nginx 2>/dev/null || true
+    elif [ "$ENVIRONMENT" == "production" ]; then
+        sudo systemctl restart reco-qly-production nginx 2>/dev/null || true
+    fi
+    
+    print_error "Recovery attempted. Please check manually."
+    exit 1
+}
+
+# Set error trap
+trap handle_error ERR
+
 print_status "🚀 Safe updating server for $ENVIRONMENT environment..."
 
 # 1. Backup static files before Git pull
@@ -75,14 +99,15 @@ if [ ! -f "staticfiles/css/home.css" ]; then
     fi
 fi
 
-# 9. Fix permissions (including logs)
+# 9. Fix permissions (including logs) - BEFORE Django operations
 print_status "Fixing permissions..."
 sudo mkdir -p logs
 sudo chown -R www-data:www-data staticfiles/ media/ data/ logs/
 sudo chmod -R 755 staticfiles/ media/ data/ logs/
+sudo chmod 666 data/*.sqlite3 2>/dev/null || true  # Write permissions for database
 sudo touch logs/django.log
 sudo chown www-data:www-data logs/django.log
-sudo chmod 644 logs/django.log
+sudo chmod 666 logs/django.log
 
 # 10. Check Django configuration
 print_status "Checking Django configuration..."
@@ -93,12 +118,64 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# 11. Restart services
+# 10.5. Ensure admin user exists for test environment
+if [ "$ENVIRONMENT" == "test" ]; then
+    print_status "Ensuring admin user exists for test environment..."
+    sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py shell << 'PYTHON_SCRIPT'
+from django.contrib.auth import get_user_model
+from users.models import UserRole
+
+User = get_user_model()
+
+if not User.objects.filter(username='admin').exists():
+    try:
+        admin = User.objects.create_superuser(
+            username='admin',
+            email='admin@test.com',
+            password='admin123',
+            first_name='Admin',
+            last_name='Test',
+            role=UserRole.ADMIN,
+            employee_id='ADMIN001',
+            department='IT'
+        )
+        print("✅ Created admin user: admin / admin123")
+    except Exception as e:
+        print(f"⚠️  Could not create admin user: {e}")
+else:
+    print("✅ Admin user already exists")
+
+print(f"📊 Total users in database: {User.objects.count()}")
+PYTHON_SCRIPT
+fi
+
+# 11. Restart services carefully
 print_status "Restarting services..."
 if [ "$ENVIRONMENT" == "test" ]; then
-    sudo systemctl restart checkin-taylaibui-test
+    sudo systemctl stop checkin-taylaibui-test
+    sleep 2
+    sudo systemctl start checkin-taylaibui-test
+    sleep 3
+    
+    # Check if service started successfully
+    if ! systemctl is-active --quiet checkin-taylaibui-test; then
+        print_error "Django service failed to start!"
+        print_status "Checking logs..."
+        sudo journalctl -u checkin-taylaibui-test -n 10 --no-pager
+        exit 1
+    fi
 elif [ "$ENVIRONMENT" == "production" ]; then
-    sudo systemctl restart reco-qly-production
+    sudo systemctl stop reco-qly-production
+    sleep 2
+    sudo systemctl start reco-qly-production
+    sleep 3
+    
+    if ! systemctl is-active --quiet reco-qly-production; then
+        print_error "Django service failed to start!"
+        print_status "Checking logs..."
+        sudo journalctl -u reco-qly-production -n 10 --no-pager
+        exit 1
+    fi
 fi
 
 sudo systemctl reload nginx
