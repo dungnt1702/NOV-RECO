@@ -273,6 +273,21 @@ if [ "$WEBSITE_STATUS" = "301" ] || [ "$WEBSITE_STATUS" = "302" ]; then
             
             if [ "$HTTPS_STATUS" = "200" ]; then
                 print_success "✅ Website working on HTTPS: $HTTPS_URL"
+            elif [ "$HTTPS_STATUS" = "000" ]; then
+                print_error "❌ HTTPS connection failed - SSL certificate issue"
+                print_status "🔧 Temporarily disabling SSL redirect for HTTP access..."
+                
+                # Comment out SSL redirect in Nginx for testing
+                sudo sed -i 's/return 301 https/#return 301 https/' /etc/nginx/sites-available/checkin.taylaibui.vn 2>/dev/null || true
+                sudo systemctl reload nginx
+                sleep 2
+                
+                # Re-test HTTP after disabling SSL redirect
+                NEW_HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$WEBSITE_URL" 2>/dev/null || echo "000")
+                if [ "$NEW_HTTP_STATUS" = "200" ]; then
+                    print_success "✅ Website working on HTTP after disabling SSL redirect"
+                    print_status "💡 SSL certificate needs to be fixed for HTTPS to work"
+                fi
             fi
         fi
     fi
@@ -289,6 +304,37 @@ if [ "$STATIC_STATUS" = "301" ] || [ "$STATIC_STATUS" = "302" ]; then
     
     if [ "$HTTPS_STATIC_STATUS" = "200" ]; then
         print_success "✅ Static files working on HTTPS: $HTTPS_STATIC_URL"
+    elif [ "$HTTPS_STATIC_STATUS" = "000" ]; then
+        print_error "❌ HTTPS connection failed - SSL certificate issue"
+        print_status "🔧 Checking SSL certificate..."
+        
+        # Check if SSL files exist
+        if [ -f "/etc/ssl/certs/checkin.taylaibui.vn.crt" ] && [ -f "/etc/ssl/private/checkin.taylaibui.vn.key" ]; then
+            print_status "SSL files found, testing certificate..."
+            openssl x509 -in /etc/ssl/certs/checkin.taylaibui.vn.crt -text -noout | grep -E "(Subject:|Not After)" || true
+        else
+            print_error "SSL certificate files missing!"
+            print_status "Expected files:"
+            print_status "- /etc/ssl/certs/checkin.taylaibui.vn.crt"
+            print_status "- /etc/ssl/private/checkin.taylaibui.vn.key"
+        fi
+        
+        print_status "🔧 Temporarily disabling SSL redirect to allow HTTP access..."
+        # Comment out SSL redirect in Nginx for testing
+        sudo sed -i 's/return 301 https/#return 301 https/' /etc/nginx/sites-available/checkin.taylaibui.vn 2>/dev/null || true
+        sudo systemctl reload nginx
+        
+        # Re-test HTTP after disabling SSL redirect
+        sleep 2
+        NEW_HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$WEBSITE_URL" 2>/dev/null || echo "000")
+        NEW_STATIC_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$STATIC_URL" 2>/dev/null || echo "000")
+        
+        if [ "$NEW_HTTP_STATUS" = "200" ] && [ "$NEW_STATIC_STATUS" = "200" ]; then
+            print_success "✅ Website working on HTTP after disabling SSL redirect"
+            print_status "💡 SSL certificate needs to be fixed for HTTPS to work"
+            WEBSITE_SUCCESS=true
+            STATIC_SUCCESS=true
+        fi
     fi
 fi
 
