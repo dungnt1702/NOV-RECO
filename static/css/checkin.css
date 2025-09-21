@@ -284,17 +284,25 @@
     border: 1px solid #e2e8f0;
 }
 
-/* Camera styles */
+/* Camera styles - Portrait orientation for mobile */
 .checkin-page .camera-container {
     position: relative;
     margin-bottom: 20px;
     margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center camera horizontally */
+    max-width: 320px; /* Limit container width for portrait */
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .checkin-page .camera-preview {
     width: 100%;
-    min-height: 200px;
-    height: 200px;
+    max-width: 280px; /* Same as video max-width */
+    aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
+    min-height: 300px; /* Portrait height */
+    height: auto; /* Auto height based on aspect ratio */
     background: #f8fafc;
     border: 2px dashed #cbd5e0;
     border-radius: 12px;
