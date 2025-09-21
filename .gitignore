@@ -61,8 +61,11 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
-# Allow database in data folder for development
-!data/db.sqlite3
+# Database files - separate for each environment
+data/db.sqlite3
+data/db_*.sqlite3
+data/*.db
+*.sqlite3
 
 # Flask stuff:
 instance/

@@ -33,8 +33,10 @@ if [ -d "staticfiles" ]; then
     cp -r staticfiles staticfiles.backup.$(date +%Y%m%d-%H%M%S)
 fi
 
-# 2. Stash local changes
+# 2. Stash local changes (excluding database files)
 print_status "Stashing local changes..."
+git add .
+git reset data/*.sqlite3 data/*.db 2>/dev/null || true
 git stash || true
 
 # 3. Pull latest code
