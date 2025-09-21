@@ -95,6 +95,10 @@ if [ $? -eq 0 ]; then
         sudo -u www-data cp -r /var/backups/nov-reco/latest/staticfiles.backup/* staticfiles/ 2>/dev/null || true
     fi
     
+    # Fix static files permissions
+    sudo chown -R www-data:www-data staticfiles/
+    sudo chmod -R 755 staticfiles/
+    
 else
     print_error "Django configuration error!"
     print_warning "Restoring from backup..."
