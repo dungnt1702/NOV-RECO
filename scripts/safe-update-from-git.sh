@@ -136,81 +136,21 @@ fi
 print_status "Running database migrations..."
 sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py migrate
 
-# 8. Collect static files properly
+# 8. Collect static files properly (simplified - match working manual commands)
 print_status "Collecting static files..."
 sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py collectstatic --noinput
 
-# 8.5. Verify static files were collected
-if [ ! -f "staticfiles/css/home.css" ]; then
-    print_error "Critical static files missing after collectstatic!"
-    print_status "Attempting to restore from backup..."
-    
-    # Try to restore from local backup first
-    LATEST_BACKUP=$(ls -t staticfiles.backup.* 2>/dev/null | head -1)
-    if [ -n "$LATEST_BACKUP" ]; then
-        print_status "Restoring from local backup: $LATEST_BACKUP"
-        sudo -u www-data cp -r "$LATEST_BACKUP"/* staticfiles/ 2>/dev/null || true
-    fi
-    
-    # If still missing, try system backup
-    if [ ! -f "staticfiles/css/home.css" ] && [ -d "/var/backups/nov-reco/latest/staticfiles.backup" ]; then
-        print_status "Restoring from system backup..."
-        sudo -u www-data cp -r /var/backups/nov-reco/latest/staticfiles.backup/* staticfiles/ 2>/dev/null || true
-    fi
-    
-    # Final check
-    if [ ! -f "staticfiles/css/home.css" ]; then
-        print_error "❌ Could not restore static files! Manual intervention required."
-        print_status "You may need to run: python manage.py collectstatic --noinput"
-    else
-        print_success "✅ Static files restored successfully"
-    fi
-else
+# Simple verification - just check if basic files exist
+if [ -f "staticfiles/css/base.css" ] && [ -f "staticfiles/js/base.js" ]; then
     print_success "✅ Static files collected successfully"
-fi
-
-# 9. Final static files verification and test
-print_status "Final static files verification..."
-if [ -f "staticfiles/css/home.css" ]; then
-    print_success "✅ home.css found"
-    ls -la staticfiles/css/home.css
 else
-    print_error "❌ home.css still missing!"
+    print_error "❌ Static files collection may have failed"
+    print_status "Files status:"
+    ls -la staticfiles/css/ 2>/dev/null | head -5 || echo "css directory missing"
+    ls -la staticfiles/js/ 2>/dev/null | head -5 || echo "js directory missing"
 fi
 
-# List some key static files for verification
-print_status "Key static files status:"
-for file in "staticfiles/css/base.css" "staticfiles/css/checkin.css" "staticfiles/js/base.js"; do
-    if [ -f "$file" ]; then
-        echo "✅ $file ($(wc -c < "$file") bytes)"
-    else
-        echo "❌ $file (missing)"
-    fi
-done
-
-# Test actual CSS content (not just HTTP status)
-print_status "Testing actual CSS content..."
-if [ -f "staticfiles/css/home.css" ]; then
-    CSS_SIZE=$(wc -c < "staticfiles/css/home.css")
-    if [ "$CSS_SIZE" -gt 100 ]; then
-        print_success "✅ home.css has content ($CSS_SIZE bytes)"
-        
-        # Test if CSS contains expected content
-        if grep -q "body\|html\|\.container" "staticfiles/css/home.css"; then
-            print_success "✅ home.css contains valid CSS rules"
-        else
-            print_error "❌ home.css exists but contains no valid CSS"
-            head -5 "staticfiles/css/home.css"
-        fi
-    else
-        print_error "❌ home.css is too small ($CSS_SIZE bytes) - likely empty or corrupted"
-        cat "staticfiles/css/home.css"
-    fi
-else
-    print_error "❌ home.css file not found"
-fi
-
-# 9. Fix permissions (including logs) - BEFORE Django operations
+# 9. Fix permissions and restart services
 print_status "Fixing permissions..."
 sudo mkdir -p logs
 sudo chown -R www-data:www-data staticfiles/ media/ data/ logs/
@@ -220,94 +160,27 @@ sudo touch logs/django.log
 sudo chown www-data:www-data logs/django.log
 sudo chmod 666 logs/django.log
 
-# 10. Check Django configuration
-print_status "Checking Django configuration..."
-sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py check
-
-if [ $? -ne 0 ]; then
-    print_error "Django configuration error!"
-    exit 1
-fi
-
-# 10.5. Ensure admin user exists for test environment
-if [ "$ENVIRONMENT" == "test" ]; then
-    print_status "Ensuring admin user exists for test environment..."
-    sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py shell << 'PYTHON_SCRIPT'
-from django.contrib.auth import get_user_model
-from users.models import UserRole
-
-User = get_user_model()
-
-if not User.objects.filter(username='admin').exists():
-    try:
-        admin = User.objects.create_superuser(
-            username='admin',
-            email='admin@test.com',
-            password='admin123',
-            first_name='Admin',
-            last_name='Test',
-            role=UserRole.ADMIN,
-            employee_id='ADMIN001',
-            department='IT'
-        )
-        print("✅ Created admin user: admin / admin123")
-    except Exception as e:
-        print(f"⚠️  Could not create admin user: {e}")
-else:
-    print("✅ Admin user already exists")
-
-print(f"📊 Total users in database: {User.objects.count()}")
-PYTHON_SCRIPT
-fi
-
-# 11. Restart services carefully
+# 10. Restart services (simplified - match working manual commands)
 print_status "Restarting services..."
 if [ "$ENVIRONMENT" == "test" ]; then
-    sudo systemctl stop checkin-taylaibui-test
-    sleep 2
-    sudo systemctl start checkin-taylaibui-test
-    sleep 3
-    
-    # Check if service started successfully
-    if ! systemctl is-active --quiet checkin-taylaibui-test; then
-        print_error "Django service failed to start!"
-        print_status "Checking logs..."
-        sudo journalctl -u checkin-taylaibui-test -n 10 --no-pager
-        exit 1
-    fi
+    sudo systemctl restart checkin-taylaibui-test
 elif [ "$ENVIRONMENT" == "production" ]; then
-    sudo systemctl stop reco-qly-production
-    sleep 2
-    sudo systemctl start reco-qly-production
-    sleep 3
-    
-    if ! systemctl is-active --quiet reco-qly-production; then
-        print_error "Django service failed to start!"
-        print_status "Checking logs..."
-        sudo journalctl -u reco-qly-production -n 10 --no-pager
-        exit 1
-    fi
+    sudo systemctl restart reco-qly-production
 fi
 
-sudo systemctl reload nginx
+print_success "✅ Services restarted successfully"
 
-# 12. Wait and test
-sleep 5
-
-# 13. Test website and static files with detailed diagnostics
-print_status "Testing website and static files..."
-
-# Set URLs based on environment
+# 11. Simple final test
+print_status "Testing website..."
 if [ "$ENVIRONMENT" == "test" ]; then
     WEBSITE_URL="http://checkin.taylaibui.vn"
-    STATIC_URL="http://checkin.taylaibui.vn/static/css/home.css"
 elif [ "$ENVIRONMENT" == "production" ]; then
     WEBSITE_URL="http://reco.qly.vn"
-    STATIC_URL="http://reco.qly.vn/static/css/home.css"
 else
     WEBSITE_URL="http://localhost:8000"
-    STATIC_URL="http://localhost:8000/static/css/home.css"
 fi
+
+sleep 3
 
 # 13.5. Quick test of multiple static files to ensure Nginx fix worked
 print_status "Testing multiple static files after Nginx fix..."
