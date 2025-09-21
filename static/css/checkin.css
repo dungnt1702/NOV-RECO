@@ -298,9 +298,9 @@
 
 .checkin-page .camera-preview {
     width: 100%;
-    max-width: 360px; /* Wider to match map container better */
+    max-width: 480px; /* Mobile-friendly width for better UX */
     aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
-    min-height: 380px; /* Increased height for wider portrait */
+    min-height: 480px; /* Proportional height for 480px width */
     height: auto; /* Auto height based on aspect ratio */
     background: #f8fafc;
     border: 2px dashed #cbd5e0;
@@ -346,9 +346,9 @@
 /* Video element styles */
 .checkin-page #video {
     width: 100%;
-    max-width: 360px; /* Wider to match map container better */
+    max-width: 480px; /* Mobile-friendly width for better UX */
     aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
-    min-height: 380px; /* Increased height for wider portrait */
+    min-height: 480px; /* Proportional height for 480px width */
     height: auto; /* Auto height based on aspect ratio */
     object-fit: cover;
     border-radius: 12px;
@@ -367,7 +367,7 @@
 /* Canvas element for captured photo - same portrait aspect ratio */
 .checkin-page canvas {
     width: 100%;
-    max-width: 360px; /* Same as video - wider to match map */
+    max-width: 480px; /* Same as video - mobile-friendly width */
     aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
     object-fit: cover;
     border-radius: 12px;
