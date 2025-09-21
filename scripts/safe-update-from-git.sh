@@ -89,25 +89,57 @@ sudo chmod 666 logs/django.log
 print_status "Running database migrations..."
 sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py migrate
 
-# 8. Collect static files
+# 8. Collect static files properly
 print_status "Collecting static files..."
-sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py collectstatic --noinput
+sudo -u www-data DJANGO_ENVIRONMENT=$ENVIRONMENT ./venv/bin/python manage.py collectstatic --noinput --clear
 
-# 9. Restore static files from backup if missing
+# 8.5. Verify static files were collected
 if [ ! -f "staticfiles/css/home.css" ]; then
-    print_status "Static files missing, restoring from backup..."
+    print_error "Critical static files missing after collectstatic!"
+    print_status "Attempting to restore from backup..."
+    
+    # Try to restore from local backup first
     LATEST_BACKUP=$(ls -t staticfiles.backup.* 2>/dev/null | head -1)
     if [ -n "$LATEST_BACKUP" ]; then
+        print_status "Restoring from local backup: $LATEST_BACKUP"
         sudo -u www-data cp -r "$LATEST_BACKUP"/* staticfiles/ 2>/dev/null || true
-        print_status "Restored from $LATEST_BACKUP"
     fi
     
-    # Also try to restore from Git backup
-    if [ -d "/var/backups/nov-reco/latest/staticfiles.backup" ]; then
+    # If still missing, try system backup
+    if [ ! -f "staticfiles/css/home.css" ] && [ -d "/var/backups/nov-reco/latest/staticfiles.backup" ]; then
         print_status "Restoring from system backup..."
         sudo -u www-data cp -r /var/backups/nov-reco/latest/staticfiles.backup/* staticfiles/ 2>/dev/null || true
     fi
+    
+    # Final check
+    if [ ! -f "staticfiles/css/home.css" ]; then
+        print_error "❌ Could not restore static files! Manual intervention required."
+        print_status "You may need to run: python manage.py collectstatic --noinput"
+    else
+        print_success "✅ Static files restored successfully"
+    fi
+else
+    print_success "✅ Static files collected successfully"
 fi
+
+# 9. Final static files verification and test
+print_status "Final static files verification..."
+if [ -f "staticfiles/css/home.css" ]; then
+    print_success "✅ home.css found"
+    ls -la staticfiles/css/home.css
+else
+    print_error "❌ home.css still missing!"
+fi
+
+# List some key static files for verification
+print_status "Key static files status:"
+for file in "staticfiles/css/base.css" "staticfiles/css/checkin.css" "staticfiles/js/base.js"; do
+    if [ -f "$file" ]; then
+        echo "✅ $file"
+    else
+        echo "❌ $file (missing)"
+    fi
+done
 
 # 9. Fix permissions (including logs) - BEFORE Django operations
 print_status "Fixing permissions..."
@@ -193,29 +225,69 @@ sudo systemctl reload nginx
 # 12. Wait and test
 sleep 5
 
-# 13. Test website
-print_status "Testing website..."
+# 13. Test website and static files with detailed diagnostics
+print_status "Testing website and static files..."
+
+# Set URLs based on environment
 if [ "$ENVIRONMENT" == "test" ]; then
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://103.15.51.66 || echo "000")
-    if [ "$HTTP_CODE" == "200" ]; then
-        print_success "✅ Website is working: http://103.15.51.66"
-    else
-        print_error "❌ Website error (HTTP $HTTP_CODE)"
+    WEBSITE_URL="http://checkin.taylaibui.vn"
+    STATIC_URL="http://checkin.taylaibui.vn/static/css/home.css"
+elif [ "$ENVIRONMENT" == "production" ]; then
+    WEBSITE_URL="http://reco.qly.vn"
+    STATIC_URL="http://reco.qly.vn/static/css/home.css"
+else
+    WEBSITE_URL="http://localhost:8000"
+    STATIC_URL="http://localhost:8000/static/css/home.css"
+fi
+
+# Test with detailed curl output
+print_status "Testing website: $WEBSITE_URL"
+WEBSITE_RESPONSE=$(curl -s -I "$WEBSITE_URL" 2>/dev/null || echo "Connection failed")
+WEBSITE_STATUS=$(echo "$WEBSITE_RESPONSE" | head -1 | grep -o '[0-9][0-9][0-9]' || echo "000")
+
+print_status "Testing static files: $STATIC_URL"
+STATIC_RESPONSE=$(curl -s -I "$STATIC_URL" 2>/dev/null || echo "Connection failed")
+STATIC_STATUS=$(echo "$STATIC_RESPONSE" | head -1 | grep -o '[0-9][0-9][0-9]' || echo "000")
+
+print_status "=== Test Results ==="
+print_status "Website status: HTTP $WEBSITE_STATUS"
+print_status "Static files status: HTTP $STATIC_STATUS"
+
+# Show response headers if there are redirects
+if [ "$WEBSITE_STATUS" = "301" ] || [ "$WEBSITE_STATUS" = "302" ]; then
+    print_error "❌ Website redirect detected (HTTP $WEBSITE_STATUS):"
+    echo "$WEBSITE_RESPONSE" | head -5
+fi
+
+if [ "$STATIC_STATUS" = "301" ] || [ "$STATIC_STATUS" = "302" ]; then
+    print_error "❌ Static files redirect detected (HTTP $STATIC_STATUS):"
+    echo "$STATIC_RESPONSE" | head -5
+fi
+
+# Final verdict
+if [ "$WEBSITE_STATUS" = "200" ] && [ "$STATIC_STATUS" = "200" ]; then
+    print_success "🎉 SUCCESS! Update completed successfully!"
+    print_success "✅ Website: $WEBSITE_URL (HTTP 200)"
+    print_success "✅ Static files: HTTP 200"
+else
+    print_error "❌ Issues detected after update:"
+    if [ "$WEBSITE_STATUS" != "200" ]; then
+        print_error "Website: HTTP $WEBSITE_STATUS (expected 200)"
+    fi
+    if [ "$STATIC_STATUS" != "200" ]; then
+        print_error "Static files: HTTP $STATIC_STATUS (expected 200)"
     fi
     
-    # Test static files
-    CSS_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://103.15.51.66/static/css/home.css || echo "000")
-    if [ "$CSS_CODE" == "200" ]; then
-        print_success "✅ Static files working"
-    else
-        print_error "❌ Static files error (HTTP $CSS_CODE)"
+    print_status "Recent service logs:"
+    if [ "$ENVIRONMENT" == "test" ]; then
+        sudo journalctl -u checkin-taylaibui-test -n 5 --no-pager
+    elif [ "$ENVIRONMENT" == "production" ]; then
+        sudo journalctl -u reco-qly-production -n 5 --no-pager
     fi
 fi
 
-print_success "✅ Safe update completed for $ENVIRONMENT environment!"
+print_status "✅ Safe update script completed!"
 
 # Cleanup old backups (keep last 3)
 print_status "Cleaning up old backups..."
 ls -t staticfiles.backup.* 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
-
-print_status "Update completed successfully!"
