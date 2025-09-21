@@ -365,19 +365,24 @@
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     
     /* Modern Mobile Card Styles */
+    .dashboard-page .mobile-cards .mobile-card,
     .mobile-card {
-        background: linear-gradient(145deg, #ffffff, #f8fafc);
-        border-radius: 16px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: linear-gradient(145deg, #ffffff, #f8fafc) !important;
+        border-radius: 16px !important;
+        padding: 20px !important;
+        margin-bottom: 20px !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
         display: flex !important;
         flex-direction: column !important;
-        transition: all 0.3s ease;
+        transition: all 0.3s ease !important;
+        width: 100% !important;
     }
     
     .mobile-card:hover {
