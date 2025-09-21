@@ -304,8 +304,8 @@ function renderCheckins(checkins = null) {
                         </div>
                     ` : ''}
                 </div>
-                ${checkin.photo ? `
-                    <img src="${checkin.photo}" alt="Check-in photo" class="checkin-photo">
+                ${checkin.photo_url ? `
+                    <img src="${checkin.photo_url}" alt="Check-in photo" class="checkin-photo">
                 ` : ''}
             </div>
         </div>

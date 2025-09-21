@@ -113,7 +113,7 @@ function renderCheckinsTable(items = null) {
         <td>${formatDate(checkin.created_at)}</td>
         <td>${checkin.note || 'N/A'}</td>
         <td>
-          ${checkin.photo ? `<img src="${checkin.photo}" alt="Check-in photo" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">` : 'N/A'}
+          ${checkin.photo_url ? `<img src="${checkin.photo_url}" alt="Check-in photo" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">` : 'N/A'}
         </td>
       </tr>
     `).join('');
@@ -175,9 +175,9 @@ function renderMobileCards(items = null) {
           </div>
           ` : ''}
           
-          ${checkin.photo ? `
+          ${checkin.photo_url ? `
           <div class="mobile-card-row">
-            <img src="${checkin.photo}" alt="Check-in photo" class="mobile-card-photo">
+            <img src="${checkin.photo_url}" alt="Check-in photo" class="mobile-card-photo">
           </div>
           ` : ''}
         </div>
