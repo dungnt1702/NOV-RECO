@@ -13,8 +13,8 @@
     {% csrf_token %}
     <div class="dashboard-container">
       <div class="dashboard-header">
-        <h1>Danh sách Check-in</h1>
-        <p class="dashboard-subtitle">Xem tất cả check-in trong hệ thống</p>
+        <h1>📋 Danh sách Check-in</h1>
+        <p class="dashboard-subtitle">Xem và quản lý tất cả check-in trong hệ thống</p>
       </div>
 
 
@@ -22,27 +22,26 @@
       <!-- Filters -->
       <div class="filters">
         <div class="filter-group">
-          <label class="filter-label">Tìm kiếm</label>
+          <label class="filter-label">🔍 Tìm kiếm</label>
           <input type="text" id="search-input" class="filter-input" placeholder="Tìm theo tên, khu vực, ghi chú...">
         </div>
         <div class="filter-group">
-          <label class="filter-label">Từ ngày</label>
+          <label class="filter-label">📅 Từ ngày</label>
           <input type="date" id="date-from" class="filter-input">
         </div>
         <div class="filter-group">
-          <label class="filter-label">Đến ngày</label>
+          <label class="filter-label">📅 Đến ngày</label>
           <input type="date" id="date-to" class="filter-input">
         </div>
         <div class="filter-group">
-          <label class="filter-label">Người dùng</label>
+          <label class="filter-label">👤 Người dùng</label>
           <select id="user-filter" class="filter-input">
             <option value="">Tất cả người dùng</option>
           </select>
         </div>
         <div class="filter-group">
           <button type="button" onclick="clearFilters()" class="btn btn-secondary">
-            <i class="fas fa-times"></i>
-            Xóa bộ lọc
+            🗑️ Xóa bộ lọc
           </button>
         </div>
       </div>
@@ -79,16 +78,13 @@
       <!-- Actions -->
       <div class="actions">
         <button onclick="loadCheckins()" class="action-button">
-          <i class="fas fa-refresh"></i>
-          Tải lại
+          🔄 Tải lại
         </button>
         <button onclick="exportData()" class="action-button success">
-          <i class="fas fa-download"></i>
-          Xuất dữ liệu
+          📥 Xuất dữ liệu
         </button>
         <a href="{% url 'user_history' %}" class="action-button secondary">
-          <i class="fas fa-history"></i>
-          Lịch sử cá nhân
+          📊 Lịch sử cá nhân
         </a>
       </div>
     </div>
