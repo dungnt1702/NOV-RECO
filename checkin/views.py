@@ -563,9 +563,46 @@ def areas_api(request):
         return Response({"error": "Permission denied"}, status=403)
 
     if request.method == "GET":
-        areas = Area.objects.all().order_by("-created_at")
-        serializer = AreaSerializer(areas, many=True)
-        return Response(serializer.data)
+        from django.core.paginator import Paginator
+        from django.db.models import Q
+        
+        # Get query parameters
+        page = int(request.GET.get('page', 1))
+        page_size = int(request.GET.get('page_size', 25))
+        status = request.GET.get('status', '')
+        search = request.GET.get('search', '')
+        
+        # Build queryset
+        queryset = Area.objects.all().order_by("-created_at")
+        
+        # Apply filters
+        if status == 'active':
+            queryset = queryset.filter(is_active=True)
+        elif status == 'inactive':
+            queryset = queryset.filter(is_active=False)
+        
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) | 
+                Q(description__icontains=search)
+            )
+        
+        # Pagination
+        paginator = Paginator(queryset, page_size)
+        page_obj = paginator.get_page(page)
+        
+        # Serialize data
+        serializer = AreaSerializer(page_obj, many=True)
+        
+        return Response({
+            'results': serializer.data,
+            'count': paginator.count,
+            'page': page,
+            'page_size': page_size,
+            'total_pages': paginator.num_pages,
+            'has_next': page_obj.has_next(),
+            'has_previous': page_obj.has_previous()
+        })
 
     elif request.method == "POST":
         serializer = AreaSerializer(data=request.data)
@@ -605,8 +642,31 @@ def area_detail_api(request, area_id):
 
 @admin_required
 def area_management(request):
-    """Trang quản lý khu vực cho Admin"""
-    return render(request, "checkin/area_management.html")
+    """Trang quản lý khu vực cho Admin - redirect to new list view"""
+    return redirect("area_list")
+
+
+@admin_required
+def area_list(request):
+    """Trang danh sách khu vực với pagination"""
+    return render(request, "checkin/area_list.html")
+
+
+@admin_required
+def area_form(request, area_id=None):
+    """Trang form thêm/sửa khu vực với bản đồ"""
+    area = None
+    if area_id:
+        try:
+            area = Area.objects.get(id=area_id)
+        except Area.DoesNotExist:
+            messages.error(request, "Khu vực không tồn tại.")
+            return redirect("area_list")
+    
+    context = {
+        'area': area
+    }
+    return render(request, "checkin/area_form.html", context)
 
 
 @api_view(["POST"])

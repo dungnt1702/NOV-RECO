@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Xóa Nhân viên - {{ employee.get_display_name }} - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/employee/delete.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="employee-delete-page">
+    <div class="delete-container">
+        <div class="delete-header">
+            <div class="warning-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h1 class="delete-title">Xác nhận Xóa Nhân viên</h1>
+            <p class="delete-subtitle">Hành động này không thể hoàn tác</p>
+        </div>
+
+        <div class="delete-content">
+            <div class="employee-info-card">
+                <div class="employee-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="employee-details">
+                    <h3>{{ employee.get_display_name }}</h3>
+                    <p class="employee-role">{{ employee.get_role_display }}</p>
+                    <p class="employee-department">
+                        {% if employee.department %}
+                            <i class="fas fa-building"></i> {{ employee.department.name }}
+                        {% else %}
+                            <i class="fas fa-exclamation-triangle"></i> Chưa phân phòng ban
+                        {% endif %}
+                    </p>
+                    <p class="employee-email">
+                        <i class="fas fa-envelope"></i> {{ employee.email }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="warning-message">
+                <h4><i class="fas fa-warning"></i> Cảnh báo</h4>
+                <ul>
+                    <li>Tài khoản nhân viên sẽ bị xóa vĩnh viễn</li>
+                    <li>Tất cả dữ liệu liên quan sẽ bị mất</li>
+                    <li>Lịch sử check-in sẽ được giữ lại nhưng không liên kết với tài khoản</li>
+                    <li>Hành động này không thể hoàn tác</li>
+                </ul>
+            </div>
+
+            <div class="delete-actions">
+                <form method="post" id="deleteForm">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-lg">
+                        <i class="fas fa-trash"></i> Xác nhận Xóa
+                    </button>
+                </form>
+                <a href="{% url 'employee:detail' employee.id %}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-arrow-left"></i> Hủy bỏ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/employee/delete.js' %}"></script>
+{% endblock %}

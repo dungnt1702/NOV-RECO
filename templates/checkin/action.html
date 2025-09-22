@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Check-in - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="{% static 'css/checkin/action.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="checkin-page">
+    <div class="checkin-container">
+        <div class="checkin-header">
+            <h1 class="checkin-title">
+                <i class="fas fa-camera"></i> Check-in
+            </h1>
+            <p class="checkin-subtitle">
+                Chụp ảnh và xác định vị trí để check-in
+            </p>
+        </div>
+
+        <div class="checkin-content">
+            <!-- Main Check-in Form -->
+            <div id="checkinForm" class="checkin-form">
+                <form id="checkinFormElement">
+                    {% csrf_token %}
+                    
+                    <!-- Camera Section -->
+                    <div class="camera-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-camera"></i> Chụp ảnh</h3>
+                            <p class="section-subtitle">Chụp ảnh để xác minh danh tính</p>
+                        </div>
+                        <div class="camera-container">
+                            <div id="camera-preview" class="camera-preview">
+                                <div class="camera-placeholder">
+                                    <div class="camera-icon">📷</div>
+                                    <div class="camera-text">Chạm để mở camera</div>
+                                    <div class="camera-hint">Camera sẽ tự động lấy vị trí</div>
+                                </div>
+                            </div>
+                            <video id="video" autoplay muted style="display: none;"></video>
+                            <canvas id="canvas" style="display: none;"></canvas>
+                            
+                            <!-- Camera Controls -->
+                            <div class="camera-controls">
+                                <button type="button" id="captureBtn" class="btn-capture">
+                                    <i class="fas fa-camera"></i>
+                                    <span>Chụp ảnh</span>
+                                </button>
+                                <button type="button" id="switchCameraBtn" class="btn-switch">
+                                    <i class="fas fa-sync-alt"></i>
+                                    <span>Đổi camera</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Photo Preview -->
+                            <div id="photoPreview" class="photo-preview" style="display: none;">
+                                <div class="photo-container">
+                                    <img id="previewImg" alt="Preview">
+                                    <div class="photo-overlay">
+                                        <button type="button" id="retakeBtn" class="btn-retake">
+                                            <i class="fas fa-redo"></i>
+                                            <span>Chụp lại</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Section -->
+                    <div class="location-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-map-marker-alt"></i> Vị trí</h3>
+                            <p class="section-subtitle">Xác định vị trí hiện tại của bạn</p>
+                        </div>
+                        
+                        <!-- Location Status -->
+                        <div class="location-status-container">
+                            <div id="locationStatus" class="location-status" style="display: none;">
+                                <div class="status-icon">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                                <div class="status-text">
+                                    <span class="status-title">Đang lấy vị trí...</span>
+                                    <span class="status-subtitle">Vui lòng cho phép truy cập vị trí</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Location Button -->
+                            <button type="button" id="getLocationBtn" class="btn-location">
+                                <i class="fas fa-location-arrow"></i>
+                                <span>Lấy vị trí</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Location Details -->
+                        <div id="locationDetails" class="location-details" style="display: none;">
+                            <div class="location-info-card">
+                                <div class="info-item">
+                                    <i class="fas fa-globe"></i>
+                                    <div class="info-content">
+                                        <span class="info-label">Vĩ độ</span>
+                                        <span class="info-value" id="currentLat">-</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-globe"></i>
+                                    <div class="info-content">
+                                        <span class="info-label">Kinh độ</span>
+                                        <span class="info-value" id="currentLng">-</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-crosshairs"></i>
+                                    <div class="info-content">
+                                        <span class="info-label">Độ chính xác</span>
+                                        <span class="info-value" id="locationAccuracy">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Map for location selection -->
+                        <div id="map" class="map-container"></div>
+                    </div>
+
+                    <!-- Note Section -->
+                    <div class="note-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-sticky-note"></i> Ghi chú</h3>
+                            <p class="section-subtitle">Thêm ghi chú cho lần check-in này (tùy chọn)</p>
+                        </div>
+                        <div class="note-container">
+                            <textarea id="note" name="note" class="note-textarea" rows="3" placeholder="Nhập ghi chú về lần check-in này..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="submit-section">
+                        <button type="submit" id="submitBtn" class="btn-submit" disabled>
+                            <div class="btn-content">
+                                <i class="fas fa-check"></i>
+                                <span>Hoàn thành Check-in</span>
+                            </div>
+                            <div class="btn-loading" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <span>Đang xử lý...</span>
+                            </div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'js/checkin/action.js' %}"></script>
+{% endblock %}

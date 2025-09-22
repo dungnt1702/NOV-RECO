@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Danh sách Check-in - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/checkin/list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="checkin-list-page">
+    <div class="list-container">
+        <div class="list-header">
+            <h1 class="list-title">
+                <i class="fas fa-list"></i> Danh sách Check-in
+            </h1>
+            <p class="list-subtitle">
+                Quản lý tất cả check-in trong hệ thống
+            </p>
+        </div>
+
+        <div class="list-content">
+            <!-- Filters and Controls -->
+            <div class="list-controls">
+                <div class="filter-group">
+                    <label for="userFilter">Nhân viên:</label>
+                    <select id="userFilter" class="form-control">
+                        <option value="">Tất cả nhân viên</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="areaFilter">Khu vực:</label>
+                    <select id="areaFilter" class="form-control">
+                        <option value="">Tất cả khu vực</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="dateFrom">Từ ngày:</label>
+                    <input type="date" id="dateFrom" class="form-control">
+                </div>
+                <div class="filter-group">
+                    <label for="dateTo">Đến ngày:</label>
+                    <input type="date" id="dateTo" class="form-control">
+                </div>
+                <div class="filter-group">
+                    <label for="itemsPerPage">Hiển thị:</label>
+                    <select id="itemsPerPage" class="form-control">
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button id="applyFilters" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Lọc
+                    </button>
+                </div>
+            </div>
+
+            <!-- Check-in List -->
+            <div class="checkin-list-section">
+                <!-- Desktop Table View -->
+                <div id="desktopTable" class="desktop-table-view">
+                    <div class="table-container">
+                        <table class="checkin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nhân viên</th>
+                                    <th>Khu vực</th>
+                                    <th>Tọa độ</th>
+                                    <th>Khoảng cách</th>
+                                    <th>Thời gian</th>
+                                    <th>Ghi chú</th>
+                                    <th>Ảnh</th>
+                                </tr>
+                            </thead>
+                            <tbody id="checkins-table">
+                                <tr>
+                                    <td colspan="8" class="loading">
+                                        <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Mobile Cards View -->
+                <div id="mobileCards" class="mobile-cards-view">
+                    <div id="mobile-cards" class="mobile-cards">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div id="pagination" class="pagination-container">
+                <!-- Pagination will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/checkin/list.js' %}"></script>
+{% endblock %}

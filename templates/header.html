@@ -38,7 +38,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'user_history' %}">
+                            <a href="{% url 'checkin:history' %}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
@@ -47,7 +47,7 @@
                         </li>
                         {% if user.is_superuser or user.is_admin_user or user.is_manager_user or user.role == 'employee' and user.is_staff %}
                             <li>
-                                <a href="{% url 'checkin_list_view' %}">
+                                <a href="{% url 'checkin:list' %}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                                     </svg>
@@ -55,7 +55,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{% url 'area_management' %}">
+                                <a href="{% url 'area:list' %}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -117,9 +117,15 @@
         
         <div class="user-info">
             {% if user.is_authenticated %}
-                <div class="user-avatar">
-                    {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
-                </div>
+                <a href="{% url 'personal:profile' %}" class="user-profile-link" title="Thông tin cá nhân">
+                    <div class="user-avatar">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="Avatar">
+                        {% else %}
+                            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                        {% endif %}
+                    </div>
+                </a>
                 <a href="/accounts/logout/" class="logout-btn" title="Đăng xuất">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -153,7 +159,7 @@
         <span class="nav-label">Check-in</span>
     </a>
     
-    <a href="{% url 'user_history' %}" class="nav-item {% if request.resolver_match.url_name == 'user_history' %}active{% endif %}">
+    <a href="{% url 'checkin:history' %}" class="nav-item {% if request.resolver_match.url_name == 'history' %}active{% endif %}">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
@@ -161,7 +167,7 @@
     </a>
     
     {% if user.is_authenticated and user.is_superuser or user.is_admin_user or user.is_manager_user or user.role == 'employee' and user.is_staff %}
-    <a href="{% url 'checkin_list_view' %}" class="nav-item {% if request.resolver_match.url_name == 'checkin_list_view' %}active{% endif %}">
+    <a href="{% url 'checkin:list' %}" class="nav-item {% if request.resolver_match.url_name == 'list' %}active{% endif %}">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
         </svg>

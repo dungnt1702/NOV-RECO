@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lịch sử Check-in - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/checkin/history.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="checkin-history-page">
+    <div class="history-container">
+        <div class="history-header">
+            <h1 class="history-title">
+                <i class="fas fa-history"></i> Lịch sử Check-in
+            </h1>
+            <p class="history-subtitle">
+                Xem lịch sử check-in của bạn
+            </p>
+        </div>
+
+        <div class="history-content">
+            <!-- Filters -->
+            <div class="history-filters">
+                <div class="filter-group">
+                    <label for="dateFrom">Từ ngày:</label>
+                    <input type="date" id="dateFrom" class="form-control">
+                </div>
+                <div class="filter-group">
+                    <label for="dateTo">Đến ngày:</label>
+                    <input type="date" id="dateTo" class="form-control">
+                </div>
+                <div class="filter-group">
+                    <label for="areaFilter">Khu vực:</label>
+                    <select id="areaFilter" class="form-control">
+                        <option value="">Tất cả khu vực</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button id="applyFilters" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Lọc
+                    </button>
+                </div>
+            </div>
+
+            <!-- Check-in List -->
+            <div class="checkin-list-section">
+                <!-- Desktop Table View -->
+                <div id="desktopTable" class="desktop-table-view" style="display: none;">
+                    <div class="table-container">
+                        <table class="checkin-table">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Khu vực</th>
+                                    <th>Vị trí</th>
+                                    <th>Ghi chú</th>
+                                    <th>Ảnh</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody id="checkinTableBody">
+                                <!-- Table rows will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Mobile Cards View -->
+                <div id="mobileCards" class="mobile-cards-view">
+                    <div id="checkinList" class="checkin-list">
+                        <div class="loading">
+                            <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div id="pagination" class="pagination-container">
+                <!-- Pagination will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/checkin/history.js' %}"></script>
+{% endblock %}

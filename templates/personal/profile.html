@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Thông tin cá nhân{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/personal/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="personal-profile-page">
+    <div class="container">
+        <!-- Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="Avatar" class="avatar-image">
+                {% else %}
+                    <div class="avatar-placeholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+                {% endif %}
+                <div class="avatar-overlay">
+                    <a href="{% url 'personal:edit' %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-camera"></i> Thay đổi
+                    </a>
+                </div>
+            </div>
+            <div class="profile-info">
+                <h1 class="profile-name">{{ user.get_display_name }}</h1>
+                <p class="profile-role">{{ user.get_role_display }}</p>
+                {% if user.department %}
+                    <p class="profile-department">{{ user.department.name }}</p>
+                {% endif %}
+                {% if user.position %}
+                    <p class="profile-position">{{ user.position }}</p>
+                {% endif %}
+            </div>
+            <div class="profile-actions">
+                <a href="{% url 'personal:edit' %}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Chỉnh sửa
+                </a>
+                <a href="{% url 'personal:change_password' %}" class="btn btn-outline">
+                    <i class="fas fa-key"></i> Đổi mật khẩu
+                </a>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="profile-content">
+            <div class="profile-sections">
+                <!-- Thông tin cơ bản -->
+                <div class="profile-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user"></i> Thông tin cơ bản
+                    </h3>
+                    <div class="section-content">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Họ tên:</label>
+                                <span>{{ user.get_full_name|default:"Chưa cập nhật" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Email:</label>
+                                <span>{{ user.email|default:"Chưa cập nhật" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Số điện thoại:</label>
+                                <span>{{ user.phone|default:"Chưa cập nhật" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Ngày sinh:</label>
+                                <span>{{ user.date_of_birth|date:"d/m/Y"|default:"Chưa cập nhật" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Giới tính:</label>
+                                <span>{{ user.get_gender_display|default:"Chưa cập nhật" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Địa chỉ:</label>
+                                <span>{{ user.address|default:"Chưa cập nhật" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông tin công việc -->
+                <div class="profile-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-briefcase"></i> Thông tin công việc
+                    </h3>
+                    <div class="section-content">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Mã nhân viên:</label>
+                                <span>{{ user.employee_id|default:"Chưa cập nhật" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Phòng ban:</label>
+                                <span>{{ user.department.name|default:"Chưa phân phòng ban" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Chức vụ:</label>
+                                <span>{{ user.position|default:"Chưa cập nhật" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Ngày vào làm:</label>
+                                <span>{{ user.hire_date|date:"d/m/Y"|default:"Chưa cập nhật" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Lịch làm việc:</label>
+                                <span>{{ user.work_schedule|default:"Chưa cập nhật" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Trạng thái:</label>
+                                <span class="status-badge {{ user.is_active_employee|yesno:'active,inactive' }}">
+                                    {{ user.is_active_employee|yesno:"Đang hoạt động,Tạm nghỉ" }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông tin liên hệ khẩn cấp -->
+                <div class="profile-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-phone"></i> Liên hệ khẩn cấp
+                    </h3>
+                    <div class="section-content">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Người liên hệ:</label>
+                                <span>{{ user.emergency_contact|default:"Chưa cập nhật" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Số điện thoại:</label>
+                                <span>{{ user.emergency_phone|default:"Chưa cập nhật" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kỹ năng và ghi chú -->
+                <div class="profile-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-star"></i> Kỹ năng & Ghi chú
+                    </h3>
+                    <div class="section-content">
+                        <div class="info-item full-width">
+                            <label>Kỹ năng chuyên môn:</label>
+                            <div class="skills-content">
+                                {{ user.skills|default:"Chưa cập nhật"|linebreaks }}
+                            </div>
+                        </div>
+                        <div class="info-item full-width">
+                            <label>Ghi chú thêm:</label>
+                            <div class="notes-content">
+                                {{ user.notes|default:"Chưa cập nhật"|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/personal/profile.js' %}"></script>
+{% endblock %}

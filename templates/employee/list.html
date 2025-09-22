@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Danh sách Nhân viên - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/employee/list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="employee-list-page">
+    <div class="employee-list-container">
+        <div class="employee-list-header">
+            <h1 class="employee-list-title">
+                <i class="fas fa-users"></i> Danh sách Nhân viên
+            </h1>
+            <p class="employee-list-subtitle">
+                Quản lý thông tin nhân viên trong hệ thống
+            </p>
+        </div>
+
+        <div class="employee-list-content">
+            <!-- Action Buttons -->
+            <div class="employee-list-actions">
+                <a href="{% url 'employee:form' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Thêm Nhân viên Mới
+                </a>
+            </div>
+
+            <!-- Filters and Controls -->
+            <div class="employee-list-controls">
+                <div class="filter-group">
+                    <label for="roleFilter">Vai trò:</label>
+                    <select id="roleFilter" class="form-control">
+                        <option value="">Tất cả vai trò</option>
+                        <option value="admin">Admin</option>
+                        <option value="manager">Quản lý</option>
+                        <option value="hcns">Hành chính nhân sự</option>
+                        <option value="employee">Nhân viên</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="departmentFilter">Phòng ban:</label>
+                    <select id="departmentFilter" class="form-control">
+                        <option value="">Tất cả phòng ban</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="searchInput">Tìm kiếm:</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Tên, email, mã NV...">
+                </div>
+                <div class="filter-group">
+                    <label for="itemsPerPage">Hiển thị:</label>
+                    <select id="itemsPerPage" class="form-control">
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Employees List -->
+            <div class="employee-list-section">
+                <div id="employeesList" class="employees-list">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div id="pagination" class="pagination-container">
+                <!-- Pagination will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/employee/list.js' %}"></script>
+{% endblock %}

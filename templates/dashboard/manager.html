@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Quản lý - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/manager.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-manager-page">
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">
+                <i class="fas fa-chart-line"></i> Dashboard Quản lý
+            </h1>
+            <p class="dashboard-subtitle">
+                Tổng quan toàn bộ hệ thống và quản lý
+            </p>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="{% url 'employee:form' %}" class="action-card action-primary">
+                    <div class="action-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="action-content">
+                        <h3>Thêm Nhân viên</h3>
+                        <p>Tạo tài khoản mới</p>
+                    </div>
+                </a>
+                <a href="{% url 'area:form' %}" class="action-card action-secondary">
+                    <div class="action-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div class="action-content">
+                        <h3>Thêm Khu vực</h3>
+                        <p>Tạo khu vực check-in</p>
+                    </div>
+                </a>
+                <a href="{% url 'checkin:list' %}" class="action-card action-info">
+                    <div class="action-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div class="action-content">
+                        <h3>Danh sách Check-in</h3>
+                        <p>Xem tất cả check-in</p>
+                    </div>
+                </a>
+                <a href="{% url 'employee:list' %}" class="action-card action-warning">
+                    <div class="action-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="action-content">
+                        <h3>Quản lý Nhân viên</h3>
+                        <p>Xem và chỉnh sửa</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ total_users }}</h3>
+                        <p>Tổng người dùng</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ total_checkins }}</h3>
+                        <p>Tổng check-in</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ total_areas }}</h3>
+                        <p>Tổng khu vực</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ today_checkins }}</h3>
+                        <p>Check-in hôm nay</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Role Statistics -->
+            <div class="role-stats-card">
+                <h3><i class="fas fa-chart-pie"></i> Thống kê Vai trò</h3>
+                <div class="role-stats-grid">
+                    <div class="role-stat-item">
+                        <div class="role-icon admin">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="role-content">
+                            <div class="role-count">{{ users_by_role.admin }}</div>
+                            <div class="role-label">Admin</div>
+                        </div>
+                    </div>
+                    <div class="role-stat-item">
+                        <div class="role-icon manager">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="role-content">
+                            <div class="role-count">{{ users_by_role.manager }}</div>
+                            <div class="role-label">Quản lý</div>
+                        </div>
+                    </div>
+                    <div class="role-stat-item">
+                        <div class="role-icon hcns">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <div class="role-content">
+                            <div class="role-count">{{ users_by_role.hcns }}</div>
+                            <div class="role-label">HCNS</div>
+                        </div>
+                    </div>
+                    <div class="role-stat-item">
+                        <div class="role-icon employee">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="role-content">
+                            <div class="role-count">{{ users_by_role.employee }}</div>
+                            <div class="role-label">Nhân viên</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Area Statistics -->
+            <div class="area-stats-card">
+                <h3><i class="fas fa-chart-bar"></i> Thống kê Khu vực</h3>
+                {% if area_stats %}
+                    <div class="area-stats-list">
+                        {% for area in area_stats %}
+                        <div class="area-stat-item">
+                            <div class="area-name">{{ area.name }}</div>
+                            <div class="area-count">{{ area.checkin_count }} check-in</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Chưa có khu vực nào</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Department Statistics -->
+            <div class="department-stats-card">
+                <h3><i class="fas fa-building"></i> Thống kê Phòng ban</h3>
+                {% if department_stats %}
+                    <div class="department-stats-list">
+                        {% for dept in department_stats %}
+                        <div class="department-stat-item">
+                            <div class="department-name">{{ dept.name }}</div>
+                            <div class="department-count">{{ dept.employee_count }} nhân viên</div>
+                            <div class="department-checkins">{{ dept.checkin_count }} check-in</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Chưa có phòng ban nào</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Recent Check-ins -->
+            <div class="recent-checkins-card">
+                <h3><i class="fas fa-history"></i> Check-in Gần đây</h3>
+                {% if recent_checkins %}
+                    <div class="checkin-list">
+                        {% for checkin in recent_checkins %}
+                        <div class="checkin-item">
+                            <div class="checkin-user">
+                                <i class="fas fa-user"></i> {{ checkin.user.get_display_name }}
+                            </div>
+                            <div class="checkin-location">
+                                <i class="fas fa-map-marker-alt"></i> {{ checkin.area.name }}
+                            </div>
+                            <div class="checkin-time">
+                                {{ checkin.created_at|date:"d/m H:i" }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="view-all">
+                        <a href="{% url 'checkin:list' %}" class="btn btn-outline">
+                            <i class="fas fa-eye"></i> Xem tất cả
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Chưa có check-in nào</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard/manager.js' %}"></script>
+{% endblock %}

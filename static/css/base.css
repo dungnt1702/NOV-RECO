@@ -251,6 +251,17 @@ body {
     flex-direction: row !important;
 }
 
+.user-profile-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.3s ease;
+}
+
+.user-profile-link:hover {
+    opacity: 0.8;
+}
+
 .user-avatar {
     width: 32px;
     height: 32px;
@@ -266,6 +277,14 @@ body {
     transition: all 0.2s ease;
     flex-shrink: 0;
     text-transform: uppercase;
+    overflow: hidden;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .user-avatar:hover {

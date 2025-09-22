@@ -67,6 +67,81 @@ class User(AbstractUser):
     employee_id = models.CharField(
         max_length=20, blank=True, unique=True, help_text="Mã nhân viên"
     )
+    
+    # Thông tin cá nhân đầy đủ
+    avatar = models.ImageField(
+        upload_to='avatars/', 
+        blank=True, 
+        null=True, 
+        help_text="Ảnh đại diện"
+    )
+    date_of_birth = models.DateField(
+        blank=True, 
+        null=True, 
+        help_text="Ngày sinh"
+    )
+    gender = models.CharField(
+        max_length=10,
+        choices=[
+            ('male', 'Nam'),
+            ('female', 'Nữ'),
+            ('other', 'Khác'),
+        ],
+        blank=True,
+        help_text="Giới tính"
+    )
+    address = models.TextField(
+        blank=True, 
+        help_text="Địa chỉ thường trú"
+    )
+    emergency_contact = models.CharField(
+        max_length=100, 
+        blank=True, 
+        help_text="Người liên hệ khẩn cấp"
+    )
+    emergency_phone = models.CharField(
+        max_length=15, 
+        blank=True, 
+        help_text="Số điện thoại liên hệ khẩn cấp"
+    )
+    
+    # Thông tin công việc
+    position = models.CharField(
+        max_length=100, 
+        blank=True, 
+        help_text="Chức vụ"
+    )
+    hire_date = models.DateField(
+        blank=True, 
+        null=True, 
+        help_text="Ngày vào làm"
+    )
+    salary = models.DecimalField(
+        max_digits=12, 
+        decimal_places=2, 
+        blank=True, 
+        null=True, 
+        help_text="Mức lương"
+    )
+    work_schedule = models.CharField(
+        max_length=50, 
+        blank=True, 
+        help_text="Lịch làm việc (VD: 8h-17h)"
+    )
+    
+    # Thông tin bổ sung
+    skills = models.TextField(
+        blank=True, 
+        help_text="Kỹ năng chuyên môn"
+    )
+    notes = models.TextField(
+        blank=True, 
+        help_text="Ghi chú thêm"
+    )
+    is_active_employee = models.BooleanField(
+        default=True, 
+        help_text="Trạng thái hoạt động"
+    )
 
     def is_admin(self):
         return self.role == UserRole.ADMIN or self.is_superuser

@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Cá nhân - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/personal.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-personal-page">
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">
+                <i class="fas fa-user"></i> Dashboard Cá nhân
+            </h1>
+            <p class="dashboard-subtitle">
+                Chào mừng {{ user.get_display_name }}!
+            </p>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="{% url 'checkin:action' %}" class="action-card action-primary">
+                    <div class="action-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div class="action-content">
+                        <h3>Check-in</h3>
+                        <p>Thực hiện check-in mới</p>
+                    </div>
+                </a>
+                <a href="{% url 'checkin:history' %}" class="action-card action-secondary">
+                    <div class="action-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <div class="action-content">
+                        <h3>Lịch sử</h3>
+                        <p>Xem lịch sử check-in</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ total_checkins }}</h3>
+                        <p>Tổng check-in</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ weekly_checkins }}</h3>
+                        <p>Tuần này</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ monthly_checkins }}</h3>
+                        <p>Tháng này</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Check-in -->
+            {% if recent_checkin %}
+            <div class="recent-checkin-card">
+                <h3><i class="fas fa-clock"></i> Check-in Gần nhất</h3>
+                <div class="checkin-info">
+                    <div class="checkin-time">
+                        {{ recent_checkin.created_at|date:"d/m/Y H:i" }}
+                    </div>
+                    <div class="checkin-location">
+                        <i class="fas fa-map-marker-alt"></i> {{ recent_checkin.area.name }}
+                    </div>
+                    <div class="checkin-coordinates">
+                        {{ recent_checkin.lat|floatformat:6 }}, {{ recent_checkin.lng|floatformat:6 }}
+                    </div>
+                    {% if recent_checkin.note %}
+                    <div class="checkin-note">
+                        <i class="fas fa-sticky-note"></i> {{ recent_checkin.note }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Recent Check-ins List -->
+            <div class="recent-checkins-card">
+                <h3><i class="fas fa-history"></i> Lịch sử Gần đây</h3>
+                {% if recent_checkins %}
+                    <div class="checkin-list">
+                        {% for checkin in recent_checkins %}
+                        <div class="checkin-item">
+                            <div class="checkin-time">
+                                {{ checkin.created_at|date:"d/m H:i" }}
+                            </div>
+                            <div class="checkin-location">
+                                <i class="fas fa-map-marker-alt"></i> {{ checkin.area.name }}
+                            </div>
+                            <div class="checkin-coordinates">
+                                {{ checkin.lat|floatformat:4 }}, {{ checkin.lng|floatformat:4 }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="view-all">
+                        <a href="{% url 'checkin:history' %}" class="btn btn-outline">
+                            <i class="fas fa-eye"></i> Xem tất cả
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Chưa có check-in nào</p>
+                        <a href="{% url 'checkin:action' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Check-in ngay
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard/personal.js' %}"></script>
+{% endblock %}

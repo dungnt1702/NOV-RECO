@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{% if area %}Chỉnh sửa Khu vực{% else %}Thêm Khu vực Mới{% endif %} - NOV-RECO
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="{% static 'css/area/form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="area-form-page">
+    <div class="area-form-container">
+        <div class="area-form-header">
+            <h1 class="area-form-title">
+                <i class="fas fa-{% if area %}edit{% else %}plus{% endif %}"></i> 
+                {% if area %}Chỉnh sửa Khu vực{% else %}Thêm Khu vực Mới{% endif %}
+            </h1>
+            <p class="area-form-subtitle">
+                {% if area %}Cập nhật thông tin khu vực{% else %}Tạo khu vực check-in mới{% endif %}
+            </p>
+        </div>
+
+        <div class="area-form-content">
+            <div class="area-form-grid">
+                <!-- Form Section -->
+                <div class="area-form-section">
+                    <h3>
+                        <i class="fas fa-edit"></i> Thông tin Khu vực
+                    </h3>
+                    <form id="areaFormElement">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="name">Tên khu vực *</label>
+                            <input type="text" id="name" name="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Mô tả</label>
+                            <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="radius_m">Bán kính (mét) *</label>
+                            <input type="number" id="radius_m" name="radius_m" class="form-control" value="100" min="10" max="10000" required>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="is_active" name="is_active" checked> 
+                                Khu vực hoạt động
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Map Section -->
+                <div class="area-form-section">
+                    <h3>
+                        <i class="fas fa-map"></i> Vị trí Khu vực
+                    </h3>
+                    <div id="map" class="map-container"></div>
+                    
+                    <!-- Location Input Methods -->
+                    <div class="location-methods">
+                        <div class="location-method">
+                            <h4><i class="fas fa-mouse-pointer"></i> Chọn trên bản đồ</h4>
+                            <p>Nhấp vào bản đồ để chọn vị trí khu vực</p>
+                        </div>
+                        
+                        <div class="location-method">
+                            <h4><i class="fas fa-location-arrow"></i> Định vị GPS</h4>
+                            <button type="button" id="getCurrentLocationBtn" class="btn btn-info">
+                                <i class="fas fa-location-arrow"></i> Lấy vị trí hiện tại
+                            </button>
+                        </div>
+                        
+                        <div class="location-method">
+                            <h4><i class="fas fa-keyboard"></i> Nhập tọa độ</h4>
+                            <div class="coordinate-inputs">
+                                <div class="form-group">
+                                    <label for="lat">Vĩ độ *</label>
+                                    <input type="number" id="lat" name="lat" class="form-control" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lng">Kinh độ *</label>
+                                    <input type="number" id="lng" name="lng" class="form-control" step="any" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="area-form-actions">
+                <button type="button" id="saveAreaBtn" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Lưu Khu vực
+                </button>
+                <a href="{% url 'area:list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'js/area/form.js' %}"></script>
+{% endblock %}

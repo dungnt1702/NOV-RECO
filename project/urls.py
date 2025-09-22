@@ -13,7 +13,7 @@ urlpatterns = (
             TemplateView.as_view(template_name="home.html"),
             name="home",
         ),
-        path("checkin/", include("checkin.urls")),  # UI + APIs for check-in
+        path("", include("checkin.urls")),  # All modules at root level
         path("users/", include("users.urls")),  # User management
     ]
     + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

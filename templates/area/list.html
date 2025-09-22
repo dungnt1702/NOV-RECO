@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Danh sách Khu vực - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/area/list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="area-list-page">
+    <div class="area-list-container">
+        <div class="area-list-header">
+            <h1 class="area-list-title">
+                <i class="fas fa-map-marked-alt"></i> Danh sách Khu vực
+            </h1>
+            <p class="area-list-subtitle">
+                Quản lý các khu vực check-in trong hệ thống
+            </p>
+        </div>
+
+        <div class="area-list-content">
+            <!-- Action Buttons -->
+            <div class="area-list-actions">
+                <a href="{% url 'area:form' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Thêm Khu vực Mới
+                </a>
+                <button id="updateCheckinsBtn" class="btn btn-success">
+                    <i class="fas fa-sync"></i> Cập nhật Check-in
+                </button>
+            </div>
+
+            <!-- Filters and Controls -->
+            <div class="area-list-controls">
+                <div class="filter-group">
+                    <label for="statusFilter">Trạng thái:</label>
+                    <select id="statusFilter" class="form-control">
+                        <option value="">Tất cả</option>
+                        <option value="active">Hoạt động</option>
+                        <option value="inactive">Tạm dừng</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="searchInput">Tìm kiếm:</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Tên khu vực...">
+                </div>
+                <div class="filter-group">
+                    <label for="itemsPerPage">Hiển thị:</label>
+                    <select id="itemsPerPage" class="form-control">
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Areas List -->
+            <div class="area-list-section">
+                <div id="areasList" class="areas-list">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div id="pagination" class="pagination-container">
+                <!-- Pagination will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/area/list.js' %}"></script>
+{% endblock %}
