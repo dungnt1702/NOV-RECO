@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Load .env file
 load_dotenv(BASE_DIR / '.env')
@@ -10,25 +10,10 @@ load_dotenv(BASE_DIR / '.env')
 # Environment Configuration
 ENVIRONMENT = os.environ.get("DJANGO_ENVIRONMENT", "local")
 
-# Load environment-specific settings
-if ENVIRONMENT == "production":
-    # Production settings
-    SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
-    if not SECRET_KEY:
-        raise ValueError("DJANGO_SECRET_KEY environment variable is required in production")
-    DEBUG = False
-    ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
-elif ENVIRONMENT == "test":
-    # Test/Staging settings
-    SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "test-secret-key-change-me")
-    DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
-    ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(",")
-else:
-    # Local development settings
-    SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key-change-me")
-    DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
-    ALLOWED_HOSTS = ["*"]
+# Security
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key-change-me")
 
+# Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -44,17 +29,17 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     # Local apps
-    "checkin",
-    "area",
-    "employee", 
-    "dashboard",
-    "personal",
-    "users",
+    "apps.checkin",
+    "apps.area",
+    "apps.employee", 
+    "apps.dashboard",
+    "apps.personal",
+    "apps.users",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "checkin.middleware.FaviconMiddleware",
+    "apps.checkin.middleware.FaviconMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -64,7 +49,7 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 ]
 
-ROOT_URLCONF = "project.urls"
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
@@ -82,7 +67,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "project.wsgi.application"
+WSGI_APPLICATION = "config.wsgi.application"
 
 # Database Configuration
 DATABASE_ENGINE = os.environ.get("DATABASE_ENGINE", "django.db.backends.sqlite3")
@@ -127,6 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Internationalization
 LANGUAGE_CODE = os.environ.get("LANGUAGE_CODE", "vi")
 TIME_ZONE = os.environ.get("TIME_ZONE", "Asia/Ho_Chi_Minh")
 USE_I18N = True
@@ -149,7 +135,6 @@ if isinstance(MEDIA_ROOT, str) and not MEDIA_ROOT.startswith("/"):
     MEDIA_ROOT = BASE_DIR / MEDIA_ROOT
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 
 # django-allauth
 SITE_ID = int(os.environ.get("SITE_ID", "1"))
@@ -198,28 +183,6 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "0") == "1"
 
-# Security Settings (applied based on environment)
-if ENVIRONMENT == "production":
-    # Strict security for production
-    SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "1") == "1"
-    SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", "31536000"))
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get("SECURE_HSTS_INCLUDE_SUBDOMAINS", "1") == "1"
-    SECURE_HSTS_PRELOAD = os.environ.get("SECURE_HSTS_PRELOAD", "1") == "1"
-    SECURE_CONTENT_TYPE_NOSNIFF = os.environ.get("SECURE_CONTENT_TYPE_NOSNIFF", "1") == "1"
-    SECURE_BROWSER_XSS_FILTER = os.environ.get("SECURE_BROWSER_XSS_FILTER", "1") == "1"
-    SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "1") == "1"
-    CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", "1") == "1"
-else:
-    # Relaxed security for local development
-    SECURE_SSL_REDIRECT = False
-    SECURE_HSTS_SECONDS = 0
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-    SECURE_HSTS_PRELOAD = False
-    SECURE_CONTENT_TYPE_NOSNIFF = False
-    SECURE_BROWSER_XSS_FILTER = False
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
-
 # Logging Configuration
 # Create logs directory if it doesn't exist
 LOGS_DIR = BASE_DIR / 'logs'
@@ -254,12 +217,12 @@ LOGGING = {
             'handlers': ['console', 'file'] if ENVIRONMENT in ["production", "test"] else ['console'],
             'level': os.environ.get("LOG_LEVEL", "INFO" if ENVIRONMENT in ["production", "test"] else "DEBUG"),
         },
-        'checkin': {
+        'apps.checkin': {
             'handlers': ['console', 'file'] if ENVIRONMENT in ["production", "test"] else ['console'],
             'level': os.environ.get("LOG_LEVEL", "INFO" if ENVIRONMENT in ["production", "test"] else "DEBUG"),
             'propagate': False,
         },
-        'users': {
+        'apps.users': {
             'handlers': ['console', 'file'] if ENVIRONMENT in ["production", "test"] else ['console'],
             'level': os.environ.get("LOG_LEVEL", "INFO" if ENVIRONMENT in ["production", "test"] else "DEBUG"),
             'propagate': False,

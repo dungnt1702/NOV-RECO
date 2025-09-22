@@ -23,6 +23,12 @@
             <!-- Filters and Controls -->
             <div class="list-controls">
                 <div class="filter-group">
+                    <label for="departmentFilter">Phòng ban:</label>
+                    <select id="departmentFilter" class="form-control">
+                        <option value="">Tất cả phòng ban</option>
+                    </select>
+                </div>
+                <div class="filter-group">
                     <label for="userFilter">Nhân viên:</label>
                     <select id="userFilter" class="form-control">
                         <option value="">Tất cả nhân viên</option>
@@ -51,9 +57,10 @@
                         <option value="100">100</option>
                     </select>
                 </div>
-                <div class="filter-group">
-                    <button id="applyFilters" class="btn btn-primary">
-                        <i class="fas fa-filter"></i> Lọc
+                <div class="filter-group filter-button-group">
+                    <label for="applyFilters">Lọc:</label>
+                    <button id="applyFilters" class="btn btn-primary filter-btn">
+                        <i class="fa-solid fa-filter"></i>
                     </button>
                 </div>
             </div>
@@ -64,18 +71,32 @@
                 <div id="desktopTable" class="desktop-table-view">
                     <div class="table-container">
                         <table class="checkin-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nhân viên</th>
-                                    <th>Khu vực</th>
-                                    <th>Tọa độ</th>
-                                    <th>Khoảng cách</th>
-                                    <th>Thời gian</th>
-                                    <th>Ghi chú</th>
-                                    <th>Ảnh</th>
-                                </tr>
-                            </thead>
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-sort="id">
+                                ID <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="user_name">
+                                Nhân viên <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="area_name">
+                                Khu vực <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="lat">
+                                Tọa độ <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="distance_m">
+                                Khoảng cách <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable active" data-sort="created_at">
+                                Thời gian <i class="fas fa-sort-down sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="note">
+                                Ghi chú <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th>Ảnh</th>
+                        </tr>
+                    </thead>
                             <tbody id="checkins-table">
                                 <tr>
                                     <td colspan="8" class="loading">

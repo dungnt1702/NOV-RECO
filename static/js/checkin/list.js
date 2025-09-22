@@ -3,6 +3,7 @@ let allCheckins = [];
 let currentPage = 1;
 let totalPages = 1;
 let itemsPerPage = 25;
+let currentSort = { field: 'created_at', direction: 'desc' };
 
 console.log('Checkin list JS loaded');
 
@@ -56,13 +57,18 @@ async function loadCheckins() {
       const data = await response.json();
       console.log('Data received:', data);
       allCheckins = data.results || [];
+      window.originalCheckins = allCheckins; // Store original data for filtering
+      
+      // Initialize sort icons
+      updateSortIcons(currentSort.field, currentSort.direction);
       
       // Render checkins with pagination
       renderCheckinsTable(allCheckins);
       updatePagination();
       
       console.log('Checkins loaded:', allCheckins.length);
-      loadUsers();
+      loadDepartments();
+      loadAreas();
     } else {
       console.error('API error:', response.status, response.statusText);
       // Use sample data for demonstration when API fails
@@ -81,11 +87,79 @@ async function loadCheckins() {
   }
 }
 
+// Sorting functions
+function sortCheckins(checkins, field, direction) {
+  return [...checkins].sort((a, b) => {
+    let aVal = a[field];
+    let bVal = b[field];
+    
+    // Handle different data types
+    if (field === 'created_at') {
+      aVal = new Date(aVal);
+      bVal = new Date(bVal);
+    } else if (field === 'id' || field === 'distance_m' || field === 'lat' || field === 'lng') {
+      aVal = parseFloat(aVal) || 0;
+      bVal = parseFloat(bVal) || 0;
+    } else {
+      aVal = String(aVal || '').toLowerCase();
+      bVal = String(bVal || '').toLowerCase();
+    }
+    
+    if (direction === 'asc') {
+      return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+    } else {
+      return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+    }
+  });
+}
+
+function updateSortIcons(field, direction) {
+  // Remove active class from all sortable headers
+  document.querySelectorAll('.checkin-table th.sortable').forEach(th => {
+    th.classList.remove('active');
+    const icon = th.querySelector('.sort-icon');
+    if (icon) {
+      icon.className = 'fas fa-sort sort-icon';
+    }
+  });
+  
+  // Add active class to current sort field
+  const activeTh = document.querySelector(`.checkin-table th[data-sort="${field}"]`);
+  if (activeTh) {
+    activeTh.classList.add('active');
+    const icon = activeTh.querySelector('.sort-icon');
+    if (icon) {
+      icon.className = `fas fa-sort-${direction === 'asc' ? 'up' : 'down'} sort-icon`;
+    }
+  }
+}
+
+function handleSort(field) {
+  // Toggle direction if same field, otherwise set to desc
+  if (currentSort.field === field) {
+    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentSort.direction = 'desc';
+  }
+  currentSort.field = field;
+  
+  // Update icons
+  updateSortIcons(field, currentSort.direction);
+  
+  // Sort and re-render
+  const sortedCheckins = sortCheckins(allCheckins, field, currentSort.direction);
+  renderCheckinsTable(sortedCheckins);
+  updatePagination();
+}
+
 function renderCheckinsTable(items = null) {
+  // Use provided items or sort allCheckins
+  const dataToRender = items || sortCheckins(allCheckins, currentSort.field, currentSort.direction);
+  
   // Calculate pagination
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const checkinsToRender = items ? items.slice(startIndex, endIndex) : allCheckins.slice(startIndex, endIndex);
+  const checkinsToRender = dataToRender.slice(startIndex, endIndex);
   
   console.log('Rendering checkins table, count:', checkinsToRender.length);
   
@@ -104,8 +178,8 @@ function renderCheckinsTable(items = null) {
               <div class="user-email">${checkin.user_email || ''}</div>
             </div>
           </td>
-          <td>
-            <span class="area-badge">${checkin.area_name || 'N/A'}</span>
+          <td class="area-cell">
+            <i class="fas fa-map-marker-alt"></i>${checkin.area_name || 'N/A'}
           </td>
           <td class="location-cell">
             ${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}
@@ -225,7 +299,30 @@ function renderMobileCards(items = null) {
   }
 }
 
-async function loadUsers() {
+async function loadDepartments() {
+  try {
+    let response;
+    if (typeof api === 'function') {
+      response = await api('/users/api/departments/');
+    } else {
+      response = await fetch('/users/api/departments/', {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+    if (response.ok) {
+      const departments = await response.json();
+      populateDepartmentFilter(departments);
+    }
+  } catch (error) {
+    console.error('Error loading departments:', error);
+  }
+}
+
+async function loadAllUsers() {
   try {
     let response;
     if (typeof api === 'function') {
@@ -240,7 +337,8 @@ async function loadUsers() {
       });
     }
     if (response.ok) {
-      const users = await response.json();
+      const data = await response.json();
+      const users = Array.isArray(data) ? data : data.results || [];
       populateUserFilter(users);
     }
   } catch (error) {
@@ -248,43 +346,120 @@ async function loadUsers() {
   }
 }
 
+async function loadUsersByDepartment(departmentId) {
+  try {
+    let response;
+    if (typeof api === 'function') {
+      response = await api(`/users/api/?department=${departmentId}`);
+    } else {
+      response = await fetch(`/users/api/?department=${departmentId}`, {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+    if (response.ok) {
+      const data = await response.json();
+      const users = Array.isArray(data) ? data : data.results || [];
+      populateUserFilter(users);
+    }
+  } catch (error) {
+    console.error('Error loading users by department:', error);
+  }
+}
+
+async function loadAreas() {
+  try {
+    let response;
+    if (typeof api === 'function') {
+      response = await api('/area/api/');
+    } else {
+      response = await fetch('/area/api/', {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+    if (response.ok) {
+      const data = await response.json();
+      const areas = data.results || data; // Handle both paginated and direct array responses
+      populateAreaFilter(areas);
+    }
+  } catch (error) {
+    console.error('Error loading areas:', error);
+  }
+}
+
+function populateDepartmentFilter(departments) {
+  const departmentFilter = document.getElementById('departmentFilter');
+  if (departmentFilter) {
+    departmentFilter.innerHTML = '<option value="">Tất cả phòng ban</option>' +
+      departments.map(dept => `<option value="${dept.id}">${dept.name}</option>`).join('');
+    
+    // Add event listener for department change
+    departmentFilter.addEventListener('change', function() {
+      const departmentId = this.value;
+      if (departmentId) {
+        loadUsersByDepartment(departmentId);
+      } else {
+        loadAllUsers();
+      }
+    });
+  }
+}
+
 function populateUserFilter(users) {
-  const userFilter = document.getElementById('user-filter');
+  const userFilter = document.getElementById('userFilter');
   if (userFilter) {
-    userFilter.innerHTML = '<option value="">Tất cả người dùng</option>' +
-      users.map(user => `<option value="${user.id}">${user.display_name}</option>`).join('');
+    userFilter.innerHTML = '<option value="">Tất cả nhân viên</option>' +
+      users.map(user => `<option value="${user.id}">${user.first_name} ${user.last_name}</option>`).join('');
+  }
+}
+
+function populateAreaFilter(areas) {
+  const areaFilter = document.getElementById('areaFilter');
+  if (areaFilter) {
+    areaFilter.innerHTML = '<option value="">Tất cả khu vực</option>' +
+      areas.map(area => `<option value="${area.id}">${area.name}</option>`).join('');
   }
 }
 
 function applyFilters() {
-  const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
-  const dateFrom = document.getElementById('date-from')?.value || '';
-  const dateTo = document.getElementById('date-to')?.value || '';
-  const userId = document.getElementById('user-filter')?.value || '';
+  const dateFrom = document.getElementById('dateFrom')?.value || '';
+  const dateTo = document.getElementById('dateTo')?.value || '';
+  const departmentId = document.getElementById('departmentFilter')?.value || '';
+  const userId = document.getElementById('userFilter')?.value || '';
+  const areaId = document.getElementById('areaFilter')?.value || '';
 
-  const filtered = allCheckins.filter(checkin => {
-    // Search filter
-    if (searchTerm && !checkin.user_name.toLowerCase().includes(searchTerm) &&
-        !checkin.area_name.toLowerCase().includes(searchTerm) &&
-        !(checkin.note && checkin.note.toLowerCase().includes(searchTerm))) {
-      return false;
-    }
-
+  // Get original data (not filtered data)
+  const originalData = window.originalCheckins || allCheckins;
+  
+  const filtered = originalData.filter(checkin => {
     // Date filter
     if (dateFrom && checkin.created_at < dateFrom) return false;
     if (dateTo && checkin.created_at > dateTo + 'T23:59:59') return false;
 
+    // Department filter
+    if (departmentId && checkin.user_department_id !== parseInt(departmentId)) return false;
+
     // User filter
     if (userId && checkin.user_id !== parseInt(userId)) return false;
+
+    // Area filter
+    if (areaId && checkin.area_id !== parseInt(areaId)) return false;
 
     return true;
   });
 
-  // Update pagination component with filtered data
-  if (window.paginationComponent) {
-    window.paginationComponent.setData(filtered);
-    renderCheckinsTable(window.paginationComponent.getCurrentPageItems());
-  }
+  // Update current page to 1 and re-render
+  currentPage = 1;
+  allCheckins = filtered;
+  renderCheckinsTable();
+  updatePagination();
 }
 
 // Clear all filters
@@ -439,6 +614,16 @@ document.addEventListener('DOMContentLoaded', function() {
   // Load checkins
   loadCheckins();
   
+  // Add event listeners for sorting
+  document.querySelectorAll('.checkin-table th.sortable').forEach(th => {
+    th.addEventListener('click', function() {
+      const field = this.getAttribute('data-sort');
+      if (field) {
+        handleSort(field);
+      }
+    });
+  });
+  
   // Add event listeners for filters
   const applyFiltersBtn = document.getElementById('applyFilters');
   if (applyFiltersBtn) {
@@ -453,5 +638,30 @@ document.addEventListener('DOMContentLoaded', function() {
       renderCheckinsTable();
       updatePagination();
     });
+  }
+
+  // Department filter change - handled in populateDepartmentFilter
+
+  // User filter change
+  const userFilter = document.getElementById('userFilter');
+  if (userFilter) {
+    userFilter.addEventListener('change', applyFilters);
+  }
+
+  // Area filter change
+  const areaFilter = document.getElementById('areaFilter');
+  if (areaFilter) {
+    areaFilter.addEventListener('change', applyFilters);
+  }
+
+  // Date filters
+  const dateFrom = document.getElementById('dateFrom');
+  if (dateFrom) {
+    dateFrom.addEventListener('change', applyFilters);
+  }
+
+  const dateTo = document.getElementById('dateTo');
+  if (dateTo) {
+    dateTo.addEventListener('change', applyFilters);
   }
 });

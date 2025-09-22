@@ -49,16 +49,24 @@
                 <div id="desktopTable" class="desktop-table-view" style="display: none;">
                     <div class="table-container">
                         <table class="checkin-table">
-                            <thead>
-                                <tr>
-                                    <th>Thời gian</th>
-                                    <th>Khu vực</th>
-                                    <th>Vị trí</th>
-                                    <th>Ghi chú</th>
-                                    <th>Ảnh</th>
-                                    <th>Trạng thái</th>
-                                </tr>
-                            </thead>
+                    <thead>
+                        <tr>
+                            <th class="sortable active" data-sort="created_at">
+                                Thời gian <i class="fas fa-sort-down sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="area_name">
+                                Khu vực <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="lat">
+                                Vị trí <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="note">
+                                Ghi chú <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th>Ảnh</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
                             <tbody id="checkinTableBody">
                                 <!-- Table rows will be inserted here by JavaScript -->
                             </tbody>

@@ -402,21 +402,10 @@ async function openCamera() {
                 switchBtn.textContent = '🔄 Đổi camera';
                 console.log('Switch camera button shown - mobile device detected');
             } else {
-                // On desktop, check for multiple cameras
-                checkMultipleCameras().then(hasMultiple => {
-                    if (hasMultiple) {
-                        switchBtn.style.display = 'inline-block';
-                        switchBtn.textContent = '🔄 Đổi camera';
-                        console.log('Switch camera button shown - multiple cameras detected');
-                    } else {
-                        switchBtn.style.display = 'none';
-                        console.log('Switch camera button hidden - only one camera detected');
-                    }
-                }).catch(error => {
-                    console.warn('Could not detect camera count, showing switch button anyway:', error);
-                    switchBtn.style.display = 'inline-block';
-                    switchBtn.textContent = '🔄 Đổi camera';
-                });
+                // On desktop, always show switch camera button
+                switchBtn.style.display = 'inline-block';
+                switchBtn.textContent = '🔄 Đổi camera';
+                console.log('Switch camera button shown - desktop device');
             }
         } else {
             console.error('Switch camera button not found!');
@@ -627,7 +616,9 @@ function updateSubmitButtonState() {
 
 // Handle form submission
 async function handleSubmit(e) {
-    e.preventDefault();
+    if (e) {
+        e.preventDefault();
+    }
     
     // Check if we have required data
     if (!currentPosition || !currentPhoto) {
@@ -653,7 +644,7 @@ async function handleSubmit(e) {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         formData.append('csrfmiddlewaretoken', csrfToken);
         
-        const response = await fetch('/checkin/submit/', {
+        const response = await fetch('/submit/', {
             method: 'POST',
             body: formData,
             credentials: 'include'

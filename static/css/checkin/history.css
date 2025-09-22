@@ -157,6 +157,47 @@
     font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    position: relative;
+}
+
+/* Sortable column styles */
+.checkin-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.checkin-table th.sortable:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.checkin-table th.sortable.active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.checkin-table th.sortable .sort-icon {
+    margin-left: 8px;
+    font-size: 0.75rem;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.checkin-table th.sortable:hover .sort-icon {
+    opacity: 1;
+}
+
+.checkin-table th.sortable.active .sort-icon {
+    opacity: 1;
+    color: #FFD700;
+}
+
+.checkin-table th.sortable .sort-icon.fa-sort-up {
+    color: #4CAF50;
+}
+
+.checkin-table th.sortable .sort-icon.fa-sort-down {
+    color: #FF9800;
 }
 
 .checkin-table tbody tr {

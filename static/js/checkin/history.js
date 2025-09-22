@@ -4,6 +4,7 @@ let allCheckins = [];
 let filteredCheckins = [];
 let currentPage = 1;
 let totalPages = 1;
+let currentSort = { field: 'created_at', direction: 'desc' };
 
 // Update view visibility based on screen size
 function updateViewVisibility() {
@@ -36,6 +37,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     loadCheckins();
     setupEventListeners();
+    
+    // Add event listeners for sorting
+    document.querySelectorAll('.checkin-table th.sortable').forEach(th => {
+        th.addEventListener('click', function() {
+            const field = this.getAttribute('data-sort');
+            if (field) {
+                handleSort(field);
+            }
+        });
+    });
     
     // Listen for window resize to update view
     window.addEventListener('resize', updateViewVisibility);
@@ -87,6 +98,9 @@ async function loadCheckins() {
             allCheckins = data.results || [];
             filteredCheckins = [...allCheckins];
             
+            // Initialize sort icons
+            updateSortIcons(currentSort.field, currentSort.direction);
+            
             updatePagination(data);
             renderCheckins();
             loadAreas();
@@ -103,6 +117,72 @@ async function loadCheckins() {
         renderCheckins([]);
         showAlert('Lỗi tải lịch sử check-in. Vui lòng kiểm tra kết nối mạng.', 'error');
     }
+}
+
+// Sorting functions
+function sortCheckins(checkins, field, direction) {
+    return [...checkins].sort((a, b) => {
+        let aVal = a[field];
+        let bVal = b[field];
+        
+        // Handle different data types
+        if (field === 'created_at') {
+            aVal = new Date(aVal);
+            bVal = new Date(bVal);
+        } else if (field === 'lat' || field === 'lng') {
+            aVal = parseFloat(aVal) || 0;
+            bVal = parseFloat(bVal) || 0;
+        } else {
+            aVal = String(aVal || '').toLowerCase();
+            bVal = String(bVal || '').toLowerCase();
+        }
+        
+        if (direction === 'asc') {
+            return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+        } else {
+            return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+        }
+    });
+}
+
+function updateSortIcons(field, direction) {
+    // Remove active class from all sortable headers
+    document.querySelectorAll('.checkin-table th.sortable').forEach(th => {
+        th.classList.remove('active');
+        const icon = th.querySelector('.sort-icon');
+        if (icon) {
+            icon.className = 'fas fa-sort sort-icon';
+        }
+    });
+    
+    // Add active class to current sort field
+    const activeTh = document.querySelector(`.checkin-table th[data-sort="${field}"]`);
+    if (activeTh) {
+        activeTh.classList.add('active');
+        const icon = activeTh.querySelector('.sort-icon');
+        if (icon) {
+            icon.className = `fas fa-sort-${direction === 'asc' ? 'up' : 'down'} sort-icon`;
+        }
+    }
+}
+
+function handleSort(field) {
+    // Toggle direction if same field, otherwise set to desc
+    if (currentSort.field === field) {
+        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSort.direction = 'desc';
+    }
+    currentSort.field = field;
+    
+    // Update icons
+    updateSortIcons(field, currentSort.direction);
+    
+    // Sort and re-render
+    const sortedCheckins = sortCheckins(allCheckins, field, currentSort.direction);
+    filteredCheckins = sortedCheckins;
+    renderCheckins();
+    updatePagination();
 }
 
 // Load areas for filter
@@ -288,8 +368,9 @@ function renderCheckins(checkins = null) {
     const mobileContainer = document.getElementById('checkinList');
     const tableBody = document.getElementById('checkinTableBody');
     
-    // Use provided checkins or filtered checkins
-    const checkinsToRender = checkins || filteredCheckins;
+    // Use provided checkins or sort filtered checkins
+    const dataToRender = checkins || sortCheckins(filteredCheckins, currentSort.field, currentSort.direction);
+    const checkinsToRender = dataToRender;
     console.log('Rendering history checkins, count:', checkinsToRender.length);
     
     if (checkinsToRender.length === 0) {

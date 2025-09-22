@@ -11,7 +11,7 @@
 <div class="users-page">
   <div class="page-header">
     <h1>{{ title }}</h1>
-    <a href="{% url 'users:user_list' %}" class="btn btn-secondary">
+    <a href="{% url 'users:list' %}" class="btn btn-secondary">
       ← Quay lại
     </a>
   </div>
@@ -183,7 +183,7 @@
         <button type="submit" class="btn btn-primary">
           {{ submit_text }}
         </button>
-        <a href="{% url 'users:user_list' %}" class="btn btn-secondary">
+        <a href="{% url 'users:list' %}" class="btn btn-secondary">
           Hủy
         </a>
       </div>
