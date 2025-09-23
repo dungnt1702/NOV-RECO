@@ -468,7 +468,13 @@ function populateUserFilter(users) {
     } else {
       console.log('Found users, showing user list');
       userFilter.innerHTML = '<option value="">Tất cả nhân viên</option>' +
-        users.map(user => `<option value="${user.id}">${user.first_name} ${user.last_name}</option>`).join('');
+        users.map(user => {
+          // Use full_name from API, otherwise construct from first_name and last_name
+          const fullName = user.full_name || 
+            (user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : 
+             user.first_name || user.last_name || user.username || 'Unknown User');
+          return `<option value="${user.id}">${fullName}</option>`;
+        }).join('');
     }
   } else {
     console.error('User filter element not found');
