@@ -226,6 +226,12 @@ def department_delete_view(request, dept_id):
 def user_list_api(request):
     """API danh sách người dùng"""
     users = User.objects.all()
+    
+    # Filter by department if provided
+    department_id = request.GET.get('department')
+    if department_id:
+        users = users.filter(department_id=department_id)
+    
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
 
