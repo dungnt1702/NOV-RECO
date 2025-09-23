@@ -4,101 +4,215 @@
 {% block title %}Tạo Khu vực Mới{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-4">
-    <h1 class="text-3xl font-bold mb-6 text-center">Tạo Khu vực Mới</h1>
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 col-xl-6">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="h2 mb-3 d-flex align-items-center justify-content-center">
+                    <i class="fas fa-map-marked-alt text-primary me-3"></i>
+                    Tạo Khu vực Mới
+                </h1>
+            </div>
 
-    <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
-        <form method="post" class="space-y-6">
-            {% csrf_token %}
-            
-            {% if form.errors %}
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">Lỗi!</strong>
-                    <span class="block sm:inline">Vui lòng kiểm tra lại các trường.</span>
-                    <ul class="mt-2 list-disc list-inside">
-                        {% for field in form %}
-                            {% for error in field.errors %}
-                                <li>{{ field.label }}: {{ error }}</li>
+            <!-- Form Card -->
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Lỗi!</strong>
+                                </div>
+                                <span class="d-block mt-1">Vui lòng kiểm tra lại các trường.</span>
+                                <ul class="mt-2 mb-0">
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
+                                            <li>{{ field.label }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <!-- Area Name -->
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                <i class="fas fa-tag text-primary me-2"></i>
+                                Tên khu vực <span class="text-danger">*</span>
+                            </label>
+                            {{ form.name }}
+                            {% if form.name.help_text %}
+                                <div class="form-text">{{ form.name.help_text }}</div>
+                            {% endif %}
+                            {% for error in form.name.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
                             {% endfor %}
-                        {% endfor %}
-                        {% for error in form.non_field_errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                <i class="fas fa-info-circle text-primary me-2"></i>
+                                Mô tả
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.help_text %}
+                                <div class="form-text">{{ form.description.help_text }}</div>
+                            {% endif %}
+                            {% for error in form.description.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Coordinates -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.lat.id_for_label }}" class="form-label">
+                                    <i class="fas fa-map-pin text-primary me-2"></i>
+                                    Vĩ độ (Latitude) <span class="text-danger">*</span>
+                                </label>
+                                {{ form.lat }}
+                                {% if form.lat.help_text %}
+                                    <div class="form-text">{{ form.lat.help_text }}</div>
+                                {% endif %}
+                                {% for error in form.lat.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.lng.id_for_label }}" class="form-label">
+                                    <i class="fas fa-map-pin text-primary me-2"></i>
+                                    Kinh độ (Longitude) <span class="text-danger">*</span>
+                                </label>
+                                {{ form.lng }}
+                                {% if form.lng.help_text %}
+                                    <div class="form-text">{{ form.lng.help_text }}</div>
+                                {% endif %}
+                                {% for error in form.lng.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Radius -->
+                        <div class="mb-3">
+                            <label for="{{ form.radius_m.id_for_label }}" class="form-label">
+                                <i class="fas fa-expand-arrows-alt text-primary me-2"></i>
+                                Bán kính (mét) <span class="text-danger">*</span>
+                            </label>
+                            {{ form.radius_m }}
+                            {% if form.radius_m.help_text %}
+                                <div class="form-text">{{ form.radius_m.help_text }}</div>
+                            {% endif %}
+                            {% for error in form.radius_m.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Is Active -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label for="{{ form.is_active.id_for_label }}" class="form-check-label">
+                                    <i class="fas fa-toggle-on text-success me-2"></i>
+                                    Khu vực hoạt động
+                                </label>
+                            </div>
+                            {% for error in form.is_active.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'area:list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Hủy
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                Tạo Khu vực
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            {% endif %}
-
-            <div>
-                <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700">Tên khu vực:</label>
-                {{ form.name }}
-                {% if form.name.help_text %}
-                    <p class="mt-1 text-sm text-gray-500">{{ form.name.help_text }}</p>
-                {% endif %}
-                {% for error in form.name.errors %}
-                    <p class="text-red-500 text-xs italic">{{ error }}</p>
-                {% endfor %}
             </div>
-
-            <div>
-                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700">Mô tả:</label>
-                {{ form.description }}
-                {% if form.description.help_text %}
-                    <p class="mt-1 text-sm text-gray-500">{{ form.description.help_text }}</p>
-                {% endif %}
-                {% for error in form.description.errors %}
-                    <p class="text-red-500 text-xs italic">{{ error }}</p>
-                {% endfor %}
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="{{ form.lat.id_for_label }}" class="block text-sm font-medium text-gray-700">Vĩ độ (Latitude):</label>
-                    {{ form.lat }}
-                    {% if form.lat.help_text %}
-                        <p class="mt-1 text-sm text-gray-500">{{ form.lat.help_text }}</p>
-                    {% endif %}
-                    {% for error in form.lat.errors %}
-                        <p class="text-red-500 text-xs italic">{{ error }}</p>
-                    {% endfor %}
-                </div>
-                <div>
-                    <label for="{{ form.lng.id_for_label }}" class="block text-sm font-medium text-gray-700">Kinh độ (Longitude):</label>
-                    {{ form.lng }}
-                    {% if form.lng.help_text %}
-                        <p class="mt-1 text-sm text-gray-500">{{ form.lng.help_text }}</p>
-                    {% endif %}
-                    {% for error in form.lng.errors %}
-                        <p class="text-red-500 text-xs italic">{{ error }}</p>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div>
-                <label for="{{ form.radius_m.id_for_label }}" class="block text-sm font-medium text-gray-700">Bán kính (mét):</label>
-                {{ form.radius_m }}
-                {% if form.radius_m.help_text %}
-                    <p class="mt-1 text-sm text-gray-500">{{ form.radius_m.help_text }}</p>
-                {% endif %}
-                {% for error in form.radius_m.errors %}
-                    <p class="text-red-500 text-xs italic">{{ error }}</p>
-                {% endfor %}
-            </div>
-
-            <div>
-                <label for="{{ form.is_active.id_for_label }}" class="inline-flex items-center">
-                    {{ form.is_active }}
-                    <span class="ml-2 text-sm font-medium text-gray-700">Khu vực hoạt động</span>
-                </label>
-                {% for error in form.is_active.errors %}
-                    <p class="text-red-500 text-xs italic">{{ error }}</p>
-                {% endfor %}
-            </div>
-
-            <div class="flex justify-end space-x-4">
-                <a href="{% url 'area:list' %}" class="btn btn-secondary">Hủy</a>
-                <button type="submit" class="btn btn-primary">Tạo Khu vực</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
+
+<style>
+/* Custom CSS for area create form */
+.area-create-form .form-control,
+.area-create-form .form-select {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    padding: 8px 12px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.area-create-form .form-control:focus,
+.area-create-form .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.area-create-form .form-label {
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #495057;
+}
+
+.area-create-form .card {
+    border: none;
+    border-radius: 12px;
+}
+
+.area-create-form .alert {
+    border-radius: 8px;
+    border: none;
+}
+
+.area-create-form .btn {
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.area-create-form .form-check-input {
+    margin-top: 4px;
+}
+
+.area-create-form .gap-2 > * + * {
+    margin-left: 8px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add Bootstrap classes to form fields
+    const formControls = document.querySelectorAll('input[type="text"], input[type="number"], input[type="email"], textarea, select');
+    formControls.forEach(function(control) {
+        if (control.type === 'checkbox') {
+            control.classList.add('form-check-input');
+        } else {
+            control.classList.add('form-control');
+        }
+    });
+    
+    // Add form wrapper class for custom styles
+    const form = document.querySelector('form');
+    if (form) {
+        form.classList.add('area-create-form');
+    }
+});
+</script>
 {% endblock %}
