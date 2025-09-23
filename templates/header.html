@@ -2,19 +2,21 @@
 {% load static %}
 <nav class="navbar">
     <div class="nav-container">
-        {% if user.is_authenticated %}
-        <button class="nav-toggle" id="nav-toggle">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-            </svg>
-        </button>
-        {% endif %}
-        
-        <a href="/" class="nav-logo">
-            <img src="{% static 'logo.svg' %}" alt="NOV-RECO Logo">
-            <span>NOV-RECO</span>
-        </a>
-        
+        <!-- Left side: Hamburger + Logo -->
+        <div class="nav-left">
+            {% if user.is_authenticated %}
+            <button class="nav-toggle" id="nav-toggle">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            {% endif %}
+            
+            <a href="/" class="nav-logo">
+                <img src="{% static 'logo.svg' %}" alt="NOV-RECO Logo">
+                <span>NOV-RECO</span>
+            </a>
+        </div>        
         <ul class="nav-menu" id="nav-menu">
             {% if user.is_authenticated %}
                 <!-- Quản lý Check-in -->
@@ -24,13 +26,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                         </svg>
                         Quản lý Check-in
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="{% url 'checkin_page' %}">
+                            <a href="{% url 'checkin:action' %}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
@@ -75,9 +74,6 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                             </svg>
                             Quản lý Nhân sự
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
                         </a>
                         <ul class="dropdown-menu">
                             <li>
@@ -101,43 +97,54 @@
                 {% endif %}
                 
                 <!-- Admin Panel -->
-                {% if user.is_superuser %}
+                {% if user.is_superuser or user.is_admin_user or user.is_manager_user %}
                     <li>
                         <a href="/admin/">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
-                            Admin Panel
+                            Admin
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'automation_test:dashboard' %}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            Test
                         </a>
                     </li>
                 {% endif %}
             {% endif %}
         </ul>
         
-        <div class="user-info">
-            {% if user.is_authenticated %}
-                <a href="{% url 'personal:profile' %}" class="user-profile-link" title="Thông tin cá nhân">
-                    <div class="user-avatar">
-                        {% if user.avatar %}
-                            <img src="{{ user.avatar.url }}" alt="Avatar">
-                        {% else %}
-                            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
-                        {% endif %}
-                    </div>
-                </a>
-                <a href="/accounts/logout/" class="logout-btn" title="Đăng xuất">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                </a>
-            {% else %}
-                <a href="/accounts/login/" class="logout-btn" title="Đăng nhập">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-                    </svg>
-                </a>
-            {% endif %}
+        <!-- Right side: User info -->
+        <div class="nav-right">
+            <div class="user-info">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'personal:profile' %}" class="user-profile-link" title="Thông tin cá nhân">
+                        <div class="user-avatar">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" alt="Avatar">
+                            {% else %}
+                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            {% endif %}
+                        </div>
+                    </a>
+                    <a href="/accounts/logout/" class="logout-btn" title="Đăng xuất">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                    </a>
+                {% else %}
+                    <a href="/accounts/login/" class="logout-btn" title="Đăng nhập">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                        </svg>
+                    </a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </nav>

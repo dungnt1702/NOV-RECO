@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.area.models import Area
-from apps.checkin.serializers import AreaSerializer
+from .serializers import AreaSerializer
 from apps.checkin.decorators import role_required
 from apps.users.models import UserRole
 

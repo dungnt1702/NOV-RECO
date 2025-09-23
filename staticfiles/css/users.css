@@ -218,6 +218,8 @@
     display: none;
 }
 
+/* Show mobile view on mobile devices - moved to main responsive section */
+
 .users-page .user-card {
     background: var(--bg-primary);
     border: 1px solid var(--border-color);
@@ -232,14 +234,86 @@
     transform: translateY(-2px);
 }
 
+/* Card header layout: CSS Grid 2 columns (80% left, 20% right) */
 .users-page .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 80% 20%;
     padding: var(--spacing-lg);
-    background: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
+    align-items: start;
+    gap: var(--spacing-sm);
 }
+
+.users-page .header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+}
+
+.users-page .header-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+
+.users-page .user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.users-page .user-details {
+    flex: 1;
+}
+
+.users-page .user-name {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Simplified user email styling */
+.users-page .user-email {
+    margin: 0 0 4px 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.users-page .user-id {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* user-status removed - status is now inline with email */
+
+.users-page .status-badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.users-page .status-badge.active {
+    background: #22c55e;
+    color: white;
+}
+
+.users-page .status-badge.inactive {
+    background: #ef4444;
+    color: white;
+}
+
+/* Removed duplicate - already defined above with correct styling */
 
 .users-page .card-body {
     padding: var(--spacing-lg);
@@ -326,12 +400,12 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .desktop-view {
-        display: none;
+    .users-page .desktop-view {
+        display: none !important;
     }
     
-    .mobile-view {
-        display: block;
+    .users-page .mobile-view {
+        display: block !important;
     }
     
     .page-header {
@@ -413,7 +487,57 @@
     }
     
     .card-actions {
-        flex-direction: column;
+        flex-direction: row;
+        gap: var(--spacing-sm);
+    }
+    
+    .card-actions .btn {
+        flex: 1;
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.9rem;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    /* Mobile optimizations for 2-column header layout */
+    .users-page .card-header {
+        grid-template-columns: 75% 25%;
+        padding: var(--spacing-md);
+        gap: var(--spacing-xs);
+    }
+    
+    .users-page .header-left {
+        gap: var(--spacing-sm);
+    }
+    
+    .users-page .header-right {
+        justify-content: flex-end;
+        align-items: flex-start;
+    }
+    
+    .users-page .user-name {
+        font-size: 0.9rem;
+    }
+    
+    .users-page .user-email {
+        font-size: 0.8rem;
+    }
+    
+    .users-page .user-id {
+        font-size: 0.7rem;
+    }
+    
+    .users-page .status-badge {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        writing-mode: horizontal-tb;
+        text-align: center;
+    }
+    
+    .users-page .user-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
     }
     
 }

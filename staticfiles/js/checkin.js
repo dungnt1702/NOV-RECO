@@ -6,6 +6,7 @@ let marker;
 let currentPosition = null;
 let currentPhoto = null;
 let stream = null;
+let currentFacingMode = 'environment'; // 'environment' for back camera, 'user' for front camera
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
@@ -138,6 +139,7 @@ function setupEventListeners() {
     // Camera buttons
     const captureBtn = document.getElementById('btn-capture');
     const retakeBtn = document.getElementById('btn-retake');
+    const switchBtn = document.getElementById('btn-switch-camera');
     const cameraPreview = document.getElementById('camera-preview');
     
     if (captureBtn) {
@@ -163,6 +165,13 @@ function setupEventListeners() {
         retakeBtn.addEventListener('click', retakePhoto);
     } else {
         console.warn('Retake button not found');
+    }
+    
+    if (switchBtn) {
+        console.log('Switch camera button found, adding listener');
+        switchBtn.addEventListener('click', switchCamera);
+    } else {
+        console.warn('Switch camera button not found');
     }
     
     if (cameraPreview) {
@@ -332,9 +341,9 @@ async function openCamera() {
         
         stream = await navigator.mediaDevices.getUserMedia({
             video: { 
-                facingMode: 'environment',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
+                facingMode: currentFacingMode,
+                width: { ideal: 720 }, // Portrait width (smaller)
+                height: { ideal: 960 } // Portrait height (larger) - 3:4 ratio
             }
         });
         
@@ -361,12 +370,48 @@ async function openCamera() {
             cameraPreview.classList.add('has-photo', 'showing-video');
         }
         
-        // Show capture button
+        // Show capture and switch camera buttons
         const captureBtn = document.getElementById('btn-capture');
         const retakeBtn = document.getElementById('btn-retake');
+        const switchBtn = document.getElementById('btn-switch-camera');
+        
+        console.log('Camera buttons found:', {
+            capture: !!captureBtn,
+            retake: !!retakeBtn,
+            switch: !!switchBtn
+        });
         
         if (captureBtn) captureBtn.textContent = '📷 Chụp ảnh';
         if (retakeBtn) retakeBtn.style.display = 'none';
+        if (switchBtn) {
+            // Always show switch button on mobile, let user decide
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // On mobile, always show the button since most phones have front+back cameras
+                switchBtn.style.display = 'inline-block';
+                switchBtn.textContent = '🔄 Đổi camera';
+                console.log('Switch camera button shown - mobile device detected');
+            } else {
+                // On desktop, check for multiple cameras
+                checkMultipleCameras().then(hasMultiple => {
+                    if (hasMultiple) {
+                        switchBtn.style.display = 'inline-block';
+                        switchBtn.textContent = '🔄 Đổi camera';
+                        console.log('Switch camera button shown - multiple cameras detected');
+                    } else {
+                        switchBtn.style.display = 'none';
+                        console.log('Switch camera button hidden - only one camera detected');
+                    }
+                }).catch(error => {
+                    console.warn('Could not detect camera count, showing switch button anyway:', error);
+                    switchBtn.style.display = 'inline-block';
+                    switchBtn.textContent = '🔄 Đổi camera';
+                });
+            }
+        } else {
+            console.error('Switch camera button not found!');
+        }
         
         updateSubmitButtonState();
         console.log('Camera opened successfully');
@@ -434,9 +479,11 @@ function capturePhoto() {
         // Update buttons
         const captureBtn = document.getElementById('btn-capture');
         const retakeBtn = document.getElementById('btn-retake');
+        const switchBtn = document.getElementById('btn-switch-camera');
         
         if (captureBtn) captureBtn.textContent = '✅ Đã chụp';
         if (retakeBtn) retakeBtn.style.display = 'inline-block';
+        if (switchBtn) switchBtn.style.display = 'none';
         
         // Stop camera
         stopCamera();
@@ -465,6 +512,10 @@ function retakePhoto() {
     if (captureBtn) captureBtn.textContent = '📷 Chụp ảnh';
     if (retakeBtn) retakeBtn.style.display = 'none';
     
+    // Hide switch camera button when retaking
+    const switchBtn = document.getElementById('btn-switch-camera');
+    if (switchBtn) switchBtn.style.display = 'none';
+    
     updateSubmitButtonState();
 }
 
@@ -477,6 +528,74 @@ function stopCamera() {
             console.error('Error stopping camera:', error);
         }
         stream = null;
+    }
+}
+
+// Check if device has multiple cameras
+async function checkMultipleCameras() {
+    try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+            console.log('enumerateDevices not supported');
+            return true; // Assume multiple cameras if we can't check
+        }
+        
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        
+        console.log('Video devices found:', videoDevices.length, videoDevices);
+        
+        // Check if we have at least 2 cameras or if we can't determine (return true to be safe)
+        return videoDevices.length >= 2 || videoDevices.length === 0;
+        
+    } catch (error) {
+        console.error('Error checking camera devices:', error);
+        return true; // If we can't check, assume multiple cameras
+    }
+}
+
+// Switch camera (front/back)
+async function switchCamera() {
+    try {
+        // Stop current camera
+        stopCamera();
+        
+        // Switch facing mode
+        currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+        
+        // Show loading state
+        const switchBtn = document.getElementById('btn-switch-camera');
+        if (switchBtn) {
+            switchBtn.textContent = '🔄 Đang chuyển...';
+            switchBtn.disabled = true;
+        }
+        
+        // Open camera with new facing mode
+        await openCamera();
+        
+        // Update button text and re-enable
+        if (switchBtn) {
+            switchBtn.textContent = currentFacingMode === 'environment' ? '🤳 Camera trước' : '📷 Camera sau';
+            switchBtn.disabled = false;
+        }
+        
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+            showAlert('✅ Đã chuyển camera!', 'success');
+        }
+        
+        console.log(`Switched to ${currentFacingMode === 'environment' ? 'back' : 'front'} camera`);
+        
+    } catch (error) {
+        console.error('Error switching camera:', error);
+        
+        // Reset button state
+        const switchBtn = document.getElementById('btn-switch-camera');
+        if (switchBtn) {
+            switchBtn.textContent = '🔄 Đổi camera';
+            switchBtn.disabled = false;
+        }
+        
+        showAlert('❌ Không thể chuyển đổi camera. Vui lòng thử lại.', 'error');
     }
 }
 

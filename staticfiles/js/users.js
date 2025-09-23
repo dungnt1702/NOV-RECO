@@ -3,8 +3,58 @@
 let allUsers = [];
 let filteredUsers = [];
 
+// Sample data for testing when API is not available
+const sampleUsers = [
+    {
+        id: 1,
+        username: 'admin',
+        first_name: 'Admin',
+        last_name: 'System',
+        display_name: 'Admin System',
+        email: 'admin@nov-reco.com',
+        role: 'admin',
+        department: 'IT',
+        employee_id: 'EMP001',
+        is_active: true
+    },
+    {
+        id: 2,
+        username: 'manager1',
+        first_name: 'Nguyễn',
+        last_name: 'Văn A',
+        display_name: 'Nguyễn Văn A',
+        email: 'manager@nov-reco.com',
+        role: 'manager',
+        department: 'Sales',
+        employee_id: 'EMP002',
+        is_active: true
+    },
+    {
+        id: 3,
+        username: 'employee1',
+        first_name: 'Trần',
+        last_name: 'Thị B',
+        display_name: 'Trần Thị B',
+        email: 'employee@nov-reco.com',
+        role: 'employee',
+        department: 'Marketing',
+        employee_id: 'EMP003',
+        is_active: true
+    }
+];
+
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('Users page loaded');
+    console.log('Users page DOM loaded, initializing...');
+
+    // Check if elements exist
+    const tableBody = document.querySelector('.users-table tbody');
+    const mobileView = document.querySelector('.mobile-view');
+    console.log('Table body found:', !!tableBody);
+    console.log('Mobile view found:', !!mobileView);
+    console.log('Mobile view element:', mobileView);
+    console.log('Mobile view classes:', mobileView ? mobileView.className : 'N/A');
+    console.log('Mobile view computed style display:', mobileView ? window.getComputedStyle(mobileView).display : 'N/A');
+    console.log('Pagination component available:', !!window.paginationComponent);
 
     // Initialize form validation
     initializeFormValidation();
@@ -17,22 +67,61 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Load users data and initialize pagination
     loadUsers();
+    
+    // Fallback: If no users loaded after 2 seconds, show sample data
+    setTimeout(() => {
+        if (allUsers.length === 0) {
+            console.log('Fallback: No users loaded, showing sample data');
+            allUsers = sampleUsers;
+            filteredUsers = [...allUsers];
+            renderUsersTable(allUsers);
+            showAlert('Hiển thị dữ liệu mẫu do không thể tải dữ liệu thực.', 'info');
+        }
+    }, 2000);
+    
+    // Add a test function to global scope for debugging
+    window.testUsersRender = function() {
+        console.log('Test: Force rendering sample users...');
+        allUsers = sampleUsers;
+        filteredUsers = [...allUsers];
+        renderUsersTable(allUsers);
+        console.log('Test: Sample users rendered');
+    };
+    
+    // Add mobile test function
+    window.testMobileView = function() {
+        console.log('Test: Checking mobile view...');
+        const mobileView = document.querySelector('.mobile-view');
+        if (mobileView) {
+            console.log('Mobile view element:', mobileView);
+            console.log('Current display:', window.getComputedStyle(mobileView).display);
+            console.log('Current visibility:', window.getComputedStyle(mobileView).visibility);
+            console.log('Mobile view innerHTML:', mobileView.innerHTML);
+            
+            // Force show mobile view for testing
+            mobileView.style.display = 'block';
+            mobileView.style.visibility = 'visible';
+            console.log('Mobile view forced to show');
+        } else {
+            console.error('Mobile view not found!');
+        }
+    };
 });
 
 // Load users from API
 async function loadUsers() {
     try {
-        const response = await fetch('/users/api/', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        });
-
+        console.log('Loading users from API...');
+        console.log('API function available:', typeof api);
+        const response = await api('/users/api/');
+        console.log('Users API response status:', response.status);
         if (response.ok) {
-            allUsers = await response.json();
+            const data = await response.json();
+            console.log('Users API data received:', data);
+            allUsers = Array.isArray(data) ? data : (data.results || []);
             filteredUsers = [...allUsers];
+            
+            console.log('Processed users count:', allUsers.length);
             
             // Initialize pagination component
             if (window.paginationComponent) {
@@ -50,27 +139,58 @@ async function loadUsers() {
                 
                 // Render first page immediately
                 renderUsersTable(window.paginationComponent.getCurrentPageItems());
+            } else {
+                // Fallback: render without pagination
+                renderUsersTable(allUsers.slice(0, 20));
             }
         } else {
             console.error('Failed to load users:', response.statusText);
+            // Use sample data for demonstration when API fails
+            console.log('Using sample data for demonstration');
+            allUsers = sampleUsers;
+            filteredUsers = [...allUsers];
+            renderUsersTable(allUsers);
+            showAlert('Đang sử dụng dữ liệu mẫu. Vui lòng đăng nhập để xem dữ liệu thực.', 'warning');
         }
     } catch (error) {
         console.error('Error loading users:', error);
+        // Use sample data for demonstration when API fails
+        console.log('Using sample data for demonstration');
+        allUsers = sampleUsers;
+        filteredUsers = [...allUsers];
+        renderUsersTable(allUsers);
+        showAlert('Đang sử dụng dữ liệu mẫu. Vui lòng kiểm tra kết nối mạng.', 'warning');
     }
 }
 
 // Render users table
-function renderUsersTable(users) {
+function renderUsersTable(users = null) {
+    // Use provided users or get current page items from pagination component or use all users
+    let usersToRender;
+    if (users) {
+        usersToRender = users;
+    } else if (window.paginationComponent) {
+        usersToRender = window.paginationComponent.getCurrentPageItems();
+    } else {
+        // Fallback: show first 20 users if pagination is not available
+        usersToRender = allUsers.slice(0, 20);
+    }
+    
+    console.log('Rendering users table/mobile, count:', usersToRender.length);
+    
     const tableBody = document.querySelector('.users-table tbody');
     const mobileView = document.querySelector('.mobile-view');
     
-    if (!tableBody || !mobileView) return;
+    if (!tableBody || !mobileView) {
+        console.error('Table body or mobile view not found');
+        return;
+    }
 
     // Clear existing content
     tableBody.innerHTML = '';
     mobileView.innerHTML = '';
 
-    if (users.length === 0) {
+    if (usersToRender.length === 0) {
         // Show empty state
         const emptyState = `
             <tr>
@@ -101,15 +221,23 @@ function renderUsersTable(users) {
     }
 
     // Render desktop table
-    users.forEach(user => {
+    console.log('Rendering desktop table for', usersToRender.length, 'users');
+    usersToRender.forEach((user, index) => {
+        console.log(`Creating row for user ${index}:`, user);
         const row = createUserRow(user);
         tableBody.appendChild(row);
     });
 
     // Render mobile cards
-    users.forEach(user => {
+    console.log('Rendering mobile cards for', usersToRender.length, 'users');
+    usersToRender.forEach((user, index) => {
+        console.log(`Creating card for user ${index}:`, user);
         const card = createUserCard(user);
-        mobileView.appendChild(card);
+        if (card) {
+            mobileView.appendChild(card);
+        } else {
+            console.error('Failed to create card for user:', user);
+        }
     });
 }
 
@@ -178,12 +306,13 @@ function createUserRow(user) {
 
 // Create user mobile card
 function createUserCard(user) {
+    console.log('Creating user card for:', user);
     const card = document.createElement('div');
     card.className = 'user-card';
     
     card.innerHTML = `
         <div class="card-header">
-            <div class="user-info">
+            <div class="header-left">
                 <div class="user-avatar">
                     ${(user.first_name || user.username).charAt(0).toUpperCase()}
                 </div>
@@ -193,7 +322,7 @@ function createUserCard(user) {
                     ${user.employee_id ? `<p class="user-id">Mã NV: ${user.employee_id}</p>` : ''}
                 </div>
             </div>
-            <div class="user-status">
+            <div class="header-right">
                 <span class="status-badge ${user.is_active ? 'active' : 'inactive'}">
                     ${user.is_active ? 'Hoạt động' : 'Không hoạt động'}
                 </span>

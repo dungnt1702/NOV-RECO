@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "apps.dashboard",
     "apps.personal",
     "apps.users",
+    "apps.automation_test",
 ]
 
 MIDDLEWARE = [

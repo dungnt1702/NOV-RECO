@@ -4,12 +4,13 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator
 from django.db.models import Q
+from datetime import datetime
 
 from .models import Checkin
 from apps.area.models import Area
 from apps.users.models import User, UserRole
 from .decorators import role_required
-from .serializers import CheckinListSerializer
+from .serializers import CheckinSerializer, CheckinListSerializer
 from .utils import haversine_m
 
 
@@ -173,7 +174,7 @@ def checkin_list_view(request):
     # Get filter options
     areas = Area.objects.filter(is_active=True)
     users = (User.objects.filter(is_active=True)
-                .order_by('first_name', 'last_name'))
+             .order_by('first_name', 'last_name'))
 
     context = {
         'page_obj': page_obj,
@@ -270,3 +271,27 @@ def checkin_history_api(request):
         'current_page': page,
         'total_count': paginator.count,
     })
+
+
+@login_required
+def checkin_user_info_api(request):
+    """API thông tin user cho trang check-in"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+
+    user_data = {
+        'id': request.user.id,
+        'username': request.user.username,
+        'first_name': request.user.first_name,
+        'last_name': request.user.last_name,
+        'full_name': request.user.full_name,
+        'email': request.user.email,
+        'role': request.user.role,
+        'department': (request.user.department.name
+                       if request.user.department else None),
+        'avatar': request.user.avatar.url if request.user.avatar else None,
+        'is_active': request.user.is_active,
+    }
+
+    return JsonResponse(user_data)
+

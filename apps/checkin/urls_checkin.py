@@ -7,9 +7,10 @@ from .views import (
     checkin_list_view,
     checkin_list_api,
     checkin_history_api,
+    checkin_user_info_api,
 )
 
-app_name = "checkin"
+# app_name = "checkin"  # Commented out to avoid namespace conflict
 
 urlpatterns = [
     # Check-in views
@@ -22,4 +23,5 @@ urlpatterns = [
     # APIs
     path("api/", checkin_list_api, name="list_api"),
     path("api/history/", checkin_history_api, name="history_api"),
+    path("api/user-info/", checkin_user_info_api, name="user_info_api"),
 ]

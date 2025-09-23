@@ -1,0 +1,622 @@
+/* History page specific styles - Modern responsive design */
+.checkin-history-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 20px;
+}
+
+.history-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.history-header {
+    background: linear-gradient(135deg, #0A5597 0%, #F5831F 100%);
+    color: white;
+    padding: 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.history-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.history-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    position: relative;
+    z-index: 1;
+}
+
+.history-title i {
+    margin-right: 12px;
+    color: #F5831F;
+}
+
+.history-subtitle {
+    font-size: 1.125rem;
+    opacity: 0.9;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.history-content {
+    padding: 40px;
+}
+
+/* Modern Filters */
+.history-filters {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+}
+
+.form-control {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #0A5597;
+    box-shadow: 0 0 0 3px rgba(10, 85, 151, 0.1);
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #0A5597 0%, #F5831F 100%);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(10, 85, 151, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -5px rgba(10, 85, 151, 0.4);
+}
+
+/* Desktop Table View */
+.desktop-table-view {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.checkin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.checkin-table thead {
+    background: linear-gradient(135deg, #0A5597 0%, #F5831F 100%);
+    color: white;
+}
+
+.checkin-table th {
+    padding: 16px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    position: relative;
+}
+
+/* Sortable column styles */
+.checkin-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.checkin-table th.sortable:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.checkin-table th.sortable.active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.checkin-table th.sortable .sort-icon {
+    margin-left: 8px;
+    font-size: 0.75rem;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.checkin-table th.sortable:hover .sort-icon {
+    opacity: 1;
+}
+
+.checkin-table th.sortable.active .sort-icon {
+    opacity: 1;
+    color: #FFD700;
+}
+
+.checkin-table th.sortable .sort-icon.fa-sort-up {
+    color: #4CAF50;
+}
+
+.checkin-table th.sortable .sort-icon.fa-sort-down {
+    color: #FF9800;
+}
+
+.checkin-table tbody tr {
+    border-bottom: 1px solid #e2e8f0;
+    transition: background-color 0.2s ease;
+}
+
+.checkin-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.checkin-table td {
+    padding: 16px 12px;
+    vertical-align: middle;
+}
+
+.checkin-table .status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.checkin-table .status-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.checkin-table .status-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.checkin-table .status-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.checkin-table .photo-thumbnail {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.checkin-table .photo-thumbnail:hover {
+    transform: scale(1.1);
+}
+
+/* Table cell styles */
+.checkin-table .time-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.checkin-table .time-primary {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 0.875rem;
+}
+
+.checkin-table .time-secondary {
+    font-size: 0.75rem;
+    color: #718096;
+}
+
+.checkin-table .area-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: #2d3748;
+}
+
+.checkin-table .area-cell i {
+    color: #0A5597;
+    font-size: 0.875rem;
+}
+
+.checkin-table .location-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.75rem;
+    color: #4a5568;
+}
+
+.checkin-table .note-cell {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #4a5568;
+    font-size: 0.875rem;
+}
+
+.checkin-table .photo-placeholder {
+    width: 50px;
+    height: 50px;
+    background: #f7fafc;
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a0aec0;
+    font-size: 1.25rem;
+}
+
+/* Mobile Cards View */
+.mobile-cards-view {
+    display: none;
+}
+
+.mobile-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.mobile-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.2);
+    border-color: #0A5597;
+}
+
+.mobile-card-header {
+    background: linear-gradient(135deg, #0A5597 0%, #F5831F 100%);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mobile-card-time {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.mobile-card-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.mobile-card-content {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: start;
+}
+
+.mobile-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mobile-card-detail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+}
+
+.mobile-card-detail i {
+    width: 16px;
+    color: #0A5597;
+    text-align: center;
+}
+
+.mobile-card-detail strong {
+    color: #374151;
+    font-weight: 600;
+}
+
+.mobile-card-photo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-card-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-card-photo:hover {
+    transform: scale(1.05);
+}
+
+.mobile-card-note {
+    grid-column: 1 / -1;
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* Loading State */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #6b7280;
+    font-size: 1.125rem;
+}
+
+.loading i {
+    margin-right: 12px;
+    color: #0A5597;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: #d1d5db;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #374151;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Pagination */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 32px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pagination-btn {
+    padding: 10px 16px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    color: #374151;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 40px;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-btn:hover:not(:disabled) {
+    border-color: #0A5597;
+    color: #0A5597;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(10, 85, 151, 0.2);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-btn.active {
+    background: linear-gradient(135deg, #0A5597 0%, #F5831F 100%);
+    color: white;
+    border-color: #0A5597;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(10, 85, 151, 0.3);
+}
+
+.pagination-info {
+    margin: 0 16px;
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: #f8fafc;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .checkin-history-page {
+        padding: 10px;
+    }
+    
+    .history-container {
+        border-radius: 16px;
+    }
+    
+    .history-header {
+        padding: 24px 20px;
+    }
+    
+    .history-title {
+        font-size: 1.75rem;
+    }
+    
+    .history-content {
+        padding: 20px;
+    }
+    
+    .history-filters {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 16px;
+    }
+    
+    .desktop-table-view {
+        display: none !important;
+    }
+    
+    .mobile-cards-view {
+        display: block !important;
+    }
+    
+    .mobile-card-content {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .mobile-card-photo-container {
+        justify-content: flex-start;
+    }
+    
+    .mobile-card-photo {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .pagination-container {
+        gap: 6px;
+        margin-top: 24px;
+    }
+    
+    .pagination-btn {
+        padding: 8px 12px;
+        font-size: 0.8125rem;
+        min-width: 36px;
+    }
+    
+    .pagination-info {
+        margin: 0 8px;
+        font-size: 0.8125rem;
+        padding: 6px 12px;
+    }
+}
+
+@media (min-width: 769px) {
+    .desktop-table-view {
+        display: block !important;
+    }
+    
+    .mobile-cards-view {
+        display: none !important;
+    }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mobile-card {
+    animation: fadeInUp 0.3s ease;
+}
+
+.checkin-table tbody tr {
+    animation: fadeInUp 0.3s ease;
+}

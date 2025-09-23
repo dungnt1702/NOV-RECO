@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -155,7 +155,7 @@ def user_delete_view(request, user_id):
 def department_list_view(request):
     """Danh sách phòng ban"""
     departments = Department.objects.annotate(
-        employee_count=Count('employees')
+        employee_count=Count('user')
     ).order_by('name')
     
     context = {

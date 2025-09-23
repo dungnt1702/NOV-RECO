@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Test Session {{ session.session_id }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/automation_test/session_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-clipboard-check text-primary"></i>
+                        Test Session: {{ session.session_id }}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Started by {{ session.user.get_display_name|default:"System" }} 
+                        on {{ session.started_at|date:"M d, Y H:i:s" }}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'automation_test:dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Info -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Session Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Session ID:</strong> {{ session.session_id }}</p>
+                            <p><strong>Status:</strong> 
+                                {% if session.status == 'completed' %}
+                                    <span class="badge badge-success">Completed</span>
+                                {% elif session.status == 'failed' %}
+                                    <span class="badge badge-danger">Failed</span>
+                                {% elif session.status == 'running' %}
+                                    <span class="badge badge-warning">Running</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">{{ session.status|title }}</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Started:</strong> {{ session.started_at|date:"M d, Y H:i:s" }}</p>
+                            {% if session.completed_at %}
+                            <p><strong>Completed:</strong> {{ session.completed_at|date:"M d, Y H:i:s" }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Total Tests:</strong> {{ session.total_tests }}</p>
+                            <p><strong>Passed:</strong> <span class="text-success">{{ session.passed_tests }}</span></p>
+                            <p><strong>Failed:</strong> <span class="text-danger">{{ session.failed_tests }}</span></p>
+                            <p><strong>Skipped:</strong> <span class="text-muted">{{ session.skipped_tests }}</span></p>
+                            {% if session.duration %}
+                            <p><strong>Duration:</strong> {{ session.duration|floatformat:1 }}s</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if session.notes %}
+                    <div class="mt-3">
+                        <strong>Notes:</strong>
+                        <p class="text-muted">{{ session.notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Success Rate</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="progress-circle mb-3">
+                        <div class="progress-circle-fill" 
+                             style="--progress: {{ session.success_rate|floatformat:0 }}%">
+                            <span class="progress-circle-text">{{ session.success_rate|floatformat:1 }}%</span>
+                        </div>
+                    </div>
+                    <p class="text-muted mb-0">
+                        {% if session.success_rate >= 80 %}
+                            <i class="fas fa-check-circle text-success"></i>
+                            Excellent
+                        {% elif session.success_rate >= 60 %}
+                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                            Good
+                        {% else %}
+                            <i class="fas fa-times-circle text-danger"></i>
+                            Needs Attention
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Results -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Test Results</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Test Name</th>
+                                    <th>Module</th>
+                                    <th>Status</th>
+                                    <th>Duration</th>
+                                    <th>Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td>{{ result.test_name }}</td>
+                                    <td>
+                                        <span class="badge badge-info">{{ result.module }}</span>
+                                    </td>
+                                    <td>
+                                        {% if result.status == 'passed' %}
+                                            <span class="badge badge-success">Passed</span>
+                                        {% elif result.status == 'failed' %}
+                                            <span class="badge badge-danger">Failed</span>
+                                        {% elif result.status == 'skipped' %}
+                                            <span class="badge badge-warning">Skipped</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">{{ result.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if result.duration %}
+                                            {{ result.duration|floatformat:2 }}s
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ result.created_at|date:"H:i:s" }}</td>
+                                    <td>
+                                        {% if result.status == 'failed' and result.error_message %}
+                                        <button class="btn btn-sm btn-outline-danger" 
+                                                data-toggle="modal" 
+                                                data-target="#errorModal"
+                                                data-error="{{ result.error_message }}"
+                                                data-stack="{{ result.stack_trace }}">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">
+                                        No test results found
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Logs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Test Logs</h5>
+                </div>
+                <div class="card-body">
+                    <div class="log-container" id="logContainer">
+                        {% for log in logs %}
+                        <div class="log-entry log-{{ log.level|lower }}">
+                            <span class="log-timestamp">{{ log.timestamp|date:"H:i:s" }}</span>
+                            <span class="log-level">{{ log.level }}</span>
+                            {% if log.test_name %}
+                            <span class="log-test">{{ log.test_name }}</span>
+                            {% endif %}
+                            <span class="log-message">{{ log.message }}</span>
+                        </div>
+                        {% empty %}
+                        <div class="text-center text-muted">
+                            No logs available
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Test Error Details</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6>Error Message:</h6>
+                <pre id="errorMessage" class="bg-light p-3 rounded"></pre>
+                <h6 class="mt-3">Stack Trace:</h6>
+                <pre id="stackTrace" class="bg-light p-3 rounded"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/automation_test/session_detail.js' %}"></script>
+{% endblock %}

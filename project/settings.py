@@ -44,17 +44,18 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     # Local apps
-    "checkin",
-    "area",
-    "employee", 
-    "dashboard",
-    "personal",
-    "users",
+    "apps.checkin",
+    "apps.area",
+    "apps.employee", 
+    "apps.dashboard",
+    "apps.personal",
+    "apps.users",
+    "apps.automation_test",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "checkin.middleware.FaviconMiddleware",
+    "apps.checkin.middleware.FaviconMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

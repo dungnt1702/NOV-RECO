@@ -12,8 +12,13 @@ urlpatterns = [
         TemplateView.as_view(template_name="home.html"),
         name="home",
     ),
-    path("", include("apps.checkin.urls")),  # All modules at root level
-    path("users/", include("apps.users.urls")),  # User management
+    path("checkin/", include("apps.checkin.urls_checkin")),
+    path("area/", include("apps.area.urls")),
+    path("employee/", include("apps.employee.urls")),
+    path("personal/", include("apps.personal.urls")),
+    path("dashboard/", include("apps.dashboard.urls")),
+    path("users/", include("apps.users.urls")),
+    path("automation-test/", include("apps.automation_test.urls")),
 ]
 
 if settings.DEBUG:

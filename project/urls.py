@@ -13,8 +13,12 @@ urlpatterns = (
             TemplateView.as_view(template_name="home.html"),
             name="home",
         ),
-        path("", include("checkin.urls")),  # All modules at root level
-        path("users/", include("users.urls")),  # User management
+        path("", include("apps.checkin.urls")),  # All modules at root level
+        path("area/", include("apps.area.urls")),  # Area management
+        path("users/", include("apps.users.urls")),  # User management
+        path("automation-test/", include("apps.automation_test.urls")),  # Automation test
+        path("dashboard/", include("apps.dashboard.urls")),  # Dashboard
+        path("personal/", include("apps.personal.urls")),  # Personal profile
     ]
     + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

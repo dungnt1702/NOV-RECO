@@ -100,6 +100,43 @@ body {
     height: 100%;
 }
 
+/* Header sections */
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.nav-center {
+    display: none; /* Hidden on desktop */
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+}
+
+/* Ensure desktop layout is not affected */
+@media (min-width: 769px) {
+    .nav-container {
+        justify-content: space-between;
+    }
+    
+    .nav-center {
+        display: none !important;
+    }
+    
+    .nav-left,
+    .nav-right {
+        position: static;
+        z-index: auto;
+    }
+    
+    .nav-toggle {
+        display: none !important;
+    }
+}
+
 .nav-logo {
     display: flex;
     align-items: center;
@@ -108,8 +145,13 @@ body {
     text-decoration: none;
     font-weight: 700;
     font-size: 1.25rem;
-    margin-left: 50px; /* Space for nav-toggle */
     transition: color 0.2s ease;
+}
+
+.app-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
 }
 
 .nav-logo:hover {
@@ -154,20 +196,27 @@ body {
     position: relative;
 }
 
+/* Ensure dropdown works on desktop */
+@media (min-width: 769px) {
+    .dropdown-menu {
+        position: absolute !important;
+        display: block !important;
+    }
+    
+    .dropdown:hover .dropdown-menu {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(0) !important;
+        display: block !important;
+    }
+}
+
 .dropdown-toggle {
     display: flex;
     align-items: center;
     gap: 5px;
 }
 
-.dropdown-toggle i {
-    font-size: 0.8rem;
-    transition: transform 0.3s ease;
-}
-
-.dropdown:hover .dropdown-toggle i {
-    transform: rotate(180deg);
-}
 
 .dropdown-menu {
     position: absolute;
@@ -186,12 +235,14 @@ body {
     list-style: none;
     padding: var(--spacing-sm) 0;
     margin: var(--spacing-xs) 0 0 0;
+    display: block;
 }
 
 .dropdown:hover .dropdown-menu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+    display: block !important;
 }
 
 .dropdown-menu li {
@@ -223,16 +274,11 @@ body {
 
 .nav-toggle {
     display: none;
-    z-index: 1002;
     background: none;
     border: none;
     font-size: 1.5rem;
     color: var(--text-secondary);
     cursor: pointer;
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
     padding: var(--spacing-sm);
     border-radius: var(--radius-md);
     transition: all 0.2s ease;
@@ -367,17 +413,74 @@ svg {
         padding: 0 var(--spacing-md);
     }
 
+    .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        width: 100%;
+    }
+
+    /* Left side: Hamburger + Logo */
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        flex: 0 0 auto;
+        z-index: 10;
+    }
+
     .nav-logo {
-        margin-left: 50px; /* Space for nav-toggle */
-        font-size: 1.125rem;
+        font-size: 1rem;
+        margin-left: 0;
     }
 
     .nav-logo img {
-        height: 24px;
+        height: 20px;
     }
 
     .nav-toggle {
         display: block;
+        position: static;
+        transform: none;
+        left: auto;
+        top: auto;
+    }
+
+    /* Center: App Title */
+    .nav-center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 5;
+        pointer-events: none; /* Prevent interference with clicks */
+    }
+
+    .app-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+        text-align: center;
+    }
+
+    /* Right side: User info */
+    .nav-right {
+        display: flex;
+        align-items: center;
+        flex: 0 0 auto;
+        z-index: 10;
+    }
+
+    .nav-right .user-info {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        flex-direction: row !important;
     }
 
     .nav-menu {
@@ -426,7 +529,7 @@ svg {
 
     /* Mobile dropdown styles with slide animation */
     .dropdown-menu {
-        position: static;
+        position: static !important;
         background: var(--bg-secondary);
         border: 1px solid var(--border-color);
         padding: 0;
@@ -519,12 +622,25 @@ svg {
     }
 
     .nav-logo {
-        font-size: 1rem;
-        margin-left: 40px; /* Smaller space for mobile */
+        font-size: 0.9rem;
+        margin-left: 0;
     }
 
     .nav-logo img {
-        height: 20px;
+        height: 18px;
+    }
+
+    .app-title {
+        font-size: 0.8rem;
+    }
+
+    /* Ensure proper spacing on very small screens */
+    .nav-left {
+        gap: var(--spacing-xs);
+    }
+
+    .nav-right {
+        gap: var(--spacing-xs);
     }
 
     .nav-menu {
