@@ -6,61 +6,326 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
 <link rel="stylesheet" href="{% static 'css/area/update.css' %}">
+<style>
+/* Custom styles for area update form */
+.area-update-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.area-update-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.area-update-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.area-update-title i {
+  color: #007bff;
+}
+
+.area-update-card {
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: 1px solid #dee2e6;
+  height: 100%;
+}
+
+.area-update-card-header {
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem 0.75rem 0 0;
+  background: linear-gradient(135deg, #007bff 0%, #fd7e14 100%);
+  color: white;
+}
+
+.area-update-card-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.area-update-card-body {
+  padding: 1.5rem;
+}
+
+.area-update-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.area-update-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.area-update-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.area-update-label i {
+  margin-right: 0.25rem;
+}
+
+.area-update-input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.area-update-input:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.area-update-textarea {
+  min-height: 104px;
+}
+
+.area-update-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.area-update-checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #007bff;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+}
+
+.area-update-checkbox:focus {
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.area-update-checkbox-label {
+  font-size: 0.875rem;
+  color: #495057;
+  margin: 0;
+  cursor: pointer;
+}
+
+.area-update-checkbox-label i {
+  margin-right: 0.25rem;
+}
+
+.area-update-map {
+  width: 100%;
+  height: 24rem;
+  border-radius: 0.5rem;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.area-update-map-info {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.area-update-map-info i {
+  color: #007bff;
+}
+
+.area-update-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.area-update-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.area-update-btn-secondary {
+  color: #6c757d;
+  background-color: transparent;
+  border-color: #6c757d;
+}
+
+.area-update-btn-secondary:hover {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+  text-decoration: none;
+}
+
+.area-update-btn-primary {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.area-update-btn-primary:hover {
+  color: #fff;
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+.area-update-btn-primary:focus {
+  color: #fff;
+  background-color: #0056b3;
+  border-color: #004085;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+}
+
+.area-update-current-location {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.area-update-current-location-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #fff;
+  background-color: #007bff;
+  border: 1px solid #007bff;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.area-update-current-location-btn:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.area-update-current-location-btn:focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto p-4">
-  <div class="text-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800 flex items-center justify-center gap-2">
-      <i class="fas fa-edit text-blue-600"></i>
+<div class="area-update-container">
+  <div class="area-update-header">
+    <h1 class="area-update-title">
+      <i class="fas fa-edit"></i>
       Cập nhật Khu vực
     </h1>
   </div>
 
-  <form method="post" class="space-y-6">
+  <form method="post">
     {% csrf_token %}
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="row">
       <!-- Thông tin khu vực -->
-      <div>
-        <div class="bg-white rounded-xl shadow border border-gray-100 h-full">
-          <div class="px-6 py-4 rounded-t-xl bg-gradient-to-r from-blue-700 to-orange-500 text-white">
-            <h3 class="text-sm font-semibold flex items-center gap-2"><i class="fas fa-info-circle"></i>Thông tin khu vực</h3>
+      <div class="col-lg-6 mb-4">
+        <div class="area-update-card">
+          <div class="area-update-card-header">
+            <h3 class="area-update-card-title">
+              <i class="fas fa-info-circle"></i>
+              Thông tin khu vực
+            </h3>
           </div>
-          <div class="p-6 space-y-6">
-            <div class="space-y-2">
-              <label for="name" class="block text-sm font-medium text-gray-700"><i class="fas fa-tag mr-1"></i>Tên khu vực</label>
-              <input type="text" id="name" name="name" class="block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="{{ area.name }}" required placeholder="Nhập tên khu vực">
+          <div class="area-update-card-body">
+            <div class="area-update-form-group">
+              <label for="name" class="area-update-label">
+                <i class="fas fa-tag"></i>
+                Tên khu vực
+              </label>
+              <input type="text" id="name" name="name" class="area-update-input" value="{{ area.name }}" required placeholder="Nhập tên khu vực">
             </div>
 
-            <div class="space-y-2">
-              <label for="description" class="block text-sm font-medium text-gray-700"><i class="fas fa-align-left mr-1"></i>Mô tả</label>
-              <textarea id="description" name="description" class="block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[104px]" rows="4" placeholder="Nhập mô tả khu vực">{{ area.description }}</textarea>
+            <div class="area-update-form-group">
+              <label for="description" class="area-update-label">
+                <i class="fas fa-align-left"></i>
+                Mô tả
+              </label>
+              <textarea id="description" name="description" class="area-update-input area-update-textarea" rows="4" placeholder="Nhập mô tả khu vực">{{ area.description }}</textarea>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div class="space-y-2">
-                <label for="lat" class="block text-sm font-medium text-gray-700"><i class="fas fa-map-pin mr-1"></i>Vĩ độ (Latitude)</label>
-                <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="lat" name="lat" class="block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="{{ area.lat|unlocalize }}" required placeholder="10.762622">
+            <div class="row">
+              <div class="col-sm-6 mb-3">
+                <div class="area-update-form-group">
+                  <label for="lat" class="area-update-label">
+                    <i class="fas fa-map-pin"></i>
+                    Vĩ độ (Latitude)
+                  </label>
+                  <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="lat" name="lat" class="area-update-input" value="{{ area.lat|unlocalize }}" required placeholder="10.762622">
+                </div>
               </div>
-              <div class="space-y-2">
-                <label for="lng" class="block text-sm font-medium text-gray-700"><i class="fas fa-map-pin mr-1"></i>Kinh độ (Longitude)</label>
-                <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="lng" name="lng" class="block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="{{ area.lng|unlocalize }}" required placeholder="106.660172">
+              <div class="col-sm-6 mb-3">
+                <div class="area-update-form-group">
+                  <label for="lng" class="area-update-label">
+                    <i class="fas fa-map-pin"></i>
+                    Kinh độ (Longitude)
+                  </label>
+                  <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="lng" name="lng" class="area-update-input" value="{{ area.lng|unlocalize }}" required placeholder="106.660172">
+                </div>
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div class="space-y-2">
-                <label for="radius_m" class="block text-sm font-medium text-gray-700"><i class="fas fa-circle mr-1"></i>Bán kính (mét)</label>
-                <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="radius_m" name="radius_m" class="block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="{{ area.radius_m|unlocalize }}" min="10" max="10000" required placeholder="100">
+            <div class="row">
+              <div class="col-sm-6 mb-3">
+                <div class="area-update-form-group">
+                  <label for="radius_m" class="area-update-label">
+                    <i class="fas fa-circle"></i>
+                    Bán kính (mét)
+                  </label>
+                  <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="radius_m" name="radius_m" class="area-update-input" value="{{ area.radius_m|unlocalize }}" min="10" max="10000" required placeholder="100">
+                </div>
               </div>
-              <div class="flex items-end">
-                <label class="inline-flex items-center gap-2 select-none">
-                  <input type="checkbox" id="is_active" name="is_active" class="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500" {% if area.is_active %}checked{% endif %}>
-                  <span class="text-sm text-gray-700"><i class="fas fa-toggle-on mr-1"></i>Khu vực hoạt động</span>
-                </label>
+              <div class="col-sm-6 mb-3">
+                <div class="area-update-form-group">
+                  <div class="area-update-checkbox-container">
+                    <input type="checkbox" id="is_active" name="is_active" class="area-update-checkbox" {% if area.is_active %}checked{% endif %}>
+                    <label for="is_active" class="area-update-checkbox-label">
+                      <i class="fas fa-toggle-on"></i>
+                      Khu vực hoạt động
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -68,16 +333,22 @@
       </div>
 
       <!-- Bản đồ -->
-      <div>
-        <div class="bg-white rounded-xl shadow border border-gray-100 h-full">
-          <div class="px-6 py-4 rounded-t-xl bg-gradient-to-r from-blue-700 to-orange-500 text-white">
-            <h3 class="text-sm font-semibold flex items-center gap-2"><i class="fas fa-map"></i>Vị trí trên bản đồ</h3>
+      <div class="col-lg-6 mb-4">
+        <div class="area-update-card">
+          <div class="area-update-card-header">
+            <h3 class="area-update-card-title">
+              <i class="fas fa-map"></i>
+              Vị trí trên bản đồ
+            </h3>
           </div>
-          <div class="p-6">
-            <div id="map" class="w-full h-96 rounded-lg border border-gray-200 shadow-sm"></div>
-            <div class="text-sm text-gray-500 mt-2 flex items-center gap-2"><i class="fas fa-hand-paper"></i>Kéo thả ghim hoặc nhấp bản đồ để chọn vị trí. Tọa độ sẽ tự động điền.</div>
-            <div class="mt-3 flex justify-end">
-              <button class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500" type="button" id="btnCurrent">
+          <div class="area-update-card-body">
+            <div id="map" class="area-update-map"></div>
+            <div class="area-update-map-info">
+              <i class="fas fa-hand-paper"></i>
+              Kéo thả ghim hoặc nhấp bản đồ để chọn vị trí. Tọa độ sẽ tự động điền.
+            </div>
+            <div class="area-update-current-location">
+              <button class="area-update-current-location-btn" type="button" id="btnCurrent">
                 <i class="fas fa-location-arrow"></i>
                 Lấy vị trí hiện tại
               </button>
@@ -87,9 +358,15 @@
       </div>
     </div>
 
-    <div class="flex justify-end gap-3 mt-2">
-      <a href="{% url 'area:list' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"><i class="fas fa-times"></i>Hủy</a>
-      <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"><i class="fas fa-save"></i>Cập nhật</button>
+    <div class="area-update-actions">
+      <a href="{% url 'area:list' %}" class="area-update-btn area-update-btn-secondary">
+        <i class="fas fa-times"></i>
+        Hủy
+      </a>
+      <button type="submit" class="area-update-btn area-update-btn-primary">
+        <i class="fas fa-save"></i>
+        Cập nhật
+      </button>
     </div>
   </form>
 </div>
