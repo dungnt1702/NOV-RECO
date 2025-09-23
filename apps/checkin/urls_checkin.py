@@ -6,6 +6,7 @@ from .views import (
     checkin_history_view,
     checkin_list_view,
     checkin_list_api,
+    checkin_history_api,
 )
 
 app_name = "checkin"
@@ -17,7 +18,8 @@ urlpatterns = [
     path("success/", checkin_success_view, name="success"),
     path("history/", checkin_history_view, name="history"),
     path("list/", checkin_list_view, name="list"),
-    
+
     # APIs
     path("api/", checkin_list_api, name="list_api"),
+    path("api/history/", checkin_history_api, name="history_api"),
 ]
