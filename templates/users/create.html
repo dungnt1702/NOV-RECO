@@ -3,6 +3,10 @@
 
 {% block title %}Tạo Người dùng Mới{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/users/create.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
@@ -170,63 +174,7 @@
     </div>
 </div>
 
-<style>
-/* Custom CSS for user create form */
-.user-create-form .form-control,
-.user-create-form .form-select {
-    border-radius: 6px;
-    border: 1px solid #ced4da;
-    padding: 8px 12px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.user-create-form .form-control:focus,
-.user-create-form .form-select:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-.user-create-form .form-label {
-    font-weight: 500;
-    margin-bottom: 6px;
-    color: #495057;
-}
-
-.user-create-form .card {
-    border: none;
-    border-radius: 12px;
-}
-
-.user-create-form .alert {
-    border-radius: 8px;
-    border: none;
-}
-
-.user-create-form .btn {
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.user-create-form .gap-2 > * + * {
-    margin-left: 8px;
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add Bootstrap classes to form fields
-    const formControls = document.querySelectorAll('input[type="text"], input[type="number"], input[type="email"], input[type="password"], textarea, select');
-    formControls.forEach(function(control) {
-        control.classList.add('form-control');
-    });
-    
-    // Add form wrapper class for custom styles
-    const form = document.querySelector('form');
-    if (form) {
-        form.classList.add('user-create-form');
-    }
-});
-</script>
+{% block extra_js %}
+<script src="{% static 'js/users/create.js' %}"></script>
+{% endblock %}
 {% endblock %}

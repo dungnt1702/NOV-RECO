@@ -1,0 +1,45 @@
+/* Custom CSS for area create form */
+.area-create-form .form-control,
+.area-create-form .form-select {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    padding: 8px 12px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.area-create-form .form-control:focus,
+.area-create-form .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.area-create-form .form-label {
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #495057;
+}
+
+.area-create-form .card {
+    border: none;
+    border-radius: 12px;
+}
+
+.area-create-form .alert {
+    border-radius: 8px;
+    border: none;
+}
+
+.area-create-form .btn {
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.area-create-form .form-check-input {
+    margin-top: 4px;
+}
+
+.area-create-form .gap-2 > * + * {
+    margin-left: 8px;
+}
