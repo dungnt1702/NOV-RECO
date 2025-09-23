@@ -382,6 +382,7 @@ async function loadAllUsers() {
 
 async function loadUsersByDepartment(departmentId) {
   try {
+    console.log('Loading users for department:', departmentId);
     let response;
     if (typeof api === 'function') {
       response = await api(`/users/api/?department=${departmentId}`);
@@ -394,9 +395,12 @@ async function loadUsersByDepartment(departmentId) {
         }
       });
     }
+    console.log('API response status:', response.status);
     if (response.ok) {
       const data = await response.json();
+      console.log('API response data:', data);
       const users = Array.isArray(data) ? data : data.results || [];
+      console.log('Users found:', users.length);
       populateUserFilter(users);
     }
   } catch (error) {
@@ -434,8 +438,13 @@ function populateDepartmentFilter(departments) {
     departmentFilter.innerHTML = '<option value="">Tất cả phòng ban</option>' +
       departments.map(dept => `<option value="${dept.id}">${dept.name}</option>`).join('');
     
+    // Remove existing event listeners to avoid duplicates
+    const newDepartmentFilter = departmentFilter.cloneNode(true);
+    departmentFilter.parentNode.replaceChild(newDepartmentFilter, departmentFilter);
+    
     // Add event listener for department change
-    departmentFilter.addEventListener('change', function() {
+    newDepartmentFilter.addEventListener('change', function() {
+      console.log('Department changed to:', this.value);
       const departmentId = this.value;
       if (departmentId) {
         loadUsersByDepartment(departmentId);
@@ -447,14 +456,19 @@ function populateDepartmentFilter(departments) {
 }
 
 function populateUserFilter(users) {
+  console.log('Populating user filter with users:', users);
   const userFilter = document.getElementById('userFilter');
   if (userFilter) {
     if (users.length === 0) {
+      console.log('No users found, showing "Không có nhân viên"');
       userFilter.innerHTML = '<option value="">Không có nhân viên</option>';
     } else {
+      console.log('Found users, showing user list');
       userFilter.innerHTML = '<option value="">Tất cả nhân viên</option>' +
         users.map(user => `<option value="${user.id}">${user.first_name} ${user.last_name}</option>`).join('');
     }
+  } else {
+    console.error('User filter element not found');
   }
 }
 
