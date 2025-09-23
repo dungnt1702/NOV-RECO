@@ -14,6 +14,10 @@ def role_required(allowed_roles):
             if not request.user.is_authenticated:
                 return redirect('account_login')
             
+            # Cho phép superuser truy cập tất cả
+            if request.user.is_superuser:
+                return view_func(request, *args, **kwargs)
+            
             if not hasattr(request.user, 'role'):
                 messages.error(request, 'Tài khoản không có quyền truy cập.')
                 return redirect('dashboard:personal')
