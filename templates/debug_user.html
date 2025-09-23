@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Debug User - NOV-RECO{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Debug User Information</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>User Details</h3>
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Full Name:</strong> {{ user.get_full_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Role:</strong> {{ user.role }}</p>
+            <p><strong>is_superuser:</strong> {{ user.is_superuser }}</p>
+            <p><strong>is_staff:</strong> {{ user.is_staff }}</p>
+            <p><strong>is_active:</strong> {{ user.is_active }}</p>
+        </div>
+        <div class="col-md-6">
+            <h3>Role Properties</h3>
+            <p><strong>is_admin_user:</strong> {{ user.is_admin_user }}</p>
+            <p><strong>is_manager_user:</strong> {{ user.is_manager_user }}</p>
+            <p><strong>is_hcns_user:</strong> {{ user.is_hcns_user }}</p>
+            <p><strong>is_employee_user:</strong> {{ user.is_employee_user }}</p>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <h3>Menu Visibility Tests</h3>
+            <div class="alert alert-info">
+                <h4>Desktop Navigation Tests:</h4>
+                <p><strong>Quản lý Check-in (Danh sách):</strong> 
+                   {% if user.is_superuser or user.is_admin_user or user.is_manager_user or user.is_hcns_user %}
+                       <span class="text-success">✓ Visible</span>
+                   {% else %}
+                       <span class="text-danger">✗ Hidden</span>
+                   {% endif %}
+                </p>
+                <p><strong>Quản lý Nhân sự:</strong> 
+                   {% if user.is_superuser or user.is_admin_user or user.is_manager_user %}
+                       <span class="text-success">✓ Visible</span>
+                   {% else %}
+                       <span class="text-danger">✗ Hidden</span>
+                   {% endif %}
+                </p>
+                <p><strong>Admin Panel:</strong> 
+                   {% if user.is_superuser or user.is_admin_user or user.is_manager_user %}
+                       <span class="text-success">✓ Visible</span>
+                   {% else %}
+                       <span class="text-danger">✗ Hidden</span>
+                   {% endif %}
+                </p>
+            </div>
+            
+            <div class="alert alert-warning">
+                <h4>Mobile Navigation Tests:</h4>
+                <p><strong>Danh sách (Mobile):</strong> 
+                   {% if user.is_superuser or user.is_admin_user or user.is_manager_user or user.is_hcns_user %}
+                       <span class="text-success">✓ Visible</span>
+                   {% else %}
+                       <span class="text-danger">✗ Hidden</span>
+                   {% endif %}
+                </p>
+                <p><strong>Nhân viên (Mobile):</strong> 
+                   {% if user.is_superuser or user.is_admin_user or user.is_manager_user %}
+                       <span class="text-success">✓ Visible</span>
+                   {% else %}
+                       <span class="text-danger">✗ Hidden</span>
+                   {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'users:update' user.id %}" class="btn btn-primary">Test User Update Page</a>
+            <a href="{% url 'users:list' %}" class="btn btn-secondary">Back to User List</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

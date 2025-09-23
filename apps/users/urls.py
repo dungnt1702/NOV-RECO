@@ -1,5 +1,5 @@
 from django.urls import path
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from .views import (
     user_list_view,
     user_create_view,
@@ -17,11 +17,17 @@ from .views import (
     department_list_api,
 )
 
+def debug_user_view(request):
+    """Debug user information"""
+    return render(request, 'debug_user.html')
+
 app_name = "users"
 
 urlpatterns = [
     # Index -> users list
     path("", lambda request: redirect("users:list"), name="index"),
+    # Debug view
+    path("debug/", debug_user_view, name="debug"),
     # User management views
     path("list/", user_list_view, name="list"),
     path("create/", user_create_view, name="create"),
