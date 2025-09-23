@@ -112,12 +112,12 @@ class User(AbstractUser):
     @property
     def is_manager_user(self):
         """Kiểm tra user có phải manager không"""
-        return self.role == UserRole.MANAGER
+        return self.role == UserRole.MANAGER or self.is_superuser
 
     @property
     def is_hcns_user(self):
         """Kiểm tra user có phải HCNS không"""
-        return self.role == UserRole.HCNS
+        return self.role == UserRole.HCNS or self.is_superuser
 
     @property
     def is_employee_user(self):
