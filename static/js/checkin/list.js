@@ -83,6 +83,7 @@ async function loadCheckins() {
       loadDepartments();
       loadAreas();
       loadAllUsers();
+      initializeDepartmentFilter();
     } else {
       console.error('API error:', response.status, response.statusText);
       // Use sample data for demonstration when API fails
@@ -437,13 +438,15 @@ function populateDepartmentFilter(departments) {
   if (departmentFilter) {
     departmentFilter.innerHTML = '<option value="">Tất cả phòng ban</option>' +
       departments.map(dept => `<option value="${dept.id}">${dept.name}</option>`).join('');
-    
-    // Remove existing event listeners to avoid duplicates
-    const newDepartmentFilter = departmentFilter.cloneNode(true);
-    departmentFilter.parentNode.replaceChild(newDepartmentFilter, departmentFilter);
-    
-    // Add event listener for department change
-    newDepartmentFilter.addEventListener('change', function() {
+  }
+}
+
+// Initialize department filter event listener once
+function initializeDepartmentFilter() {
+  const departmentFilter = document.getElementById('departmentFilter');
+  if (departmentFilter && !departmentFilter.hasAttribute('data-initialized')) {
+    departmentFilter.setAttribute('data-initialized', 'true');
+    departmentFilter.addEventListener('change', function() {
       console.log('Department changed to:', this.value);
       const departmentId = this.value;
       if (departmentId) {
