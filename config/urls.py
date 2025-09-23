@@ -12,7 +12,8 @@ urlpatterns = [
         TemplateView.as_view(template_name="home.html"),
         name="home",
     ),
-    path("checkin/", include("apps.checkin.urls_checkin")),
+    # Mount checkin app under /checkin/ with namespace
+    path("checkin/", include(("apps.checkin.urls", "checkin"), namespace="checkin")),
     path("area/", include("apps.area.urls")),
     path("employee/", include("apps.employee.urls")),
     path("personal/", include("apps.personal.urls")),

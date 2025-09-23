@@ -1,4 +1,5 @@
 from django.urls import path
+from django.shortcuts import redirect
 from .views import (
     user_list_view,
     user_create_view,
@@ -13,11 +14,14 @@ from .views import (
     user_list_api,
     user_create_api,
     user_update_api,
+    department_list_api,
 )
 
 app_name = "users"
 
 urlpatterns = [
+    # Index -> users list
+    path("", lambda request: redirect("users:list"), name="index"),
     # User management views
     path("list/", user_list_view, name="list"),
     path("create/", user_create_view, name="create"),
@@ -36,4 +40,5 @@ urlpatterns = [
     path("api/", user_list_api, name="list_api"),
     path("api/create/", user_create_api, name="create_api"),
     path("api/<int:user_id>/update/", user_update_api, name="update_api"),
+    path("api/departments/", department_list_api, name="department_list_api"),
 ]

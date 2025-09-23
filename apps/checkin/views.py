@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -10,8 +11,8 @@ from .models import Checkin
 from apps.area.models import Area
 from apps.users.models import User, UserRole
 from .decorators import role_required
-from .serializers import CheckinSerializer, CheckinListSerializer
-from .utils import haversine_m
+from .serializers import CheckinListSerializer
+from .utils import haversine_m, find_nearest_area
 
 
 @login_required
@@ -40,24 +41,8 @@ def checkin_submit_view(request):
             return JsonResponse(
                 {'success': False, 'error': 'Vui lòng chụp ảnh'}, status=400
             )
-        # Tìm khu vực gần nhất
-        area = None
-        if area_id:
-            try:
-                area = Area.objects.get(id=area_id)
-            except Area.DoesNotExist:
-                pass
-
-        if not area:
-            # Tìm khu vực gần nhất
-            areas = Area.objects.filter(is_active=True)
-            min_distance = float('inf')
-            for a in areas:
-                distance = haversine_m(a.lat, a.lng, lat, lng)
-                if (distance < min_distance and
-                        distance <= a.radius_m):
-                    min_distance = distance
-                    area = a
+        # Tự động tìm khu vực gần nhất dựa trên tọa độ
+        area, distance = find_nearest_area(lat, lng, area_id)
 
         # Tạo check-in
         checkin = Checkin.objects.create(
@@ -76,11 +61,21 @@ def checkin_submit_view(request):
             checkin.distance_m = haversine_m(area.lat, area.lng, lat, lng)
             checkin.save()
 
+        # New pretty URL: /checkin/success/checkin_id/<id>/
+        redirect_url = reverse(
+            'checkin:success_by_id', kwargs={'checkin_id': checkin.id}
+        )
+
         return JsonResponse({
             'success': True,
             'checkin_id': checkin.id,
-            'area_name': area.name if area else 'Không xác định',
-            'distance': checkin.distance_m
+            'area_name': (
+                area.name
+                if area else 'Không xác định'
+            ),
+            'area_id': area.id if area else None,
+            'distance': distance if distance else checkin.distance_m,
+            'redirect_url': redirect_url,
         })
 
     except Exception as e:
@@ -88,14 +83,35 @@ def checkin_submit_view(request):
 
 
 @login_required
-def checkin_success_view(request):
+def checkin_success_view(request, checkin_id=None):
     """Trang thành công sau check-in"""
-    checkin_id = request.GET.get('checkin_id')
+    checkin_id = checkin_id or request.GET.get('checkin_id')
     if checkin_id:
         try:
             checkin = Checkin.objects.get(id=checkin_id, user=request.user)
+            success_data = {
+                'user_name': checkin.user.full_name,
+                'user_email': checkin.user.email,
+                'user_department': (
+                    checkin.user.department.name
+                    if checkin.user.department else 'N/A'
+                ),
+                'user_employee_id': checkin.user.username,
+                'area_name': checkin.get_area_name(),
+                'coordinates': (
+                    f"{checkin.lat:.6f}, {checkin.lng:.6f}"
+                ),
+                'checkin_time': checkin.created_at.strftime(
+                    '%d/%m/%Y %H:%M:%S'
+                ),
+                'note': checkin.note or '',
+                'photo_url': (
+                    checkin.photo.url if checkin.photo else None
+                ),
+            }
             context = {
                 'checkin': checkin,
+                'success_data': success_data,
                 'area_name': checkin.get_area_name(),
                 'distance': checkin.distance_m,
             }
@@ -103,7 +119,25 @@ def checkin_success_view(request):
         except Checkin.DoesNotExist:
             pass
 
-    return render(request, 'checkin/success.html')
+    # Default success data if no checkin_id provided
+    success_data = {
+        'user_name': request.user.full_name,
+        'user_email': request.user.email,
+        'user_department': (
+            request.user.department.name
+            if request.user.department else 'N/A'
+        ),
+        'user_employee_id': request.user.username,
+        'area_name': 'N/A',
+        'coordinates': 'N/A',
+        'checkin_time': 'N/A',
+        'note': '',
+        'photo_url': None,
+    }
+    context = {
+        'success_data': success_data,
+    }
+    return render(request, 'checkin/success.html', context)
 
 
 @login_required

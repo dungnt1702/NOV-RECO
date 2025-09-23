@@ -617,6 +617,12 @@
     color: #718096;
 }
 
+.empty-state-cell {
+    text-align: center;
+    padding: 0;
+    border: none;
+}
+
 .empty-state i {
     font-size: 4rem;
     margin-bottom: 20px;

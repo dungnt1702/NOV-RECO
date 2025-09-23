@@ -61,6 +61,32 @@ def test_session_detail(request, session_id):
 
 @login_required
 @role_required([UserRole.ADMIN, UserRole.MANAGER])
+def get_sessions(request):
+    """Return recent automation test sessions (for dashboard list)."""
+    sessions = (
+        TestSession.objects.select_related("user")
+        .order_by("-created_at")[:20]
+    )
+    items = [
+        {
+            "session_id": s.session_id,
+            "status": s.status,
+            "total_tests": s.total_tests,
+            "passed_tests": s.passed_tests,
+            "failed_tests": s.failed_tests,
+            "skipped_tests": s.skipped_tests,
+            "success_rate": s.success_rate,
+            "duration": s.duration,
+            "created_at": s.created_at.isoformat() if getattr(s, "created_at", None) else None,
+            "completed_at": s.completed_at.isoformat() if s.completed_at else None,
+            "user": getattr(s.user, "username", None),
+        }
+        for s in sessions
+    ]
+    return JsonResponse({"success": True, "sessions": items})
+
+@login_required
+@role_required([UserRole.ADMIN, UserRole.MANAGER])
 @require_POST
 @csrf_exempt
 def start_test(request):

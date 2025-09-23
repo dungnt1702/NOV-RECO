@@ -16,6 +16,13 @@ CSRF_COOKIE_SECURE = False
 
 # Development-specific settings
 if DEBUG:
+    # Remove Django's security middleware to avoid CSP conflicts
+    MIDDLEWARE = [mw for mw in MIDDLEWARE if mw != 'django.middleware.security.SecurityMiddleware']
+    
+    # Move our CSP middleware to the end to override any other CSP settings
+    MIDDLEWARE = [mw for mw in MIDDLEWARE if mw != 'apps.common.middleware.SecurityHeadersMiddleware']
+    MIDDLEWARE.append('apps.common.middleware.SecurityHeadersMiddleware')
+    
     # Add debug toolbar if available
     try:
         import debug_toolbar

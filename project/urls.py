@@ -13,7 +13,7 @@ urlpatterns = (
             TemplateView.as_view(template_name="home.html"),
             name="home",
         ),
-        path("", include("apps.checkin.urls")),  # All modules at root level
+        path("", include(("apps.checkin.urls", "checkin"), namespace="checkin")),  # All modules at root level with namespace
         path("area/", include("apps.area.urls")),  # Area management
         path("users/", include("apps.users.urls")),  # User management
         path("automation-test/", include("apps.automation_test.urls")),  # Automation test

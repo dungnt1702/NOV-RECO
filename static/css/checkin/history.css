@@ -291,6 +291,14 @@
     color: #4a5568;
 }
 
+.checkin-table .distance-cell {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+    color: #0A5597;
+    font-weight: 600;
+    text-align: center;
+}
+
 .checkin-table .note-cell {
     max-width: 200px;
     overflow: hidden;
@@ -441,6 +449,12 @@
     text-align: center;
     padding: 60px 20px;
     color: #6b7280;
+}
+
+.empty-state-cell {
+    text-align: center;
+    padding: 0;
+    border: none;
 }
 
 .empty-state i {

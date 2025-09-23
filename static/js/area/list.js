@@ -23,11 +23,7 @@ function setupEventListeners() {
         });
     }
 
-    // Update check-ins button
-    const updateCheckinsBtn = document.getElementById('updateCheckinsBtn');
-    if (updateCheckinsBtn) {
-        updateCheckinsBtn.addEventListener('click', updateAllCheckins);
-    }
+    // Update check-ins button removed - no longer needed
 
     // Filter controls
     const statusFilterElement = document.getElementById('statusFilter');
@@ -139,7 +135,7 @@ function createAreaItem(area) {
 
 // Edit area
 function editArea(areaId) {
-    window.location.href = `/area/form/${areaId}/`;
+    window.location.href = `/area/update/${areaId}/`;
 }
 
 // Delete area
@@ -168,39 +164,7 @@ async function deleteArea(areaId) {
     }
 }
 
-// Update all check-ins
-async function updateAllCheckins() {
-    if (!confirm('Bạn có chắc chắn muốn cập nhật tất cả check-in? Thao tác này có thể mất vài phút.')) {
-        return;
-    }
-
-    const btn = document.getElementById('updateCheckinsBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang cập nhật...';
-    btn.disabled = true;
-
-    try {
-        const response = await fetch('/area/api/update-checkins/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        });
-
-        if (response.ok) {
-            const result = await response.json();
-            showAlert(`Cập nhật thành công! ${result.updated_count} check-in đã được cập nhật.`, 'success');
-        } else {
-            throw new Error('Failed to update check-ins');
-        }
-    } catch (error) {
-        console.error('Error updating check-ins:', error);
-        showAlert('Lỗi khi cập nhật check-in', 'danger');
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
-}
+// Update all check-ins function removed - no longer needed
 
 // Update pagination
 function updatePagination() {

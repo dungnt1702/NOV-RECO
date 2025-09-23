@@ -8,6 +8,20 @@ let currentPhoto = null;
 let stream = null;
 let currentFacingMode = 'environment'; // 'environment' for back camera, 'user' for front camera
 
+// Helper: determine if current context is allowed to use camera/GPS in dev
+function isTrustedContext() {
+    try {
+        if (window.isSecureContext) return true;
+        const host = (location.hostname || '').toLowerCase();
+        if (host === 'localhost' || host === '127.0.0.1') return true;
+        // Any *.local domain (e.g., reco.local, nov-reco.local)
+        if (/^[a-z0-9-]+\.local$/.test(host)) return true;
+        // Private IPv4 ranges commonly used in LAN/dev
+        if (/^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(host)) return true;
+    } catch (_) {}
+    return false;
+}
+
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Checkin page loaded, initializing...');
@@ -24,7 +38,7 @@ function checkBrowserSupport() {
     const warnings = [];
     
     // Check HTTPS
-    const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+    const isSecureContext = isTrustedContext();
     
     if (!isSecureContext) {
         warnings.push('⚠️ Trang web không bảo mật - GPS và Camera có thể không hoạt động');
@@ -71,6 +85,12 @@ function initializeMap() {
     const mapElement = document.getElementById('map');
     if (!mapElement) {
         console.log('Map element not found, skipping map initialization');
+        return;
+    }
+    
+    // Check if Leaflet is loaded
+    if (typeof L === 'undefined') {
+        console.error('Leaflet library not loaded');
         return;
     }
     
@@ -212,7 +232,7 @@ async function getCurrentLocation() {
     setLoading(btn, true);
     
     // Check if running on HTTPS or localhost
-    const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+    const isSecureContext = isTrustedContext();
     
     if (!isSecureContext) {
         showAlert('⚠️ GPS chỉ hoạt động trên HTTPS hoặc localhost.\n\nVui lòng truy cập qua:\n• https:// (bảo mật)\n• localhost\n• reco.local', 'error');
@@ -232,10 +252,12 @@ async function getCurrentLocation() {
             const permission = await navigator.permissions.query({ name: 'geolocation' });
             console.log('Geolocation permission:', permission.state);
             
-            if (permission.state === 'denied') {
-                showAlert('🚫 Quyền truy cập vị trí bị từ chối!\n\n📋 Cách khắc phục:\n1️⃣ Nhấp vào biểu tượng 🔒 bên trái thanh địa chỉ\n2️⃣ Chọn "Vị trí" → "Cho phép"\n3️⃣ Tải lại trang và thử lại', 'error');
-                setLoading(btn, false);
-                return;
+            if (permission.state === 'granted') {
+                console.log('GPS permission already granted, proceeding...');
+            } else if (permission.state === 'prompt') {
+                console.log('GPS permission prompt expected...');
+            } else if (permission.state === 'denied') {
+                console.warn('Permissions API reports geolocation denied; will verify via getCurrentPosition');
             }
         }
         
@@ -321,7 +343,7 @@ async function openCamera() {
         console.log('Requesting camera access...');
         
         // Check if running on HTTPS or localhost
-        const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+        const isSecureContext = isTrustedContext();
         
         if (!isSecureContext) {
             showAlert('⚠️ Camera chỉ hoạt động trên HTTPS hoặc localhost.\n\nVui lòng truy cập qua:\n• https:// (bảo mật)\n• localhost\n• reco.local', 'error');
@@ -339,9 +361,12 @@ async function openCamera() {
                 const permission = await navigator.permissions.query({ name: 'camera' });
                 console.log('Camera permission:', permission.state);
                 
-                if (permission.state === 'denied') {
-                    showAlert('🚫 Quyền truy cập camera bị từ chối!\n\n📋 Cách khắc phục:\n1️⃣ Nhấp vào biểu tượng 🔒 bên trái thanh địa chỉ\n2️⃣ Chọn "Camera" → "Cho phép"\n3️⃣ Tải lại trang và thử lại', 'error');
-                    return;
+                if (permission.state === 'granted') {
+                    console.log('Camera permission already granted, proceeding...');
+                } else if (permission.state === 'prompt') {
+                    console.log('Camera permission prompt expected...');
+                } else if (permission.state === 'denied') {
+                    console.warn('Permissions API reports camera denied; will verify via getUserMedia');
                 }
             } catch (permError) {
                 console.log('Camera permission check not supported, proceeding...');
@@ -644,40 +669,35 @@ async function handleSubmit(e) {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         formData.append('csrfmiddlewaretoken', csrfToken);
         
-        const response = await fetch('/submit/', {
+        const response = await fetch('/checkin/submit/', {
             method: 'POST',
             body: formData,
             credentials: 'include'
         });
         
         if (response.ok) {
-            // Check if response is a redirect to success page
-            if (response.redirected && response.url.includes('/success/')) {
-                window.location.href = response.url;
-            } else {
-                // Try to parse JSON response
-                try {
-                    const result = await response.json();
-                    if (result.success && result.redirect_url) {
-                        window.location.href = result.redirect_url;
-                    } else if (result.success) {
-                        showAlert('Check-in thành công!', 'success');
-                        // Reset form
-                        resetForm();
-                    } else {
-                        showAlert(result.message || 'Có lỗi xảy ra', 'error');
-                    }
-                } catch (e) {
-                    // If not JSON, check if it's HTML (success page)
-                    const text = await response.text();
-                    if (text.includes('Check-in Thành công') || text.includes('success')) {
-                        // This is the success page, redirect to it
-                        window.location.href = '/success/';
-                    } else {
-                        showAlert('Check-in thành công!', 'success');
-                        resetForm();
-                    }
+            // Always parse JSON and prioritize pretty URL
+            try {
+                const result = await response.json();
+                let target = null;
+                if (result && result.redirect_url) {
+                    target = result.redirect_url;
+                } else if (result && result.success && result.checkin_id) {
+                    target = `/checkin/success/checkin_id/${result.checkin_id}/`;
                 }
+                if (target) {
+                    console.log('Redirecting to:', target);
+                    window.location.href = target;
+                    return;
+                }
+                if (result && result.success) {
+                    showAlert('Check-in thành công!', 'success');
+                    resetForm();
+                } else {
+                    showAlert((result && result.message) || 'Có lỗi xảy ra', 'error');
+                }
+            } catch (e) {
+                showAlert('Có lỗi xảy ra khi xử lý phản hồi', 'error');
             }
         } else if (response.status === 302) {
             // Redirect to login
@@ -733,7 +753,7 @@ async function testGpsPermission() {
     
     try {
         // Check secure context
-        const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+        const isSecureContext = isTrustedContext();
         
         if (!isSecureContext) {
             if (statusElement) {
@@ -797,7 +817,7 @@ async function testCameraPermission() {
     
     try {
         // Check secure context
-        const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+        const isSecureContext = isTrustedContext();
         
         if (!isSecureContext) {
             if (statusElement) {

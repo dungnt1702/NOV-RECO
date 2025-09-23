@@ -7,6 +7,19 @@ let currentSort = { field: 'created_at', direction: 'desc' };
 
 console.log('Checkin list JS loaded');
 
+function normalizePhotoSrc(photoUrl, photoField) {
+  if (photoUrl) return photoUrl;
+  if (!photoField) return null;
+  const val = String(photoField);
+  if (val.startsWith('http') || val.startsWith('/media/')) return val;
+  return `/media/${val.replace(/^\/+/, '')}`;
+}
+
+function formatDistanceNumber(meters) {
+  const n = parseFloat(meters) || 0;
+  return `${n.toFixed(2)} mét`;
+}
+
 // Sample data for testing when API is not available
 const sampleCheckins = [
   {
@@ -40,11 +53,11 @@ async function loadCheckins() {
     
     let response;
     if (typeof api === 'function') {
-      response = await api('/checkin/api/');
+      response = await api('/checkin/api/?per_page=1000');
     } else {
       // Fallback to fetch if api() not available
       console.warn('api() function not found, using fetch fallback');
-      response = await fetch('/checkin/api/', {
+      response = await fetch('/checkin/api/?per_page=1000', {
         method: 'GET',
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
@@ -56,7 +69,7 @@ async function loadCheckins() {
     if (response.ok) {
       const data = await response.json();
       console.log('Data received:', data);
-      allCheckins = data.results || [];
+      allCheckins = data.checkins || data.results || [];
       window.originalCheckins = allCheckins; // Store original data for filtering
       
       // Initialize sort icons
@@ -167,7 +180,17 @@ function renderCheckinsTable(items = null) {
   const tbody = document.getElementById('checkins-table');
   if (tbody) {
     if (checkinsToRender.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #6c757d;">Không có dữ liệu check-in</td></tr>';
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="empty-state-cell">
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <h3>Không có check-in nào</h3>
+              <p>Chưa có dữ liệu check-in phù hợp với bộ lọc.</p>
+            </div>
+          </td>
+        </tr>
+      `;
     } else {
       tbody.innerHTML = checkinsToRender.map(checkin => `
         <tr>
@@ -190,13 +213,13 @@ function renderCheckinsTable(items = null) {
           <td>${formatDate(checkin.created_at)}</td>
           <td>${checkin.note || '-'}</td>
           <td>
-            ${checkin.photo_url ? `
-              <img src="${checkin.photo_url}" alt="Check-in photo" class="photo-thumbnail" onclick="openPhotoModal('${checkin.photo_url}')">
-            ` : `
-              <div class="photo-placeholder">
-                <i class="fas fa-camera"></i>
-              </div>
-            `}
+            ${(() => {
+              const src = normalizePhotoSrc(checkin.photo_url, checkin.photo);
+              if (src) {
+                return `<img src="${src}" alt="Check-in photo" class="photo-thumbnail" onclick="openPhotoModal('${src}')" onerror="this.style.display='none'">`;
+              }
+              return `<div class=\"photo-placeholder\"><i class=\"fas fa-camera\"></i></div>`;
+            })()}
           </td>
         </tr>
       `).join('');
@@ -233,7 +256,13 @@ function renderMobileCards(items = null) {
   console.log('Mobile cards container found:', mobileCards);
   
   if (checkinsToRender.length === 0) {
-    mobileCards.innerHTML = '<div style="text-align: center; padding: 40px; color: #6c757d;">Không có dữ liệu check-in</div>';
+    mobileCards.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <h3>Không có check-in nào</h3>
+        <p>Chưa có dữ liệu check-in phù hợp với bộ lọc.</p>
+      </div>
+    `;
   } else {
   mobileCards.innerHTML = checkinsToRender.map(checkin => `
     <div class="mobile-card">
@@ -255,6 +284,11 @@ function renderMobileCards(items = null) {
           </div>
           
           <div class="mobile-card-row">
+            <span class="mobile-card-label">📏 Khoảng cách:</span>
+            <span class="mobile-card-value">${formatDistanceNumber(checkin.distance_m || 0)}</span>
+          </div>
+          
+          <div class="mobile-card-row">
             <span class="mobile-card-label">📅 Thời gian:</span>
             <span class="mobile-card-value">${formatDate(checkin.created_at)}</span>
           </div>
@@ -268,18 +302,17 @@ function renderMobileCards(items = null) {
         </div>
         
         <div class="mobile-card-photo-container">
-          ${checkin.photo_url ? `
-            <img src="${checkin.photo_url}" alt="Check-in photo" class="mobile-card-photo">
-          ` : `
-            <div class="mobile-card-photo-placeholder">📷</div>
-          `}
+          ${(function(){
+            const src = normalizePhotoSrc(checkin.photo_url, checkin.photo);
+            if (src) {
+              return `<img src="${src}" alt="Check-in photo" class="mobile-card-photo" onclick="openPhotoModal('${src}')" onerror="this.style.display='none'">`;
+            }
+            return `<div class=\"mobile-card-photo-placeholder\">📷</div>`;
+          })()}
         </div>
       </div>
         
-        <div class="mobile-card-badges">
-          <span class="mobile-card-badge location">${checkin.area_name}</span>
-          <span class="mobile-card-badge distance">${formatDistance(checkin.distance_m || 0)}</span>
-        </div>
+        <div class="mobile-card-badges"></div>
       </div>
     `).join('');
     
@@ -551,7 +584,8 @@ function openPhotoModal(photoUrl) {
 
 // Pagination functions
 function updatePagination() {
-  totalPages = Math.ceil(allCheckins.length / itemsPerPage);
+  const totalItems = allCheckins.length;
+  totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
   
   const paginationContainer = document.getElementById('pagination');
   if (paginationContainer) {
@@ -585,10 +619,12 @@ function updatePagination() {
     nextBtn.addEventListener('click', () => loadPage(currentPage + 1));
     paginationContainer.appendChild(nextBtn);
     
-    // Add pagination info
+    // Add pagination info with counts
+    const start = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+    const end = Math.min(currentPage * itemsPerPage, totalItems);
     const info = document.createElement('div');
     info.className = 'pagination-info';
-    info.textContent = `Trang ${currentPage} / ${totalPages}`;
+    info.textContent = `Trang ${currentPage}/${totalPages} • Hiển thị ${start}–${end} / ${totalItems}`;
     paginationContainer.appendChild(info);
   }
 }

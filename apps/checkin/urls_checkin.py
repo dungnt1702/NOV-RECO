@@ -17,6 +17,11 @@ urlpatterns = [
     path("action/", checkin_action_view, name="action"),
     path("submit/", checkin_submit_view, name="submit"),
     path("success/", checkin_success_view, name="success"),
+    path(
+        "success/checkin_id/<int:checkin_id>/",
+        checkin_success_view,
+        name="success_by_id",
+    ),
     path("history/", checkin_history_view, name="history"),
     path("list/", checkin_list_view, name="list"),
 
