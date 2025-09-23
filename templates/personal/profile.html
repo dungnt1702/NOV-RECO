@@ -31,6 +31,8 @@
                 <p class="profile-role">{{ user.get_role_display }}</p>
                 {% if user.department %}
                     <p class="profile-department">{{ user.department.name }}</p>
+                {% else %}
+                    <p class="profile-department">Chưa phân phòng ban</p>
                 {% endif %}
                 {% if user.position %}
                     <p class="profile-position">{{ user.position }}</p>
@@ -97,7 +99,7 @@
                             </div>
                             <div class="info-item">
                                 <label>Phòng ban:</label>
-                                <span>{{ user.department.name|default:"Chưa phân phòng ban" }}</span>
+                                <span>{% if user.department %}{{ user.department.name }}{% else %}Chưa phân phòng ban{% endif %}</span>
                             </div>
                             <div class="info-item">
                                 <label>Chức vụ:</label>

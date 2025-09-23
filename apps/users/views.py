@@ -55,7 +55,7 @@ def user_list_view(request):
         'current_dept': dept_filter,
         'current_search': search,
     }
-    return render(request, 'users/list.html', context)
+    return render(request, 'users/user_list.html', context)
 
 
 @role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])

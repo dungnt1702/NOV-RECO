@@ -103,3 +103,37 @@ class User(AbstractUser):
     def can_view_reports(self):
         """Kiểm tra có thể xem báo cáo không"""
         return self.role in [UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS]
+
+    @property
+    def is_admin_user(self):
+        """Kiểm tra user có phải admin không"""
+        return self.role == UserRole.ADMIN or self.is_superuser
+
+    @property
+    def is_manager_user(self):
+        """Kiểm tra user có phải manager không"""
+        return self.role == UserRole.MANAGER
+
+    @property
+    def is_hcns_user(self):
+        """Kiểm tra user có phải HCNS không"""
+        return self.role == UserRole.HCNS
+
+    @property
+    def is_employee_user(self):
+        """Kiểm tra user có phải employee không"""
+        return self.role == UserRole.EMPLOYEE
+
+    @property
+    def full_name(self):
+        """Tên đầy đủ của user"""
+        return f"{self.first_name} {self.last_name}".strip() or self.username
+
+    def get_display_name(self):
+        """Tên hiển thị của user"""
+        return self.full_name
+
+    @property
+    def employee_id(self):
+        """ID nhân viên (sử dụng user ID)"""
+        return self.id
