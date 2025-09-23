@@ -20,8 +20,16 @@
         </div>
 
         <div class="history-content">
+            <!-- Filters Toggle -->
+            <div class="filters-toggle">
+                <button id="filterToggle" class="btn btn-secondary toggle-btn" type="button">
+                    <i id="filterToggleIcon" class="fas fa-chevron-down"></i>
+                    <span style="margin-left:8px;">Bộ lọc</span>
+                </button>
+            </div>
+
             <!-- Filters -->
-            <div class="history-filters">
+            <div id="filtersPanel" class="history-filters">
                 <div class="filter-group">
                     <label for="dateFrom">Từ ngày:</label>
                     <input type="date" id="dateFrom" class="form-control">

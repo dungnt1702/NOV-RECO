@@ -53,6 +53,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show appropriate view based on screen size
     updateViewVisibility();
     
+    // Collapse filters by default
+    const filtersPanel = document.getElementById('filtersPanel');
+    const filterToggle = document.getElementById('filterToggle');
+    const filterToggleIcon = document.getElementById('filterToggleIcon');
+    if (filtersPanel) {
+        filtersPanel.classList.add('collapsed');
+    }
+    if (filterToggle && filtersPanel) {
+        filterToggle.addEventListener('click', function() {
+            const isCollapsed = filtersPanel.classList.toggle('collapsed');
+            if (filterToggleIcon) {
+                filterToggleIcon.className = isCollapsed ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+            }
+        });
+    }
+
     loadCheckins();
     setupEventListeners();
     

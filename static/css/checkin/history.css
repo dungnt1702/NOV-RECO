@@ -475,6 +475,26 @@
     margin: 0;
 }
 
+/* Collapsible filters */
+.filters-toggle {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+
+.toggle-btn {
+    background: #e2e8f0;
+    color: #1a202c;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+#filtersPanel.collapsed {
+    display: none;
+}
+
 /* Pagination */
 .pagination-container {
     display: flex;

@@ -20,8 +20,16 @@
         </div>
 
         <div class="list-content">
+            <!-- Filters Toggle -->
+            <div class="filters-toggle">
+                <button id="filterToggle" class="btn btn-secondary toggle-btn" type="button">
+                    <i id="filterToggleIcon" class="fas fa-chevron-down"></i>
+                    <span style="margin-left:8px;">Bộ lọc</span>
+                </button>
+            </div>
+
             <!-- Filters and Controls -->
-            <div class="list-controls">
+            <div id="filtersPanel" class="list-controls">
                 <div class="filter-group">
                     <label for="departmentFilter">Phòng ban:</label>
                     <select id="departmentFilter" class="form-control">

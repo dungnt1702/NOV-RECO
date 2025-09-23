@@ -82,6 +82,7 @@ async function loadCheckins() {
       console.log('Checkins loaded:', allCheckins.length);
       loadDepartments();
       loadAreas();
+      loadAllUsers();
     } else {
       console.error('API error:', response.status, response.statusText);
       // Use sample data for demonstration when API fails
@@ -375,7 +376,7 @@ async function loadAllUsers() {
       populateUserFilter(users);
     }
   } catch (error) {
-    console.error('Error loading users:', error);
+    console.error('Error loading all users:', error);
   }
 }
 
@@ -448,8 +449,12 @@ function populateDepartmentFilter(departments) {
 function populateUserFilter(users) {
   const userFilter = document.getElementById('userFilter');
   if (userFilter) {
-    userFilter.innerHTML = '<option value="">Tất cả nhân viên</option>' +
-      users.map(user => `<option value="${user.id}">${user.first_name} ${user.last_name}</option>`).join('');
+    if (users.length === 0) {
+      userFilter.innerHTML = '<option value="">Không có nhân viên</option>';
+    } else {
+      userFilter.innerHTML = '<option value="">Tất cả nhân viên</option>' +
+        users.map(user => `<option value="${user.id}">${user.first_name} ${user.last_name}</option>`).join('');
+    }
   }
 }
 
@@ -649,6 +654,22 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Load checkins
   loadCheckins();
+
+  // Collapse filters by default
+  const filtersPanel = document.getElementById('filtersPanel');
+  const filterToggle = document.getElementById('filterToggle');
+  const filterToggleIcon = document.getElementById('filterToggleIcon');
+  if (filtersPanel) {
+    filtersPanel.classList.add('collapsed');
+  }
+  if (filterToggle && filtersPanel) {
+    filterToggle.addEventListener('click', function() {
+      const isCollapsed = filtersPanel.classList.toggle('collapsed');
+      if (filterToggleIcon) {
+        filterToggleIcon.className = isCollapsed ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+      }
+    });
+  }
   
   // Add event listeners for sorting
   document.querySelectorAll('.checkin-table th.sortable').forEach(th => {
