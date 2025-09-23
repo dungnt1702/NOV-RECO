@@ -31,6 +31,7 @@ class User(AbstractUser):
         default=UserRole.EMPLOYEE,
         help_text="Vai trò người dùng"
     )
+    
     department = models.ForeignKey(
         Department,
         on_delete=models.SET_NULL,
@@ -66,6 +67,29 @@ class User(AbstractUser):
         ordering = ['first_name', 'last_name']
         verbose_name = 'Người dùng'
         verbose_name_plural = 'Người dùng'
+        permissions = [
+            # User management permissions
+            ("can_manage_users", "Can manage users"),
+            ("can_view_users", "Can view users"),
+            ("can_create_users", "Can create users"),
+            ("can_edit_users", "Can edit users"),
+            ("can_delete_users", "Can delete users"),
+            
+            # Department management permissions
+            ("can_manage_departments", "Can manage departments"),
+            ("can_view_departments", "Can view departments"),
+            ("can_create_departments", "Can create departments"),
+            ("can_edit_departments", "Can edit departments"),
+            ("can_delete_departments", "Can delete departments"),
+            
+            # Role management permissions
+            ("can_manage_roles", "Can manage user roles"),
+            ("can_assign_roles", "Can assign roles to users"),
+            
+            # System administration permissions
+            ("can_access_admin", "Can access admin panel"),
+            ("can_manage_system", "Can manage system settings"),
+        ]
 
     def __str__(self):
         return self.get_full_name() or self.username
@@ -137,3 +161,73 @@ class User(AbstractUser):
     def employee_id(self):
         """ID nhân viên (sử dụng user ID)"""
         return self.id
+    
+    # Django Permissions Helper Methods
+    def is_super_admin(self):
+        """Kiểm tra có phải Super Admin không"""
+        return self.is_superuser or self.groups.filter(name='Super Admin').exists()
+    
+    def is_admin_user_new(self):
+        """Kiểm tra có phải Admin không (mới)"""
+        return (self.is_superuser or 
+                self.groups.filter(name__in=['Super Admin', 'Admin']).exists())
+    
+    def is_manager_user_new(self):
+        """Kiểm tra có phải Manager không (mới)"""
+        return (self.is_superuser or 
+                self.groups.filter(name__in=['Super Admin', 'Admin', 'Manager']).exists())
+    
+    def is_hr_user(self):
+        """Kiểm tra có phải HR không"""
+        return (self.is_superuser or 
+                self.groups.filter(name__in=['Super Admin', 'Admin', 'Manager', 'HR']).exists())
+    
+    def is_secretary_user(self):
+        """Kiểm tra có phải Secretary không"""
+        return (self.is_superuser or 
+                self.groups.filter(name__in=['Super Admin', 'Admin', 'Manager', 'Secretary']).exists())
+    
+    def is_employee_user_new(self):
+        """Kiểm tra có phải Employee không (mới)"""
+        return (self.is_superuser or 
+                self.groups.filter(name__in=['Super Admin', 'Admin', 'Manager', 'HR', 'Secretary', 'Employee']).exists())
+    
+    def can_manage_users_new(self):
+        """Kiểm tra có thể quản lý users không (mới)"""
+        return self.has_perm('users.can_manage_users')
+    
+    def can_view_users_new(self):
+        """Kiểm tra có thể xem users không (mới)"""
+        return self.has_perm('users.can_view_users')
+    
+    def can_manage_checkins_new(self):
+        """Kiểm tra có thể quản lý checkins không (mới)"""
+        return self.has_perm('checkin.can_manage_checkins')
+    
+    def can_view_all_checkins_new(self):
+        """Kiểm tra có thể xem tất cả checkins không (mới)"""
+        return self.has_perm('checkin.can_view_all_checkins')
+    
+    def can_manage_areas_new(self):
+        """Kiểm tra có thể quản lý areas không (mới)"""
+        return self.has_perm('area.can_manage_areas')
+    
+    def can_view_areas_new(self):
+        """Kiểm tra có thể xem areas không (mới)"""
+        return self.has_perm('area.can_view_areas')
+    
+    def can_manage_departments_new(self):
+        """Kiểm tra có thể quản lý departments không (mới)"""
+        return self.has_perm('users.can_manage_departments')
+    
+    def can_view_checkin_reports_new(self):
+        """Kiểm tra có thể xem báo cáo checkin không (mới)"""
+        return self.has_perm('checkin.can_view_checkin_reports')
+    
+    def can_create_checkins_new(self):
+        """Kiểm tra có thể tạo checkins không (mới)"""
+        return self.has_perm('checkin.can_create_checkins')
+    
+    def can_view_own_checkins_new(self):
+        """Kiểm tra có thể xem checkins của mình không (mới)"""
+        return self.has_perm('checkin.can_view_own_checkins')

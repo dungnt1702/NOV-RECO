@@ -1,14 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from apps.checkin.models import Checkin
 from apps.area.models import Area
 from apps.users.models import User, UserRole
-from apps.checkin.decorators import role_required
+from apps.users.permissions import group_required
 
 
 @login_required
@@ -68,7 +67,7 @@ def dashboard_personal_view(request):
     return render(request, 'dashboard/personal.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER])
+@group_required(['Super Admin', 'Admin', 'Manager'])
 def dashboard_manager_view(request):
     """Dashboard cho quản lý"""
     # Thống kê tổng quan
@@ -103,7 +102,7 @@ def dashboard_manager_view(request):
     return render(request, 'dashboard/manager.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@group_required(['Super Admin', 'Admin', 'Manager', 'HR'])
 def dashboard_hr_view(request):
     """Dashboard nhân sự cho HCNS"""
     # Thống kê nhân viên
@@ -135,7 +134,7 @@ def dashboard_hr_view(request):
     return render(request, 'dashboard/hr.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@group_required(['Super Admin', 'Admin', 'Manager', 'Secretary'])
 def dashboard_secretary_view(request):
     """Dashboard cho thư ký"""
     # Thống kê khu vực

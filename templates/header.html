@@ -1,5 +1,6 @@
 <!-- Header Template -->
 {% load static %}
+{% load user_permissions %}
 <nav class="navbar">
     <div class="nav-container">
         <!-- Left side: Hamburger + Logo -->
@@ -36,13 +37,15 @@
                                 Lịch sử
                             </a>
                         </li>
-                        {% if user.is_superuser or user.is_admin_user or user.is_manager_user or user.is_hcns_user %}
+                        {% if user|has_permission:'checkin.can_view_all_checkins' %}
                             <li>
                                 <a href="{% url 'checkin:list' %}">
                                     <i class="fas fa-list"></i>
                                     Danh sách check-in
                                 </a>
                             </li>
+                        {% endif %}
+                        {% if user|has_permission:'area.can_view_areas' %}
                             <li>
                                 <a href="{% url 'area:list' %}">
                                     <i class="fas fa-map-marker-alt"></i>
@@ -54,31 +57,35 @@
                 </li>
                 
                 <!-- Quản lý Nhân sự -->
-                {% if user.is_superuser or user.is_admin_user or user.is_manager_user %}
+                {% if user|has_permission:'users.can_view_users' or user|has_permission:'users.can_manage_departments' %}
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle">
                         <i class="fas fa-users"></i>
                         Quản lý Nhân sự
                         </a>
                         <ul class="dropdown-menu">
+                            {% if user|has_permission:'users.can_view_users' %}
                             <li>
                             <a href="{% url 'users:list' %}">
                                     <i class="fas fa-users"></i>
                                     Quản lý người dùng
                                 </a>
                             </li>
+                            {% endif %}
+                            {% if user|has_permission:'users.can_manage_departments' %}
                             <li>
                                 <a href="{% url 'users:department_list' %}">
                                     <i class="fas fa-building"></i>
                                     Quản lý phòng ban
                                 </a>
                             </li>
+                            {% endif %}
                         </ul>
                     </li>
                 {% endif %}
                 
                 <!-- Admin Panel -->
-                {% if user.is_superuser or user.is_admin_user or user.is_manager_user %}
+                {% if user|in_group:'Super Admin' or user|in_group:'Admin' or user|in_group:'Manager' %}
                     <li>
                         <a href="/admin/">
                             <i class="fas fa-cog"></i>
@@ -145,7 +152,7 @@
         <span class="nav-label">Lịch sử</span>
     </a>
     
-    {% if user.is_superuser or user.is_admin_user or user.is_manager_user or user.is_hcns_user %}
+    {% if user|has_permission:'checkin.can_view_all_checkins' %}
     <a href="{% url 'checkin:list' %}" class="nav-item {% if request.resolver_match and request.resolver_match.url_name|default:'' == 'list' %}active{% endif %}">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -154,7 +161,7 @@
     </a>
     {% endif %}
     
-    {% if user.is_superuser or user.is_admin_user or user.is_manager_user %}
+    {% if user|has_permission:'users.can_view_users' %}
     <a href="{% url 'users:list' %}" class="nav-item {% if request.resolver_match and request.resolver_match.app_name|default:'' == 'users' %}active{% endif %}">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>

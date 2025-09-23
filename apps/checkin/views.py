@@ -9,8 +9,8 @@ from datetime import datetime
 
 from .models import Checkin
 from apps.area.models import Area
-from apps.users.models import User, UserRole
-from .decorators import role_required
+from apps.users.models import User
+from apps.users.permissions import permission_required
 from .serializers import CheckinListSerializer
 from .utils import haversine_m, find_nearest_area
 
@@ -159,7 +159,7 @@ def checkin_history_view(request):
     return render(request, 'checkin/history.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('checkin.can_view_all_checkins')
 def checkin_list_view(request):
     """Danh sách check-in cho quản lý"""
     checkins = (Checkin.objects.select_related('user', 'area')

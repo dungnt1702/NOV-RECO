@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -7,11 +6,10 @@ from rest_framework.response import Response
 
 from apps.area.models import Area
 from .serializers import AreaSerializer
-from apps.checkin.decorators import role_required
-from apps.users.models import UserRole
+from apps.users.permissions import permission_required
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('area.can_view_areas')
 def area_list_view(request):
     """Danh sách khu vực"""
     areas = Area.objects.all().order_by('-created_at')
@@ -22,7 +20,7 @@ def area_list_view(request):
     return render(request, 'area/list.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('area.can_create_areas')
 def area_create_view(request):
     """Tạo khu vực mới"""
     if request.method == 'POST':
@@ -52,7 +50,7 @@ def area_create_view(request):
     return render(request, 'area/create.html')
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('area.can_edit_areas')
 def area_update_view(request, area_id):
     """Cập nhật khu vực"""
     area = get_object_or_404(Area, id=area_id)
@@ -75,7 +73,7 @@ def area_update_view(request, area_id):
     return render(request, 'area/update.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('area.can_view_areas')
 def area_detail_view(request, area_id):
     """Chi tiết khu vực"""
     area = get_object_or_404(Area, id=area_id)
@@ -91,7 +89,7 @@ def area_detail_view(request, area_id):
     return render(request, 'area/detail.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('area.can_delete_areas')
 def area_delete_view(request, area_id):
     """Xóa khu vực"""
     area = get_object_or_404(Area, id=area_id)
@@ -108,7 +106,7 @@ def area_delete_view(request, area_id):
     return render(request, 'area/delete.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('area.can_activate_areas')
 def area_toggle_active_view(request, area_id):
     """Bật/tắt trạng thái hoạt động của khu vực"""
     area = get_object_or_404(Area, id=area_id)
@@ -123,7 +121,7 @@ def area_toggle_active_view(request, area_id):
     return redirect('area:list')
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('checkin.can_view_checkin_reports')
 def area_checkin_history_view(request, area_id):
     """Lịch sử check-in trong khu vực"""
     area = get_object_or_404(Area, id=area_id)
@@ -144,7 +142,7 @@ def area_checkin_history_view(request, area_id):
     return render(request, 'area/checkin_history.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('checkin.can_view_checkin_reports')
 def area_statistics_view(request, area_id):
     """Thống kê khu vực"""
     area = get_object_or_404(Area, id=area_id)

@@ -22,6 +22,20 @@ class Checkin(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Check-in'
         verbose_name_plural = 'Check-ins'
+        permissions = [
+            # Checkin management permissions
+            ("can_manage_checkins", "Can manage checkins"),
+            ("can_view_checkins", "Can view checkins"),
+            ("can_create_checkins", "Can create checkins"),
+            ("can_edit_checkins", "Can edit checkins"),
+            ("can_delete_checkins", "Can delete checkins"),
+            ("can_view_all_checkins", "Can view all checkins"),
+            ("can_view_own_checkins", "Can view own checkins"),
+            
+            # Checkin reports permissions
+            ("can_view_checkin_reports", "Can view checkin reports"),
+            ("can_export_checkin_data", "Can export checkin data"),
+        ]
 
     def __str__(self):
         return f"{self.user.get_full_name() if self.user else 'Unknown'} - {self.created_at.strftime('%d/%m/%Y %H:%M')}"

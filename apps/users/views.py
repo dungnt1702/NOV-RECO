@@ -1,9 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
-from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -12,10 +10,10 @@ from rest_framework import status
 from apps.users.models import User, UserRole, Department
 from apps.users.forms import UserCreateForm, UserUpdateForm
 from apps.users.serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer
-from apps.checkin.decorators import role_required
+from apps.users.permissions import permission_required
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_view_users')
 def user_list_view(request):
     """Danh sách người dùng"""
     users = User.objects.all().order_by('-date_joined')
@@ -58,7 +56,7 @@ def user_list_view(request):
     return render(request, 'users/user_list.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_create_users')
 def user_create_view(request):
     """Tạo người dùng mới"""
     if request.method == 'POST':
@@ -79,7 +77,7 @@ def user_create_view(request):
     return render(request, 'users/create.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_edit_users')
 def user_update_view(request, user_id):
     """Cập nhật thông tin người dùng"""
     user = get_object_or_404(User, id=user_id)
@@ -103,7 +101,7 @@ def user_update_view(request, user_id):
     return render(request, 'users/update.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_view_users')
 def user_detail_view(request, user_id):
     """Chi tiết người dùng"""
     user = get_object_or_404(User, id=user_id)
@@ -119,7 +117,7 @@ def user_detail_view(request, user_id):
     return render(request, 'users/detail.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_edit_users')
 def user_toggle_active_view(request, user_id):
     """Bật/tắt trạng thái hoạt động của người dùng"""
     user = get_object_or_404(User, id=user_id)
@@ -134,7 +132,7 @@ def user_toggle_active_view(request, user_id):
     return redirect('users:list')
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_delete_users')
 def user_delete_view(request, user_id):
     """Xóa người dùng"""
     user = get_object_or_404(User, id=user_id)
@@ -151,7 +149,7 @@ def user_delete_view(request, user_id):
     return render(request, 'users/delete.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_view_departments')
 def department_list_view(request):
     """Danh sách phòng ban"""
     departments = Department.objects.annotate(
@@ -164,7 +162,7 @@ def department_list_view(request):
     return render(request, 'users/department_list.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_create_departments')
 def department_create_view(request):
     """Tạo phòng ban mới"""
     if request.method == 'POST':
@@ -184,7 +182,7 @@ def department_create_view(request):
     return render(request, 'users/department_create.html')
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_edit_departments')
 def department_update_view(request, dept_id):
     """Cập nhật phòng ban"""
     department = get_object_or_404(Department, id=dept_id)
@@ -203,7 +201,7 @@ def department_update_view(request, dept_id):
     return render(request, 'users/department_update.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_delete_departments')
 def department_delete_view(request, dept_id):
     """Xóa phòng ban"""
     department = get_object_or_404(Department, id=dept_id)

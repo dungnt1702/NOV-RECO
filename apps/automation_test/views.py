@@ -12,12 +12,11 @@ from django.utils import timezone
 
 from .models import TestSession, TestResult, TestLog
 from .test_modules import run_test_module
-from apps.checkin.decorators import role_required
-from apps.users.models import UserRole
+from apps.users.permissions import group_required
 
 
 @login_required
-@role_required([UserRole.ADMIN, UserRole.MANAGER])
+@group_required(['Super Admin', 'Admin', 'Manager'])
 def test_dashboard(request):
     """Test dashboard view"""
     # Get recent test sessions
@@ -43,7 +42,7 @@ def test_dashboard(request):
 
 
 @login_required
-@role_required([UserRole.ADMIN, UserRole.MANAGER])
+@group_required(['Super Admin', 'Admin', 'Manager'])
 def test_session_detail(request, session_id):
     """Test session detail view"""
     session = get_object_or_404(TestSession, session_id=session_id)
@@ -60,7 +59,7 @@ def test_session_detail(request, session_id):
 
 
 @login_required
-@role_required([UserRole.ADMIN, UserRole.MANAGER])
+@group_required(['Super Admin', 'Admin', 'Manager'])
 def get_sessions(request):
     """Return recent automation test sessions (for dashboard list)."""
     sessions = (
@@ -86,7 +85,7 @@ def get_sessions(request):
     return JsonResponse({"success": True, "sessions": items})
 
 @login_required
-@role_required([UserRole.ADMIN, UserRole.MANAGER])
+@group_required(['Super Admin', 'Admin', 'Manager'])
 @require_POST
 @csrf_exempt
 def start_test(request):
@@ -128,7 +127,7 @@ def start_test(request):
 
 
 @login_required
-@role_required([UserRole.ADMIN, UserRole.MANAGER])
+@group_required(['Super Admin', 'Admin', 'Manager'])
 def get_test_status(request, session_id):
     """Get test session status"""
     try:
@@ -158,7 +157,7 @@ def get_test_status(request, session_id):
 
 
 @login_required
-@role_required([UserRole.ADMIN, UserRole.MANAGER])
+@group_required(['Super Admin', 'Admin', 'Manager'])
 def get_test_logs(request, session_id):
     """Get test logs for a session"""
     try:

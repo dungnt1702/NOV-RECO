@@ -27,6 +27,15 @@ class Area(models.Model):
         ordering = ["-created_at"]
         verbose_name = "Khu vực"
         verbose_name_plural = "Khu vực"
+        permissions = [
+            # Area management permissions
+            ("can_manage_areas", "Can manage areas"),
+            ("can_view_areas", "Can view areas"),
+            ("can_create_areas", "Can create areas"),
+            ("can_edit_areas", "Can edit areas"),
+            ("can_delete_areas", "Can delete areas"),
+            ("can_activate_areas", "Can activate/deactivate areas"),
+        ]
 
     def __str__(self):
         return f"{self.name} ({self.radius_m}m)"

@@ -1,7 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
@@ -12,10 +10,10 @@ from rest_framework import status
 from apps.users.models import User, UserRole, Department
 from apps.users.forms import UserCreateForm, UserUpdateForm
 from apps.users.serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer
-from apps.checkin.decorators import role_required
+from apps.users.permissions import permission_required
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_view_users')
 def employee_list_view(request):
     """Danh sách nhân viên"""
     employees = User.objects.filter(role=UserRole.EMPLOYEE).order_by('-date_joined')
@@ -51,7 +49,7 @@ def employee_list_view(request):
     return render(request, 'employee/list.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_view_users')
 def employee_create_view(request):
     """Tạo nhân viên mới"""
     if request.method == 'POST':
@@ -73,7 +71,7 @@ def employee_create_view(request):
     return render(request, 'employee/create.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_view_users')
 def employee_update_view(request, employee_id):
     """Cập nhật thông tin nhân viên"""
     employee = get_object_or_404(User, id=employee_id, role=UserRole.EMPLOYEE)
@@ -96,7 +94,7 @@ def employee_update_view(request, employee_id):
     return render(request, 'employee/update.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_view_users')
 def employee_detail_view(request, employee_id):
     """Chi tiết nhân viên cho Quản lý và HCNS"""
     employee = get_object_or_404(User, id=employee_id, role=UserRole.EMPLOYEE)
@@ -112,7 +110,7 @@ def employee_detail_view(request, employee_id):
     return render(request, 'employee/detail.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_view_users')
 def employee_toggle_active_view(request, employee_id):
     """Bật/tắt trạng thái hoạt động của nhân viên"""
     employee = get_object_or_404(User, id=employee_id, role=UserRole.EMPLOYEE)
@@ -127,7 +125,7 @@ def employee_toggle_active_view(request, employee_id):
     return redirect('employee:list')
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_view_users')
 def employee_delete_view(request, employee_id):
     """Xóa nhân viên"""
     employee = get_object_or_404(User, id=employee_id, role=UserRole.EMPLOYEE)
@@ -144,7 +142,7 @@ def employee_delete_view(request, employee_id):
     return render(request, 'employee/delete.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_view_users')
 def employee_checkin_history_view(request, employee_id):
     """Lịch sử check-in của nhân viên"""
     employee = get_object_or_404(User, id=employee_id, role=UserRole.EMPLOYEE)
@@ -164,14 +162,14 @@ def employee_checkin_history_view(request, employee_id):
     return render(request, 'employee/checkin_history.html', context)
 
 
-@role_required([UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS])
+@permission_required('users.can_view_users')
 def employee_statistics_view(request, employee_id):
     """Thống kê nhân viên"""
     employee = get_object_or_404(User, id=employee_id, role=UserRole.EMPLOYEE)
     
     from apps.checkin.models import Checkin
     from django.utils import timezone
-    from datetime import datetime, timedelta
+    from datetime import timedelta
     
     # Thống kê check-in
     today = timezone.now().date()
