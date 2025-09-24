@@ -12,7 +12,7 @@
   <div class="office-form-container">
     <div class="office-form-header">
       <h1>📥 Import người dùng từ Excel</h1>
-      <p>Tải lên file .xlsx với tiêu đề cột: username, first_name, last_name, email, role, employee_id, department_id</p>
+      <p>Tải lên file .xlsx hoặc .csv với tiêu đề cột: username, first_name, last_name, email, role, employee_id, department_id</p>
     </div>
 
     {% if not has_openpyxl %}
@@ -26,7 +26,7 @@
         {% csrf_token %}
         <div class="office-form-group">
           <label class="office-form-label">Chọn file Excel (.xlsx)</label>
-          <input type="file" name="file" accept=".xlsx" class="office-form-input" required>
+          <input type="file" name="file" accept=".xlsx,.csv" class="office-form-input" required>
         </div>
         <div class="office-form-group">
           <label class="office-form-label">Phòng ban mặc định (nếu file không có department_id)</label>

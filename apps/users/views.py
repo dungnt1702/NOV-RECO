@@ -130,84 +130,101 @@ def user_import_view(request):
         return render(request, 'users/import.html', context)
     
     # POST: handle upload
-    if not openpyxl:
-        messages.error(request, 'Thiếu thư viện openpyxl. Vui lòng cài đặt để sử dụng import (.xlsx).')
-        return redirect('users:import')
-
     file = request.FILES.get('file')
     default_department_id = request.POST.get('default_department')
     assign_default_department = request.POST.get('assign_default_department') == 'on'
 
     if not file:
-        messages.error(request, 'Vui lòng chọn file Excel (.xlsx).')
-        return redirect('users:import')
-
-    if not file.name.lower().endswith('.xlsx'):
-        messages.error(request, 'Định dạng không hợp lệ. Chỉ hỗ trợ .xlsx')
-        return redirect('users:import')
-
-    try:
-        wb = openpyxl.load_workbook(filename=io.BytesIO(file.read()))
-        ws = wb.active
-    except Exception as e:
-        messages.error(request, f'Không thể đọc file: {e}')
-        return redirect('users:import')
-
-    # Expected header
-    expected_headers = ['username', 'first_name', 'last_name', 'email', 'role', 'employee_id', 'department_id']
-    headers = []
-    for cell in ws[1]:
-        headers.append(str(cell.value).strip() if cell.value is not None else '')
-
-    if [h.lower() for h in headers] != expected_headers:
-        messages.error(request, 'Tiêu đề cột không hợp lệ. Yêu cầu: ' + ', '.join(expected_headers))
+        messages.error(request, 'Vui lòng chọn file (.xlsx hoặc .csv).')
         return redirect('users:import')
 
     created_count = 0
     updated_count = 0
     errors = []
 
-    with transaction.atomic():
-        for row_idx in range(2, ws.max_row + 1):
-            row = [ws.cell(row=row_idx, column=col_idx).value for col_idx in range(1, len(expected_headers) + 1)]
-            try:
-                username, first_name, last_name, email, role, employee_id, department_id = row
-                username = (username or '').strip()
-                if not username:
-                    errors.append(f"Dòng {row_idx}: thiếu username")
-                    continue
-                # Department resolution
-                dept_obj = None
-                if department_id:
-                    try:
-                        dept_obj = Department.objects.get(id=int(department_id))
-                    except Department.DoesNotExist:
-                        errors.append(f"Dòng {row_idx}: department_id {department_id} không tồn tại")
-                        dept_obj = None
-                if not dept_obj and assign_default_department and default_department_id:
-                    try:
-                        dept_obj = Department.objects.get(id=int(default_department_id))
-                    except Department.DoesNotExist:
-                        dept_obj = None
+    # Common expected headers
+    expected_headers = ['username', 'first_name', 'last_name', 'email', 'role', 'employee_id', 'department_id']
 
-                user, created = User.objects.update_or_create(
-                    username=username,
-                    defaults={
-                        'first_name': first_name or '',
-                        'last_name': last_name or '',
-                        'email': email or '',
-                        'role': role or 'employee',
-                        'employee_id': (employee_id or '')[:50],
-                        'department': dept_obj,
-                        'is_active': True,
-                    }
-                )
-                if created:
-                    created_count += 1
-                else:
-                    updated_count += 1
-            except Exception as e:
-                errors.append(f"Dòng {row_idx}: lỗi {e}")
+    def process_rows(rows_iterable):
+        nonlocal created_count, updated_count, errors
+        with transaction.atomic():
+            for idx, row in enumerate(rows_iterable, start=2):
+                try:
+                    username, first_name, last_name, email, role, employee_id, department_id = row
+                    username = (username or '').strip()
+                    if not username:
+                        errors.append(f"Dòng {idx}: thiếu username")
+                        continue
+                    # Department resolution
+                    dept_obj = None
+                    if department_id not in (None, ''):
+                        try:
+                            dept_obj = Department.objects.get(id=int(department_id))
+                        except Department.DoesNotExist:
+                            errors.append(f"Dòng {idx}: department_id {department_id} không tồn tại")
+                            dept_obj = None
+                    if not dept_obj and assign_default_department and default_department_id:
+                        try:
+                            dept_obj = Department.objects.get(id=int(default_department_id))
+                        except Department.DoesNotExist:
+                            dept_obj = None
+
+                    user, created = User.objects.update_or_create(
+                        username=username,
+                        defaults={
+                            'first_name': (first_name or '').strip(),
+                            'last_name': (last_name or '').strip(),
+                            'email': (email or '').strip(),
+                            'role': (role or 'employee').strip() or 'employee',
+                            'employee_id': str(employee_id or '')[:50],
+                            'department': dept_obj,
+                            'is_active': True,
+                        }
+                    )
+                    if created:
+                        created_count += 1
+                    else:
+                        updated_count += 1
+                except Exception as e:
+                    errors.append(f"Dòng {idx}: lỗi {e}")
+
+    name_lower = file.name.lower()
+    if name_lower.endswith('.xlsx'):
+        if not openpyxl:
+            messages.error(request, 'Thiếu thư viện openpyxl để đọc .xlsx. Bạn có thể dùng .csv thay thế.')
+            return redirect('users:import')
+        try:
+            wb = openpyxl.load_workbook(filename=io.BytesIO(file.read()))
+            ws = wb.active
+        except Exception as e:
+            messages.error(request, f'Không thể đọc file: {e}')
+            return redirect('users:import')
+        headers = [str(c.value).strip() if c.value is not None else '' for c in ws[1]]
+        if [h.lower() for h in headers] != expected_headers:
+            messages.error(request, 'Tiêu đề cột không hợp lệ. Yêu cầu: ' + ', '.join(expected_headers))
+            return redirect('users:import')
+        rows = (
+            [ws.cell(row=r, column=c).value for c in range(1, len(expected_headers) + 1)]
+            for r in range(2, ws.max_row + 1)
+        )
+        process_rows(rows)
+    elif name_lower.endswith('.csv'):
+        import csv
+        try:
+            data = file.read().decode('utf-8-sig')
+            reader = csv.reader(io.StringIO(data))
+            header_row = next(reader, None) or []
+            headers = [str(h).strip() for h in header_row]
+            if [h.lower() for h in headers] != expected_headers:
+                messages.error(request, 'Tiêu đề cột CSV không hợp lệ. Yêu cầu: ' + ', '.join(expected_headers))
+                return redirect('users:import')
+            process_rows(reader)
+        except Exception as e:
+            messages.error(request, f'Lỗi đọc CSV: {e}')
+            return redirect('users:import')
+    else:
+        messages.error(request, 'Định dạng không hợp lệ. Hỗ trợ .xlsx hoặc .csv')
+        return redirect('users:import')
 
     if created_count or updated_count:
         messages.success(request, f'Import thành công: tạo {created_count}, cập nhật {updated_count}.')
