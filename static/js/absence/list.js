@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Load users
-            const usersResponse = await fetch('/users/api/list/');
+            const usersResponse = await fetch('/users/api/');
             const usersData = await usersResponse.json();
             
             if (usersData.success) {
