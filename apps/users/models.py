@@ -9,19 +9,48 @@ class UserRole(models.TextChoices):
     EMPLOYEE = 'employee', 'Nhân viên'
 
 
-class Department(models.Model):
-    name = models.CharField(max_length=100, unique=True, help_text="Tên phòng ban")
-    description = models.TextField(blank=True, help_text="Mô tả phòng ban")
+class Office(models.Model):
+    """Văn phòng"""
+    name = models.CharField(max_length=100, unique=True, help_text="Tên văn phòng")
+    description = models.TextField(blank=True, help_text="Mô tả văn phòng")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['name']
-        verbose_name = 'Phòng ban'
-        verbose_name_plural = 'Phòng ban'
+        verbose_name = 'Văn phòng'
+        verbose_name_plural = 'Văn phòng'
 
     def __str__(self):
         return self.name
+
+
+class Department(models.Model):
+    """Phòng ban"""
+    name = models.CharField(max_length=100, help_text="Tên phòng ban")
+    office = models.ForeignKey(
+        Office,
+        on_delete=models.CASCADE,
+        null=True,  # Tạm thời cho phép null để migration
+        help_text="Văn phòng"
+    )
+    description = models.TextField(blank=True, help_text="Mô tả phòng ban")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['office__name', 'name']
+        verbose_name = 'Phòng ban'
+        verbose_name_plural = 'Phòng ban'
+        unique_together = ['name', 'office']  # Tên phòng ban chỉ unique trong cùng văn phòng
+
+    def __str__(self):
+        return f"{self.name} - {self.office.name}"
+    
+    @property
+    def full_name(self):
+        """Tên đầy đủ: Phòng ban - Văn phòng"""
+        return f"{self.name} - {self.office.name}"
 
 
 class User(AbstractUser):

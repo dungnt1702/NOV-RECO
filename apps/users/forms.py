@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, Department, UserRole
+from .models import User, Department, Office, UserRole
 
 
 class UserCreateForm(UserCreationForm):
@@ -11,7 +11,7 @@ class UserCreateForm(UserCreationForm):
     employee_id = forms.CharField(max_length=20, required=False, label='Mã nhân viên')
     role = forms.ChoiceField(choices=UserRole.choices, label='Vai trò')
     department = forms.ModelChoiceField(
-        queryset=Department.objects.all(),
+        queryset=Department.objects.select_related('office').all(),
         required=False,
         empty_label="Chọn phòng ban",
         label='Phòng ban'
@@ -54,7 +54,7 @@ class UserUpdateForm(forms.ModelForm):
     employee_id = forms.CharField(max_length=20, required=False, label='Mã nhân viên')
     role = forms.ChoiceField(choices=UserRole.choices, label='Vai trò')
     department = forms.ModelChoiceField(
-        queryset=Department.objects.all(),
+        queryset=Department.objects.select_related('office').all(),
         required=False,
         empty_label="Chọn phòng ban",
         label='Phòng ban'
@@ -100,21 +100,28 @@ class UserUpdateForm(forms.ModelForm):
 class DepartmentForm(forms.ModelForm):
     """Form phòng ban"""
     name = forms.CharField(max_length=100, required=True, label='Tên phòng ban')
+    office = forms.ModelChoiceField(
+        queryset=Office.objects.all(),
+        required=True,
+        empty_label="Chọn văn phòng",
+        label='Văn phòng'
+    )
     description = forms.CharField(widget=forms.Textarea, required=False, label='Mô tả')
 
     class Meta:
         model = Department
-        fields = ['name', 'description']
+        fields = ['name', 'office', 'description']
 
     def clean_name(self):
         name = self.cleaned_data.get('name')
-        if name:
+        office = self.cleaned_data.get('office')
+        if name and office:
             name = name.strip()
-            # Kiểm tra trùng lặp
+            # Kiểm tra trùng lặp trong cùng văn phòng
             if self.instance.pk:
-                if Department.objects.filter(name=name).exclude(pk=self.instance.pk).exists():
-                    raise forms.ValidationError('Tên phòng ban đã tồn tại')
+                if Department.objects.filter(name=name, office=office).exclude(pk=self.instance.pk).exists():
+                    raise forms.ValidationError(f'Tên phòng ban "{name}" đã tồn tại trong {office.name}')
             else:
-                if Department.objects.filter(name=name).exists():
-                    raise forms.ValidationError('Tên phòng ban đã tồn tại')
+                if Department.objects.filter(name=name, office=office).exists():
+                    raise forms.ValidationError(f'Tên phòng ban "{name}" đã tồn tại trong {office.name}')
         return name

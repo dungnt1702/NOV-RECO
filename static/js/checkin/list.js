@@ -538,7 +538,7 @@ function populateDepartmentFilter(departments) {
   const departmentFilter = document.getElementById('departmentFilter');
   if (departmentFilter) {
     departmentFilter.innerHTML = '<option value="">Tất cả phòng ban</option>' +
-      departments.map(dept => `<option value="${dept.id}">${dept.name}</option>`).join('');
+      departments.map(dept => `<option value="${dept.id}">${dept.full_name || dept.name}</option>`).join('');
   }
 }
 

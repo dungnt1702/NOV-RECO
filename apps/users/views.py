@@ -171,9 +171,9 @@ def user_delete_view(request, user_id):
 @permission_required('users.can_view_departments')
 def department_list_view(request):
     """Danh sách phòng ban"""
-    departments = Department.objects.annotate(
-        employee_count=Count('user')
-    ).order_by('name')
+    departments = Department.objects.select_related('office').annotate(
+        user_count=Count('user')
+    ).order_by('office__name', 'name')
     
     context = {
         'departments': departments,
@@ -279,12 +279,13 @@ def user_update_api(request, user_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def department_list_api(request):
-    """API danh sách phòng ban (id, name, employee_count)."""
-    departments = Department.objects.annotate(employee_count=Count('user')).order_by('name')
+    """API danh sách phòng ban (id, name, full_name, employee_count)."""
+    departments = Department.objects.select_related('office').annotate(employee_count=Count('user')).order_by('office__name', 'name')
     data = [
         {
             'id': dept.id,
             'name': dept.name,
+            'full_name': dept.full_name,
             'employee_count': dept.employee_count,
         }
         for dept in departments
