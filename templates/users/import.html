@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Import người dùng - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/users/office_forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="office-form-page">
+  <div class="office-form-container">
+    <div class="office-form-header">
+      <h1>📥 Import người dùng từ Excel</h1>
+      <p>Tải lên file .xlsx với tiêu đề cột: username, first_name, last_name, email, role, employee_id, department_id</p>
+    </div>
+
+    {% if not has_openpyxl %}
+      <div class="alert alert-warning" role="alert" style="margin-bottom: 16px;">
+        Máy chủ chưa cài openpyxl, chỉ xem hướng dẫn. Vui lòng cài đặt để dùng import.
+      </div>
+    {% endif %}
+
+    <div class="office-form-card">
+      <form method="post" enctype="multipart/form-data" class="office-form">
+        {% csrf_token %}
+        <div class="office-form-group">
+          <label class="office-form-label">Chọn file Excel (.xlsx)</label>
+          <input type="file" name="file" accept=".xlsx" class="office-form-input" required>
+        </div>
+        <div class="office-form-group">
+          <label class="office-form-label">Phòng ban mặc định (nếu file không có department_id)</label>
+          <select name="default_department" class="office-form-select">
+            <option value="">(Không chọn)</option>
+            {% for dept in departments %}
+              <option value="{{ dept.id }}">{{ dept.full_name }}</option>
+            {% endfor %}
+          </select>
+          <div style="margin-top:8px;">
+            <label style="display:flex;align-items:center;gap:8px;">
+              <input type="checkbox" name="assign_default_department"> Tự động gán phòng ban mặc định nếu thiếu
+            </label>
+          </div>
+        </div>
+
+        <div class="office-form-actions" style="display:flex; gap:8px;">
+          <button type="submit" class="office-form-btn">Import</button>
+          <a href="{% url 'users:list' %}" class="office-form-btn" style="background:#64748b;">Quay lại</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="office-form-card" style="margin-top:16px;">
+      <h3 style="margin-bottom:8px;">Mẫu file</h3>
+      <div class="office-form-group">
+        <pre style="background:#0b1220;color:#cbd5e1;border-radius:8px;padding:12px;overflow:auto;">
+username | first_name | last_name | email | role | employee_id | department_id
+employee01 | An | Nguyễn | an.nguyen@example.com | employee | EMP001 | 12
+manager01 | Bình | Trần | binh.tran@example.com | manager | EMP002 | 13
+        </pre>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

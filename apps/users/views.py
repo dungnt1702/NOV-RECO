@@ -11,6 +11,13 @@ from apps.users.models import User, UserRole, Department, Office
 from apps.users.forms import UserCreateForm, UserUpdateForm, DepartmentForm
 from apps.users.serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer
 from apps.users.permissions import permission_required
+from django.views.decorators.http import require_http_methods
+from django.db import transaction
+import io
+try:
+    import openpyxl
+except Exception:
+    openpyxl = None
 
 
 def debug_current_user(request):
@@ -108,6 +115,106 @@ def user_create_view(request):
         'role_choices': UserRole.choices,
     }
     return render(request, 'users/create.html', context)
+
+
+@permission_required('users.can_manage_users')
+@require_http_methods(["GET", "POST"]) 
+def user_import_view(request):
+    """Import người dùng từ file Excel (.xlsx)"""
+    if request.method == 'GET':
+        departments = Department.objects.select_related('office').order_by('office__name', 'name')
+        context = {
+            'departments': departments,
+            'has_openpyxl': bool(openpyxl),
+        }
+        return render(request, 'users/import.html', context)
+    
+    # POST: handle upload
+    if not openpyxl:
+        messages.error(request, 'Thiếu thư viện openpyxl. Vui lòng cài đặt để sử dụng import (.xlsx).')
+        return redirect('users:import')
+
+    file = request.FILES.get('file')
+    default_department_id = request.POST.get('default_department')
+    assign_default_department = request.POST.get('assign_default_department') == 'on'
+
+    if not file:
+        messages.error(request, 'Vui lòng chọn file Excel (.xlsx).')
+        return redirect('users:import')
+
+    if not file.name.lower().endswith('.xlsx'):
+        messages.error(request, 'Định dạng không hợp lệ. Chỉ hỗ trợ .xlsx')
+        return redirect('users:import')
+
+    try:
+        wb = openpyxl.load_workbook(filename=io.BytesIO(file.read()))
+        ws = wb.active
+    except Exception as e:
+        messages.error(request, f'Không thể đọc file: {e}')
+        return redirect('users:import')
+
+    # Expected header
+    expected_headers = ['username', 'first_name', 'last_name', 'email', 'role', 'employee_id', 'department_id']
+    headers = []
+    for cell in ws[1]:
+        headers.append(str(cell.value).strip() if cell.value is not None else '')
+
+    if [h.lower() for h in headers] != expected_headers:
+        messages.error(request, 'Tiêu đề cột không hợp lệ. Yêu cầu: ' + ', '.join(expected_headers))
+        return redirect('users:import')
+
+    created_count = 0
+    updated_count = 0
+    errors = []
+
+    with transaction.atomic():
+        for row_idx in range(2, ws.max_row + 1):
+            row = [ws.cell(row=row_idx, column=col_idx).value for col_idx in range(1, len(expected_headers) + 1)]
+            try:
+                username, first_name, last_name, email, role, employee_id, department_id = row
+                username = (username or '').strip()
+                if not username:
+                    errors.append(f"Dòng {row_idx}: thiếu username")
+                    continue
+                # Department resolution
+                dept_obj = None
+                if department_id:
+                    try:
+                        dept_obj = Department.objects.get(id=int(department_id))
+                    except Department.DoesNotExist:
+                        errors.append(f"Dòng {row_idx}: department_id {department_id} không tồn tại")
+                        dept_obj = None
+                if not dept_obj and assign_default_department and default_department_id:
+                    try:
+                        dept_obj = Department.objects.get(id=int(default_department_id))
+                    except Department.DoesNotExist:
+                        dept_obj = None
+
+                user, created = User.objects.update_or_create(
+                    username=username,
+                    defaults={
+                        'first_name': first_name or '',
+                        'last_name': last_name or '',
+                        'email': email or '',
+                        'role': role or 'employee',
+                        'employee_id': (employee_id or '')[:50],
+                        'department': dept_obj,
+                        'is_active': True,
+                    }
+                )
+                if created:
+                    created_count += 1
+                else:
+                    updated_count += 1
+            except Exception as e:
+                errors.append(f"Dòng {row_idx}: lỗi {e}")
+
+    if created_count or updated_count:
+        messages.success(request, f'Import thành công: tạo {created_count}, cập nhật {updated_count}.')
+    if errors:
+        messages.warning(request, 'Một số dòng lỗi:\n' + '\n'.join(errors[:10]) + ('' if len(errors) <= 10 else f"\n... và {len(errors)-10} lỗi khác"))
+
+    return redirect('users:list')
 
 
 @permission_required('users.can_edit_users')

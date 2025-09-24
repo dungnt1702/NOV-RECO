@@ -15,6 +15,11 @@
     <a href="{% url 'users:create' %}" class="btn btn-primary">
       ➕ Thêm người dùng
     </a>
+    {% if user|has_permission:'users.can_manage_users' %}
+    <a href="{% url 'users:import' %}" class="btn btn-outline" style="margin-left:8px;">
+      <i class="fas fa-file-import"></i> Import Excel
+    </a>
+    {% endif %}
   </div>
 
   <!-- Search and Filter -->
