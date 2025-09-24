@@ -308,8 +308,8 @@ def department_list_api(request):
 def office_list_view(request):
     """Danh sách văn phòng"""
     offices = Office.objects.annotate(
-        department_count=Count('department'),
-        user_count=Count('department__user')
+        department_count=Count('department', distinct=True),
+        user_count=Count('department__user', distinct=True)
     ).order_by('name')
     
     context = {
