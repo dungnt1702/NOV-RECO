@@ -156,14 +156,9 @@ class User(AbstractUser):
         """Kiểm tra user có phải employee không"""
         return self.role == UserRole.EMPLOYEE
 
-    @property
-    def full_name(self):
-        """Tên đầy đủ của user"""
-        return f"{self.first_name} {self.last_name}".strip() or self.username
-
     def get_display_name(self):
         """Tên hiển thị của user"""
-        return self.full_name
+        return self.get_full_name()
 
     
     # Django Permissions Helper Methods
