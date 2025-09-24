@@ -7,6 +7,55 @@ let currentSort = { field: 'created_at', direction: 'desc' };
 
 console.log('Checkin list JS loaded');
 
+// Export current filtered data to CSV (Excel-compatible)
+function exportCurrentToCSV() {
+  // Use the filtered data if available; otherwise use allCheckins
+  const data = (typeof window !== 'undefined' && window.paginationComponent && typeof window.paginationComponent.getAllItems === 'function')
+    ? window.paginationComponent.getAllItems()
+    : (window.originalCheckins && allCheckins.length && allCheckins.length <= (window.originalCheckins.length))
+      ? allCheckins
+      : (window.originalCheckins || allCheckins);
+
+  const rows = [];
+  // Header
+  rows.push(['Số thứ tự', 'Nhân viên', 'Khu vực', 'Tọa độ (lat)', 'Tọa độ (lng)', 'Khoảng cách (mét)', 'Loại checkin', 'Thời gian', 'Ghi chú']);
+  
+  // Data rows
+  data.forEach((c, index) => {
+    rows.push([
+      String(index + 1),
+      c.user_name || '',
+      c.area_name || '',
+      c.lat != null ? (Number(c.lat).toFixed(6)) : '',
+      c.lng != null ? (Number(c.lng).toFixed(6)) : '',
+      c.distance_m != null ? (Number(c.distance_m).toFixed(2)) : '',
+      c.checkin_type_display || '',
+      c.created_at || '',
+      c.note || ''
+    ]);
+  });
+
+  // Convert to CSV string
+  const csv = rows.map(r => r.map(field => {
+    const s = String(field ?? '');
+    if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }).join(',')).join('\n');
+
+  // Download as .csv (Excel opens fine)
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `checkins_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function normalizePhotoSrc(photoUrl, photoField) {
   if (photoUrl) return photoUrl;
   if (!photoField) return null;
@@ -728,6 +777,14 @@ document.addEventListener('DOMContentLoaded', function() {
       currentPage = 1;
       renderCheckinsTable();
       updatePagination();
+    });
+  }
+
+  // Export Excel (CSV) button
+  const exportBtn = document.getElementById('exportExcelBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', function() {
+      exportCurrentToCSV();
     });
   }
 
