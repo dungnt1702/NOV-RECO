@@ -39,11 +39,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateCounts();
                 renderNotifications();
             } else {
-                showEmptyState();
+                // Show empty state in current tab instead of global
+                showEmptyStateInTab();
             }
         } catch (error) {
             console.error('Error loading notifications:', error);
             showNotification('Lỗi khi tải thông báo', 'error');
+            // Show empty state in current tab on error
+            showEmptyStateInTab();
         } finally {
             showLoading(false);
         }
@@ -348,6 +351,24 @@ document.addEventListener('DOMContentLoaded', function() {
         loadingElements.forEach(el => {
             el.classList.toggle('loading', show);
         });
+    }
+
+    function showEmptyStateInTab() {
+        // Hide global empty state
+        document.getElementById('emptyState').style.display = 'none';
+        
+        // Show notification actions
+        document.querySelector('.notification-actions').style.display = 'flex';
+        
+        // Show current tab content
+        document.querySelectorAll('.tab-pane').forEach(tab => {
+            tab.classList.remove('show', 'active');
+        });
+        document.getElementById(currentTab).classList.add('show', 'active');
+        
+        // Show empty state in current tab
+        const container = document.getElementById(`${currentTab}Notifications`);
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-bell-slash"></i><h3>Không có thông báo</h3><p>Bạn chưa có thông báo nào hoặc không tìm thấy kết quả phù hợp.</p></div>';
     }
 
     function showEmptyState() {
