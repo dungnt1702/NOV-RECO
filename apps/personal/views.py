@@ -72,7 +72,11 @@ def personal_profile_edit_view(request):
 @login_required
 def personal_avatar_upload_view(request):
     """Upload avatar"""
-    if request.method == 'POST':
+    if request.method == 'GET':
+        # Display avatar upload form
+        return render(request, 'personal/avatar_upload.html')
+    
+    elif request.method == 'POST':
         if 'avatar' in request.FILES:
             avatar_file = request.FILES['avatar']
             

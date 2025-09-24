@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cập nhật Avatar - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/personal/profile.css' %}">
+<style>
+.avatar-upload-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.avatar-preview {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.avatar-preview img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #e9ecef;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.avatar-preview .avatar-placeholder {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: #f8f9fa;
+    border: 4px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 4rem;
+    color: #6c757d;
+}
+
+.upload-form {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    border-color: #007bff;
+    background-color: #f8f9ff;
+}
+
+.upload-area.dragover {
+    border-color: #007bff;
+    background-color: #e3f2fd;
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.upload-text {
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.upload-hint {
+    font-size: 0.9rem;
+    color: #adb5bd;
+}
+
+.file-input {
+    display: none;
+}
+
+.btn-upload {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-upload:hover {
+    background: #0056b3;
+}
+
+.btn-upload:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.upload-progress {
+    display: none;
+    margin-top: 1rem;
+}
+
+.upload-progress .progress {
+    height: 8px;
+    border-radius: 4px;
+}
+
+.upload-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="personal-profile-page">
+    <div class="container">
+        <div class="avatar-upload-container">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="h3 mb-2">Cập nhật Avatar</h1>
+                <p class="text-muted">Chọn ảnh đại diện mới cho tài khoản của bạn</p>
+            </div>
+
+            <!-- Avatar Preview -->
+            <div class="avatar-preview">
+                {% if user.avatar %}
+                    <img id="avatar-preview" src="{{ user.avatar.url }}" alt="Avatar hiện tại">
+                {% else %}
+                    <div class="avatar-placeholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Upload Form -->
+            <div class="upload-form">
+                <form id="avatar-upload-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">
+                            <strong>Kéo thả ảnh vào đây</strong><br>
+                            hoặc <span class="text-primary">bấm để chọn file</span>
+                        </div>
+                        <div class="upload-hint">
+                            Hỗ trợ: JPG, PNG, GIF (tối đa 5MB)
+                        </div>
+                        <input type="file" id="avatar-input" name="avatar" accept="image/*" class="file-input">
+                    </div>
+
+                    <div class="upload-progress" id="upload-progress">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div class="text-center mt-2">
+                            <small class="text-muted">Đang tải lên...</small>
+                        </div>
+                    </div>
+
+                    <div class="upload-actions">
+                        <button type="submit" id="upload-btn" class="btn btn-upload" disabled>
+                            <i class="fas fa-upload"></i> Tải lên
+                        </button>
+                        <a href="{% url 'personal:profile' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('avatar-input');
+    const uploadForm = document.getElementById('avatar-upload-form');
+    const uploadBtn = document.getElementById('upload-btn');
+    const uploadProgress = document.getElementById('upload-progress');
+    const progressBar = uploadProgress.querySelector('.progress-bar');
+    const avatarPreview = document.getElementById('avatar-preview');
+
+    // Click to select file
+    uploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFileSelect(files[0]);
+        }
+    });
+
+    // File input change
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+
+    // Handle file selection
+    function handleFileSelect(file) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            showAlert('Vui lòng chọn file hình ảnh!', 'danger');
+            return;
+        }
+
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            showAlert('File quá lớn! Vui lòng chọn file nhỏ hơn 5MB.', 'danger');
+            return;
+        }
+
+        // Preview image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (avatarPreview) {
+                avatarPreview.src = e.target.result;
+            } else {
+                // Create new preview if doesn't exist
+                const preview = document.createElement('img');
+                preview.id = 'avatar-preview';
+                preview.src = e.target.result;
+                preview.alt = 'Avatar preview';
+                preview.style.cssText = 'width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 4px solid #e9ecef; box-shadow: 0 4px 8px rgba(0,0,0,0.1);';
+                
+                const placeholder = uploadArea.parentElement.querySelector('.avatar-placeholder');
+                if (placeholder) {
+                    placeholder.replaceWith(preview);
+                }
+            }
+        };
+        reader.readAsDataURL(file);
+
+        // Enable upload button
+        uploadBtn.disabled = false;
+    }
+
+    // Form submission
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(uploadForm);
+        
+        // Show progress
+        uploadProgress.style.display = 'block';
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải lên...';
+
+        // Upload file
+        fetch('{% url "personal:avatar_upload" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            uploadProgress.style.display = 'none';
+            
+            if (data.success) {
+                showAlert(data.message, 'success');
+                // Update avatar preview
+                if (avatarPreview) {
+                    avatarPreview.src = data.avatar_url + '?t=' + new Date().getTime();
+                }
+                // Redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '{% url "personal:profile" %}';
+                }, 2000);
+            } else {
+                showAlert(data.message, 'danger');
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Tải lên';
+            }
+        })
+        .catch(error => {
+            uploadProgress.style.display = 'none';
+            showAlert('Có lỗi xảy ra khi tải lên. Vui lòng thử lại!', 'danger');
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Tải lên';
+        });
+    });
+
+    // Show alert
+    function showAlert(message, type) {
+        // Remove existing alerts
+        const existingAlerts = document.querySelectorAll('.alert');
+        existingAlerts.forEach(alert => alert.remove());
+
+        // Create new alert
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type}`;
+        alert.innerHTML = message;
+        
+        // Insert after header
+        const header = document.querySelector('.text-center.mb-4');
+        header.insertAdjacentElement('afterend', alert);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            alert.remove();
+        }, 5000);
+    }
+});
+</script>
+{% endblock %}
