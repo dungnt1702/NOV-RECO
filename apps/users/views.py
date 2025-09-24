@@ -33,7 +33,7 @@ def debug_current_user(request):
 
 
 @permission_required('users.can_view_users')
-def user_list_view(request):
+def user_list_view(request, office_id=None):
     """Danh sách người dùng"""
     users = User.objects.all().order_by('-date_joined')
     
@@ -48,7 +48,8 @@ def user_list_view(request):
         users = users.filter(department_id=dept_filter)
     
     # Filter by office (through department)
-    office_filter = request.GET.get('office')
+    # Prefer path param office_id, fallback to query param
+    office_filter = office_id or request.GET.get('office')
     if office_filter:
         users = users.filter(department__office_id=office_filter)
     
@@ -175,14 +176,14 @@ def user_delete_view(request, user_id):
 
 
 @permission_required('users.can_view_departments')
-def department_list_view(request):
+def department_list_view(request, office_id=None):
     """Danh sách phòng ban"""
     departments = Department.objects.select_related('office').annotate(
         user_count=Count('user')
     ).order_by('office__name', 'name')
     
-    # Filter by office
-    office_filter = request.GET.get('office')
+    # Filter by office (prefer path param)
+    office_filter = office_id or request.GET.get('office')
     if office_filter:
         departments = departments.filter(office_id=office_filter)
     
