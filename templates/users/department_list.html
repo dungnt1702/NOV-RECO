@@ -86,16 +86,7 @@
                                 </div>
                             </td>
                             <td>
-                                {% if dept.manager %}
-                                    <div class="manager-info">
-                                        <div class="manager-avatar">
-                                            {{ dept.manager.first_name|first|default:dept.manager.username|first|upper }}
-                                        </div>
-                                        <span class="manager-name">{{ dept.manager.get_display_name }}</span>
-                                    </div>
-                                {% else %}
-                                    <span class="text-muted">Chưa có</span>
-                                {% endif %}
+                                <span class="text-muted">Chưa có</span>
                             </td>
                             <td>
                                 <div class="action-buttons">
@@ -145,16 +136,9 @@
                                 <span class="stat-number">{{ dept.user_count }}</span>
                                 <span class="stat-label">Nhân viên</span>
                             </div>
-                            {% if dept.manager %}
                             <div class="stat-item">
-                                <div class="manager-info">
-                                    <div class="manager-avatar">
-                                        {{ dept.manager.first_name|first|default:dept.manager.username|first|upper }}
-                                    </div>
-                                    <span class="manager-name">{{ dept.manager.get_display_name }}</span>
-                                </div>
+                                <span class="text-muted">Chưa có trưởng phòng</span>
                             </div>
-                            {% endif %}
                         </div>
                     </div>
                     
