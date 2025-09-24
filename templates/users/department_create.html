@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load widget_tweaks %}
 
 {% block title %}Tạo Phòng ban - NOV-RECO{% endblock %}
 
@@ -41,7 +40,12 @@
                             </div>
                             {{ form.office.label }} *
                         </label>
-                        {{ form.office|add_class:"office-form-select" }}
+                        <select id="{{ form.office.id_for_label }}" name="{{ form.office.name }}" class="office-form-select">
+                            <option value="">Chọn văn phòng</option>
+                            {% for choice in form.office.field.queryset %}
+                                <option value="{{ choice.pk }}">{{ choice.name }}</option>
+                            {% endfor %}
+                        </select>
                         {% if form.office.errors %}
                             <div class="form-errors">
                                 {% for error in form.office.errors %}
@@ -60,7 +64,7 @@
                             </div>
                             {{ form.name.label }} *
                         </label>
-                        {{ form.name|add_class:"office-form-input" }}
+                        <input type="text" id="{{ form.name.id_for_label }}" name="{{ form.name.name }}" class="office-form-input" required placeholder="VD: Phòng Kinh doanh">
                         {% if form.name.errors %}
                             <div class="form-errors">
                                 {% for error in form.name.errors %}
@@ -79,7 +83,7 @@
                             </div>
                             {{ form.description.label }}
                         </label>
-                        {{ form.description|add_class:"office-form-textarea" }}
+                        <textarea id="{{ form.description.id_for_label }}" name="{{ form.description.name }}" class="office-form-textarea" rows="4" placeholder="Mô tả về phòng ban..."></textarea>
                         {% if form.description.errors %}
                             <div class="form-errors">
                                 {% for error in form.description.errors %}
