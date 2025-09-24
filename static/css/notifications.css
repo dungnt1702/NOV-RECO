@@ -46,6 +46,12 @@
     animation: pulse 2s infinite;
 }
 
+/* Badge with 0 count should be gray */
+.notification-badge[data-count="0"] {
+    background: #6c757d;
+    animation: none;
+}
+
 .notification-badge.hidden {
     display: none;
 }

@@ -13,10 +13,10 @@ class NotificationManager {
     init() {
         if (!this.toggle) return;
         
-        // Toggle dropdown
+        // Handle click - go to notifications page
         this.toggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.toggleDropdown();
+            // Let the link work normally to go to notifications page
+            // Don't prevent default
         });
         
         // Close dropdown when clicking outside
@@ -66,14 +66,11 @@ class NotificationManager {
     }
     
     updateBadge(count) {
-        if (count > 0) {
-            this.badge.textContent = count > 99 ? '99+' : count;
-            this.badge.classList.remove('hidden');
-            this.unreadCount.textContent = `${count} thông báo chưa đọc`;
-        } else {
-            this.badge.classList.add('hidden');
-            this.unreadCount.textContent = '0 thông báo chưa đọc';
-        }
+        // Always show badge with count (0 if no unread notifications)
+        this.badge.textContent = count > 99 ? '99+' : count;
+        this.badge.setAttribute('data-count', count);
+        this.badge.classList.remove('hidden');
+        this.unreadCount.textContent = `${count} thông báo chưa đọc`;
     }
     
     renderNotifications(notifications) {
