@@ -197,12 +197,7 @@ function renderCheckinsTable(items = null) {
       tbody.innerHTML = checkinsToRender.map(checkin => `
         <tr>
           <td>${checkin.id}</td>
-          <td>
-            <div class="user-info">
-              <div class="user-name">${checkin.user_name || 'N/A'}</div>
-              <div class="user-email">${checkin.user_email || ''}</div>
-            </div>
-          </td>
+          <td>${checkin.user_name || 'N/A'}</td>
           <td class="area-cell">
             <i class="fas fa-map-marker-alt"></i>${checkin.area_name || 'N/A'}
           </td>
