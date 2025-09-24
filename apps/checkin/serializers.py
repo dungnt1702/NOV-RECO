@@ -61,11 +61,20 @@ class CheckinSerializer(serializers.ModelSerializer):
 class CheckinListSerializer(serializers.ModelSerializer):
     """Serializer for Checkin list view"""
     
+    user_id = serializers.IntegerField(
+        source='user.id', read_only=True
+    )
     user_name = serializers.CharField(
         source='user.get_display_name', read_only=True
     )
     employee_id = serializers.CharField(
         source='user.employee_id', read_only=True
+    )
+    user_department_id = serializers.IntegerField(
+        source='user.department_id', read_only=True
+    )
+    area_id = serializers.IntegerField(
+        source='area.id', read_only=True
     )
     area_name = serializers.CharField(
         source='area.name', read_only=True
@@ -78,7 +87,7 @@ class CheckinListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkin
         fields = [
-            'id', 'user', 'employee_id', 'user_name', 'area', 'area_name', 'lat', 'lng',
+            'id', 'user', 'user_id', 'employee_id', 'user_name', 'user_department_id', 'area', 'area_id', 'area_name', 'lat', 'lng',
             'photo', 'photo_url', 'note', 'checkin_type', 'checkin_type_display', 
             'created_at', 'distance_m'
         ]
