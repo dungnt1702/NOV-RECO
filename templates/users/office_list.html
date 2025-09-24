@@ -80,13 +80,13 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="{% url 'users:department_list' %}?office={{ office.id }}" class="employee-count" title="Xem phòng ban thuộc {{ office.name }}">
+                                <a href="{% url 'users:department_list_by_office' office.id %}" class="employee-count" title="Xem phòng ban thuộc {{ office.name }}">
                                     <span class="count-number">{{ office.department_count }}</span>
                                     <span class="count-label">phòng ban</span>
                                 </a>
                             </td>
                             <td>
-                                <a href="{% url 'users:list' %}?office={{ office.id }}" class="employee-count" title="Xem nhân viên thuộc {{ office.name }}">
+                                <a href="{% url 'users:list_by_office' office.id %}" class="employee-count" title="Xem nhân viên thuộc {{ office.name }}">
                                     <span class="count-number">{{ office.user_count }}</span>
                                     <span class="count-label">nhân viên</span>
                                 </a>
@@ -141,11 +141,11 @@
                     
                     <div class="card-body">
                         <div class="card-stats">
-                            <a class="stat-item" href="{% url 'users:department_list' %}?office={{ office.id }}" title="Xem phòng ban thuộc {{ office.name }}">
+                            <a class="stat-item" href="{% url 'users:department_list_by_office' office.id %}" title="Xem phòng ban thuộc {{ office.name }}">
                                 <span class="stat-number">{{ office.department_count }}</span>
                                 <span class="stat-label">Phòng ban</span>
                             </a>
-                            <a class="stat-item" href="{% url 'users:list' %}?office={{ office.id }}" title="Xem nhân viên thuộc {{ office.name }}">
+                            <a class="stat-item" href="{% url 'users:list_by_office' office.id %}" title="Xem nhân viên thuộc {{ office.name }}">
                                 <span class="stat-number">{{ office.user_count }}</span>
                                 <span class="stat-label">Nhân viên</span>
                             </a>
