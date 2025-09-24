@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from apps.users.models import User, UserRole, Department, Office
-from apps.users.forms import UserCreateForm, UserUpdateForm
+from apps.users.forms import UserCreateForm, UserUpdateForm, DepartmentForm
 from apps.users.serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer
 from apps.users.permissions import permission_required
 
@@ -195,20 +195,18 @@ def department_list_view(request):
 def department_create_view(request):
     """Tạo phòng ban mới"""
     if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description', '')
-        
-        if name:
-            department = Department.objects.create(
-                name=name,
-                description=description
-            )
+        form = DepartmentForm(request.POST)
+        if form.is_valid():
+            department = form.save()
             messages.success(request, f'Tạo phòng ban {department.name} thành công!')
             return redirect('users:department_list')
-        else:
-            messages.error(request, 'Tên phòng ban không được để trống!')
+    else:
+        form = DepartmentForm()
     
-    return render(request, 'users/department_create.html')
+    context = {
+        'form': form,
+    }
+    return render(request, 'users/department_create.html', context)
 
 
 @permission_required('users.can_edit_departments')
@@ -217,15 +215,17 @@ def department_update_view(request, dept_id):
     department = get_object_or_404(Department, id=dept_id)
     
     if request.method == 'POST':
-        department.name = request.POST.get('name', department.name)
-        department.description = request.POST.get('description', department.description)
-        department.save()
-        
-        messages.success(request, f'Cập nhật phòng ban {department.name} thành công!')
-        return redirect('users:department_list')
+        form = DepartmentForm(request.POST, instance=department)
+        if form.is_valid():
+            department = form.save()
+            messages.success(request, f'Cập nhật phòng ban {department.name} thành công!')
+            return redirect('users:department_list')
+    else:
+        form = DepartmentForm(instance=department)
     
     context = {
         'department': department,
+        'form': form,
     }
     return render(request, 'users/department_update.html', context)
 
