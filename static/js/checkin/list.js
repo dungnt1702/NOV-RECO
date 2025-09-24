@@ -842,6 +842,34 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Reset filters button
+  const resetBtn = document.getElementById('resetFilters');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', function() {
+      // Clear inputs
+      const employeeIdSearch = document.getElementById('employeeIdSearch');
+      if (employeeIdSearch) employeeIdSearch.value = '';
+      const departmentFilter = document.getElementById('departmentFilter');
+      if (departmentFilter) departmentFilter.value = '';
+      const userFilterSel = document.getElementById('userFilter');
+      if (userFilterSel) userFilterSel.value = '';
+      const areaFilterSel = document.getElementById('areaFilter');
+      if (areaFilterSel) areaFilterSel.value = '';
+      const dateFromSel = document.getElementById('dateFrom');
+      if (dateFromSel) dateFromSel.value = '';
+      const dateToSel = document.getElementById('dateTo');
+      if (dateToSel) dateToSel.value = '';
+      const checkinTypeSel = document.getElementById('checkinTypeFilter');
+      if (checkinTypeSel) checkinTypeSel.value = '';
+      
+      // Reset data
+      allCheckins = window.originalCheckins || allCheckins;
+      currentPage = 1;
+      renderCheckinsTable();
+      updatePagination();
+    });
+  }
+
   // Department filter change - handled in populateDepartmentFilter
 
   // User filter change
