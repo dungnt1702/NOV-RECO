@@ -265,6 +265,11 @@ def user_list_api(request):
     department_id = request.GET.get('department')
     if department_id:
         users = users.filter(department_id=department_id)
+
+    # Filter by office if provided (through department)
+    office_id = request.GET.get('office')
+    if office_id:
+        users = users.filter(department__office_id=office_id)
     
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)

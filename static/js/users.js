@@ -113,7 +113,25 @@ async function loadUsers() {
     try {
         console.log('Loading users from API...');
         console.log('API function available:', typeof api);
-        const response = await api('/users/api/');
+        // Build API URL with pre-filters based on current path
+        let apiUrl = '/users/api/';
+        const path = window.location.pathname;
+        // Match /users/list/department_id/<id>/
+        const deptMatch = path.match(/\/users\/list\/department_id\/(\d+)\//);
+        // Match /users/list/office_id/<id>/
+        const officeMatch = path.match(/\/users\/list\/office_id\/(\d+)\//);
+        const params = new URLSearchParams();
+        if (deptMatch && deptMatch[1]) {
+            params.set('department', deptMatch[1]);
+        }
+        if (officeMatch && officeMatch[1]) {
+            params.set('office', officeMatch[1]);
+        }
+        if ([...params.keys()].length > 0) {
+            apiUrl += `?${params.toString()}`;
+        }
+        console.log('Users API url:', apiUrl);
+        const response = await api(apiUrl);
         console.log('Users API response status:', response.status);
         if (response.ok) {
             const data = await response.json();
