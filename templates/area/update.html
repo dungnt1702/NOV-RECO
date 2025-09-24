@@ -10,85 +10,73 @@
 {% endblock %}
 
 {% block content %}
-<div class="area-update-container">
-  <div class="area-update-header">
-    <h1 class="area-update-title">
-      <i class="fas fa-edit"></i>
-      Cập nhật Khu vực
-    </h1>
-  </div>
+<div class="area-update-wrapper">
+  <h1 class="page-title">
+    <i class="fas fa-edit"></i>
+    Cập nhật Khu vực
+  </h1>
 
   <form method="post">
     {% csrf_token %}
 
-    <div class="row">
+    <div class="update-grid">
       <!-- Thông tin khu vực -->
-      <div class="col-lg-6 mb-4">
-        <div class="area-update-card">
-          <div class="area-update-card-header">
-            <h3 class="area-update-card-title">
-              <i class="fas fa-info-circle"></i>
-              Thông tin khu vực
-            </h3>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-info-circle"></i>
+            Thông tin khu vực
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="name" class="form-label">
+              <i class="fas fa-tag"></i>
+              Tên khu vực
+            </label>
+            <input type="text" id="name" name="name" class="form-control" value="{{ area.name }}" required placeholder="Nhập tên khu vực">
           </div>
-          <div class="area-update-card-body">
-            <div class="area-update-form-group">
-              <label for="name" class="area-update-label">
-                <i class="fas fa-tag"></i>
-                Tên khu vực
+
+          <div class="form-group">
+            <label for="description" class="form-label">
+              <i class="fas fa-align-left"></i>
+              Mô tả
+            </label>
+            <textarea id="description" name="description" class="form-control" rows="4" placeholder="Nhập mô tả khu vực">{{ area.description }}</textarea>
+          </div>
+
+          <div class="form-row two">
+            <div class="form-group">
+              <label for="lat" class="form-label">
+                <i class="fas fa-map-pin"></i>
+                Vĩ độ (Latitude)
               </label>
-              <input type="text" id="name" name="name" class="area-update-input" value="{{ area.name }}" required placeholder="Nhập tên khu vực">
+              <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="lat" name="lat" class="form-control" value="{{ area.lat|unlocalize }}" required placeholder="10.762622">
             </div>
-
-            <div class="area-update-form-group">
-              <label for="description" class="area-update-label">
-                <i class="fas fa-align-left"></i>
-                Mô tả
+            <div class="form-group">
+              <label for="lng" class="form-label">
+                <i class="fas fa-map-pin"></i>
+                Kinh độ (Longitude)
               </label>
-              <textarea id="description" name="description" class="area-update-input area-update-textarea" rows="4" placeholder="Nhập mô tả khu vực">{{ area.description }}</textarea>
+              <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="lng" name="lng" class="form-control" value="{{ area.lng|unlocalize }}" required placeholder="106.660172">
             </div>
+          </div>
 
-            <div class="row">
-              <div class="col-sm-6 mb-3">
-                <div class="area-update-form-group">
-                  <label for="lat" class="area-update-label">
-                    <i class="fas fa-map-pin"></i>
-                    Vĩ độ (Latitude)
-                  </label>
-                  <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="lat" name="lat" class="area-update-input" value="{{ area.lat|unlocalize }}" required placeholder="10.762622">
-                </div>
-              </div>
-              <div class="col-sm-6 mb-3">
-                <div class="area-update-form-group">
-                  <label for="lng" class="area-update-label">
-                    <i class="fas fa-map-pin"></i>
-                    Kinh độ (Longitude)
-                  </label>
-                  <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="lng" name="lng" class="area-update-input" value="{{ area.lng|unlocalize }}" required placeholder="106.660172">
-                </div>
-              </div>
+          <div class="form-row two">
+            <div class="form-group">
+              <label for="radius_m" class="form-label">
+                <i class="fas fa-circle"></i>
+                Bán kính (mét)
+              </label>
+              <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="radius_m" name="radius_m" class="form-control" value="{{ area.radius_m|unlocalize }}" min="10" max="10000" required placeholder="100">
             </div>
-
-            <div class="row">
-              <div class="col-sm-6 mb-3">
-                <div class="area-update-form-group">
-                  <label for="radius_m" class="area-update-label">
-                    <i class="fas fa-circle"></i>
-                    Bán kính (mét)
-                  </label>
-                  <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="radius_m" name="radius_m" class="area-update-input" value="{{ area.radius_m|unlocalize }}" min="10" max="10000" required placeholder="100">
-                </div>
-              </div>
-              <div class="col-sm-6 mb-3">
-                <div class="area-update-form-group">
-                  <div class="area-update-checkbox-container">
-                    <input type="checkbox" id="is_active" name="is_active" class="area-update-checkbox" {% if area.is_active %}checked{% endif %}>
-                    <label for="is_active" class="area-update-checkbox-label">
-                      <i class="fas fa-toggle-on"></i>
-                      Khu vực hoạt động
-                    </label>
-                  </div>
-                </div>
+            <div class="form-group">
+              <div class="switch-row">
+                <input type="checkbox" id="is_active" name="is_active" {% if area.is_active %}checked{% endif %}>
+                <label for="is_active">
+                  <i class="fas fa-toggle-on"></i>
+                  Khu vực hoạt động
+                </label>
               </div>
             </div>
           </div>
@@ -96,37 +84,35 @@
       </div>
 
       <!-- Bản đồ -->
-      <div class="col-lg-6 mb-4">
-        <div class="area-update-card">
-          <div class="area-update-card-header">
-            <h3 class="area-update-card-title">
-              <i class="fas fa-map"></i>
-              Vị trí trên bản đồ
-            </h3>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-map"></i>
+            Vị trí trên bản đồ
+          </h3>
+        </div>
+        <div class="card-body">
+          <div id="map"></div>
+          <div class="hint">
+            <i class="fas fa-hand-paper"></i>
+            Kéo thả ghim hoặc nhấp bản đồ để chọn vị trí. Tọa độ sẽ tự động điền.
           </div>
-          <div class="area-update-card-body">
-            <div id="map" class="area-update-map"></div>
-            <div class="area-update-map-info">
-              <i class="fas fa-hand-paper"></i>
-              Kéo thả ghim hoặc nhấp bản đồ để chọn vị trí. Tọa độ sẽ tự động điền.
-            </div>
-            <div class="area-update-current-location">
-              <button class="area-update-current-location-btn" type="button" id="btnCurrent">
-                <i class="fas fa-location-arrow"></i>
-                Lấy vị trí hiện tại
-              </button>
-            </div>
+          <div class="actions">
+            <button class="btn btn-info" type="button" id="btnCurrent">
+              <i class="fas fa-location-arrow"></i>
+              Lấy vị trí hiện tại
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="area-update-actions">
-      <a href="{% url 'area:list' %}" class="area-update-btn area-update-btn-secondary">
+    <div class="actions">
+      <a href="{% url 'area:list' %}" class="btn btn-secondary">
         <i class="fas fa-times"></i>
         Hủy
       </a>
-      <button type="submit" class="area-update-btn area-update-btn-primary">
+      <button type="submit" class="btn btn-primary">
         <i class="fas fa-save"></i>
         Cập nhật
       </button>
