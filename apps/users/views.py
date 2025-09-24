@@ -68,11 +68,13 @@ def user_list_view(request, office_id=None, department_id=None):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    departments = Department.objects.all()
+    departments = Department.objects.select_related('office').order_by('office__name', 'name')
+    offices = Office.objects.all().order_by('name')
     
     context = {
         'users': page_obj,
         'departments': departments,
+        'offices': offices,
         'role_choices': UserRole.choices,
         'current_role': role_filter,
         'current_dept': dept_filter,

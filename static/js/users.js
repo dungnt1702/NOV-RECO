@@ -67,6 +67,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Load users data and initialize pagination
     loadUsers();
+    // Initialize advanced filters and auto-collapse
+    initializeAdvancedFilters();
     
     // Fallback: If no users loaded after 2 seconds, show sample data
     setTimeout(() => {
@@ -179,6 +181,50 @@ async function loadUsers() {
         renderUsersTable(allUsers);
         showAlert('Đang sử dụng dữ liệu mẫu. Vui lòng kiểm tra kết nối mạng.', 'warning');
     }
+}
+// Initialize office/department/role/name/employee filters and preselect from path
+function initializeAdvancedFilters() {
+    const toggleBtn = document.getElementById('toggleFilter');
+    const section = document.getElementById('usersFilterSection');
+    if (toggleBtn && section) {
+        section.classList.add('collapsed');
+        toggleBtn.addEventListener('click', () => {
+            section.classList.toggle('collapsed');
+        });
+    }
+
+    const officeSel = document.getElementById('officeSelect');
+    const deptSel = document.getElementById('departmentSelect');
+    const roleSel = document.getElementById('roleSelect');
+    const nameSearch = document.getElementById('nameSearch');
+    const empSearch = document.getElementById('employeeIdSearch');
+
+    // Preselect from path (department_id/office_id) or server-provided context
+    const path = window.location.pathname;
+    const deptMatch = path.match(/\/users\/list\/department_id\/(\d+)\//);
+    const officeMatch = path.match(/\/users\/list\/office_id\/(\d+)\//);
+    const preset = window.__USERS_PRESELECT__ || {};
+    const preDept = (deptMatch && deptMatch[1]) || preset.departmentId || '';
+    const preOffice = (officeMatch && officeMatch[1]) || preset.officeId || '';
+
+    if (preOffice && officeSel) {
+        officeSel.value = preOffice;
+    }
+    if (preDept && deptSel) {
+        deptSel.value = preDept;
+    }
+
+    // Wire filter changes to applyFilters
+    [officeSel, deptSel, roleSel, nameSearch, empSearch].forEach(el => {
+        if (!el) return;
+        const handler = () => applyFilters();
+        if (el.tagName === 'INPUT') {
+            let t;
+            el.addEventListener('input', function () { clearTimeout(t); t = setTimeout(handler, 250); });
+        } else {
+            el.addEventListener('change', handler);
+        }
+    });
 }
 
 // Render users table
@@ -531,9 +577,11 @@ function initializeSearch() {
 
 // Apply filters and update pagination
 function applyFilters() {
-    const searchQuery = document.querySelector('.search-input')?.value || '';
-    const roleFilter = document.querySelector('.role-select')?.value || '';
-    const departmentFilter = document.querySelector('.department-select')?.value || '';
+    const searchQuery = document.getElementById('nameSearch')?.value || '';
+    const employeeIdQuery = document.getElementById('employeeIdSearch')?.value || '';
+    const roleFilter = document.getElementById('roleSelect')?.value || '';
+    const departmentFilter = document.getElementById('departmentSelect')?.value || '';
+    const officeFilter = document.getElementById('officeSelect')?.value || '';
 
     // Filter users based on current filters
     filteredUsers = allUsers.filter(user => {
@@ -545,15 +593,19 @@ function applyFilters() {
             (user.last_name && user.last_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (user.employee_id && user.employee_id.toLowerCase().includes(searchQuery.toLowerCase()));
 
+        // Employee ID filter
+        const matchesEmployeeId = !employeeIdQuery || (user.employee_id && user.employee_id.toLowerCase().includes(employeeIdQuery.toLowerCase()));
+
         // Role filter
         const matchesRole = !roleFilter || user.role === roleFilter;
 
-        // Department filter
-        const matchesDepartment = !departmentFilter || 
-            (departmentFilter === 'null' && !user.department_name) ||
-            user.department_name === departmentFilter;
+        // Department filter (by id)
+        const matchesDepartment = !departmentFilter || String(user.department_id || user.department) === String(departmentFilter);
 
-        return matchesSearch && matchesRole && matchesDepartment;
+        // Office filter (by id)
+        const matchesOffice = !officeFilter || String(user.office_id || (user.department && user.department.office_id)) === String(officeFilter);
+
+        return matchesSearch && matchesEmployeeId && matchesRole && matchesDepartment && matchesOffice;
     });
 
     // Update pagination component with filtered data

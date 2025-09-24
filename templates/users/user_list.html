@@ -17,23 +17,30 @@
   </div>
 
   <!-- Search and Filter -->
-  <div class="search-filter-section">
+  <div class="search-filter-section" id="usersFilterSection">
     <div class="search-form">
       <div class="search-input-group">
-        <input type="text" placeholder="Tìm kiếm theo tên, email, mã nhân viên..." 
-               class="form-control search-input">
-        <select class="form-control role-select">
+        <input type="text" placeholder="Nhập tên hoặc email..." class="form-control search-input" id="nameSearch">
+        <input type="text" placeholder="Mã nhân viên" class="form-control" id="employeeIdSearch">
+        <select class="form-control" id="officeSelect">
+          <option value="">Tất cả văn phòng</option>
+          {% for office in offices %}
+            <option value="{{ office.id }}">{{ office.name }}</option>
+          {% endfor %}
+        </select>
+        <select class="form-control" id="departmentSelect">
+          <option value="">Tất cả phòng ban</option>
+          {% for dept in departments %}
+            <option value="{{ dept.id }}">{{ dept.full_name }}</option>
+          {% endfor %}
+        </select>
+        <select class="form-control role-select" id="roleSelect">
           <option value="">Tất cả vai trò</option>
           {% for value, label in role_choices %}
             <option value="{{ value }}">{{ label }}</option>
           {% endfor %}
         </select>
-        <select class="form-control department-select">
-          <option value="">Tất cả phòng ban</option>
-          {% for dept in departments %}
-            <option value="{{ dept.name }}">{{ dept.name }}</option>
-          {% endfor %}
-        </select>
+        <button type="button" class="btn btn-secondary" id="toggleFilter">Thu gọn</button>
       </div>
     </div>
   </div>
@@ -68,5 +75,11 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
+  window.__USERS_PRESELECT__ = {
+    officeId: '{{ current_office|default:'' }}',
+    departmentId: '{{ current_dept|default:'' }}'
+  };
+</script>
 <script src="{% static 'js/users.js' %}"></script>
 {% endblock %}
