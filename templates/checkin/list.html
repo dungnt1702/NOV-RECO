@@ -7,10 +7,6 @@
 <link rel="stylesheet" href="{% static 'css/checkin/list.css' %}">
 {% endblock %}
 
-{% block extra_js %}
-<script src="{% static 'js/vendor/xlsx.full.min.js' %}"></script>
-{% endblock %}
-
 {% block content %}
 <div class="checkin-list-page">
     <div class="list-container">
@@ -155,5 +151,6 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/vendor/xlsx.full.min.js' %}"></script>
 <script src="{% static 'js/checkin/list.js' %}"></script>
 {% endblock %}
