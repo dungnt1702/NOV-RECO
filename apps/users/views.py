@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from apps.users.models import User, UserRole, Department, Office
-from apps.users.forms import UserCreateForm, UserUpdateForm, DepartmentForm
+from apps.users.forms import UserCreateForm, UserUpdateForm, DepartmentForm, OfficeForm
 from apps.users.serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer
 from apps.users.permissions import permission_required
 from django.views.decorators.http import require_http_methods
