@@ -71,9 +71,10 @@ function exportCurrentToXLSX() {
       ? allCheckins
       : (window.originalCheckins || allCheckins);
 
-  const header = ['Số thứ tự', 'Nhân viên', 'Khu vực', 'Tọa độ (lat)', 'Tọa độ (lng)', 'Khoảng cách (mét)', 'Loại checkin', 'Thời gian', 'Ghi chú'];
+  const header = ['Số thứ tự', 'Mã nhân viên', 'Nhân viên', 'Khu vực', 'Tọa độ (lat)', 'Tọa độ (lng)', 'Khoảng cách (mét)', 'Loại checkin', 'Thời gian', 'Ghi chú'];
   const rows = data.map((c, idx) => [
     idx + 1,
+    c.employee_id || '',
     c.user_name || '',
     c.area_name || '',
     c.lat != null ? Number(c.lat).toFixed(6) : '',
@@ -291,6 +292,7 @@ function renderCheckinsTable(items = null) {
       tbody.innerHTML = checkinsToRender.map((checkin, idx) => `
         <tr>
           <td>${startIndex + idx + 1}</td>
+          <td>${checkin.employee_id || ''}</td>
           <td>${checkin.user_name || 'N/A'}</td>
           <td class="area-cell">
             <i class="fas fa-map-marker-alt"></i>${checkin.area_name || 'N/A'}
@@ -595,6 +597,7 @@ function applyFilters() {
   const userId = document.getElementById('userFilter')?.value || '';
   const areaId = document.getElementById('areaFilter')?.value || '';
   const checkinType = document.getElementById('checkinTypeFilter')?.value || '';
+  const employeeIdSearch = (document.getElementById('employeeIdSearch')?.value || '').trim().toLowerCase();
 
   // Get original data (not filtered data)
   const originalData = window.originalCheckins || allCheckins;
@@ -615,6 +618,12 @@ function applyFilters() {
 
     // Checkin type filter
     if (checkinType && checkin.checkin_type !== checkinType) return false;
+
+    // Employee ID search (contains)
+    if (employeeIdSearch) {
+      const eid = String(checkin.employee_id || '').toLowerCase();
+      if (!eid.includes(employeeIdSearch)) return false;
+    }
 
     return true;
   });

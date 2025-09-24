@@ -64,6 +64,9 @@ class CheckinListSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(
         source='user.get_display_name', read_only=True
     )
+    employee_id = serializers.CharField(
+        source='user.employee_id', read_only=True
+    )
     area_name = serializers.CharField(
         source='area.name', read_only=True
     )
@@ -75,7 +78,7 @@ class CheckinListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkin
         fields = [
-            'id', 'user', 'user_name', 'area', 'area_name', 'lat', 'lng',
+            'id', 'user', 'employee_id', 'user_name', 'area', 'area_name', 'lat', 'lng',
             'photo', 'photo_url', 'note', 'checkin_type', 'checkin_type_display', 
             'created_at', 'distance_m'
         ]

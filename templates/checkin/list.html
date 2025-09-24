@@ -47,6 +47,10 @@
                     </select>
                 </div>
                 <div class="filter-group">
+                    <label for="employeeIdSearch">Mã nhân viên:</label>
+                    <input type="text" id="employeeIdSearch" class="form-control" placeholder="Nhập mã nhân viên">
+                </div>
+                <div class="filter-group">
                     <label for="areaFilter">Khu vực:</label>
                     <select id="areaFilter" class="form-control">
                         <option value="">Tất cả khu vực</option>
@@ -95,6 +99,9 @@
                         <tr>
                             <th class="sortable" data-sort="id">
                                 Số thứ tự <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="employee_id">
+                                Mã nhân viên <i class="fas fa-sort sort-icon"></i>
                             </th>
                             <th class="sortable" data-sort="user_name">
                                 Nhân viên <i class="fas fa-sort sort-icon"></i>
