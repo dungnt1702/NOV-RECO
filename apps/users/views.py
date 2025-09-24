@@ -14,10 +14,7 @@ from apps.users.permissions import permission_required
 from django.views.decorators.http import require_http_methods
 from django.db import transaction
 import io
-try:
-    import openpyxl
-except Exception:
-    openpyxl = None
+import csv
 
 
 def debug_current_user(request):
@@ -120,12 +117,11 @@ def user_create_view(request):
 @permission_required('users.can_manage_users')
 @require_http_methods(["GET", "POST"]) 
 def user_import_view(request):
-    """Import người dùng từ file Excel (.xlsx)"""
+    """Import người dùng từ CSV (UTF-8, có BOM khuyến nghị)."""
     if request.method == 'GET':
         departments = Department.objects.select_related('office').order_by('office__name', 'name')
         context = {
             'departments': departments,
-            'has_openpyxl': bool(openpyxl),
         }
         return render(request, 'users/import.html', context)
     
@@ -188,42 +184,17 @@ def user_import_view(request):
                 except Exception as e:
                     errors.append(f"Dòng {idx}: lỗi {e}")
 
-    name_lower = file.name.lower()
-    if name_lower.endswith('.xlsx'):
-        if not openpyxl:
-            messages.error(request, 'Thiếu thư viện openpyxl để đọc .xlsx. Bạn có thể dùng .csv thay thế.')
-            return redirect('users:import')
-        try:
-            wb = openpyxl.load_workbook(filename=io.BytesIO(file.read()))
-            ws = wb.active
-        except Exception as e:
-            messages.error(request, f'Không thể đọc file: {e}')
-            return redirect('users:import')
-        headers = [str(c.value).strip() if c.value is not None else '' for c in ws[1]]
+    try:
+        data = file.read().decode('utf-8-sig')  # UTF-8 with BOM safe
+        reader = csv.reader(io.StringIO(data))
+        header_row = next(reader, None) or []
+        headers = [str(h).strip() for h in header_row]
         if [h.lower() for h in headers] != expected_headers:
-            messages.error(request, 'Tiêu đề cột không hợp lệ. Yêu cầu: ' + ', '.join(expected_headers))
+            messages.error(request, 'Tiêu đề cột CSV không hợp lệ. Yêu cầu: ' + ', '.join(expected_headers))
             return redirect('users:import')
-        rows = (
-            [ws.cell(row=r, column=c).value for c in range(1, len(expected_headers) + 1)]
-            for r in range(2, ws.max_row + 1)
-        )
-        process_rows(rows)
-    elif name_lower.endswith('.csv'):
-        import csv
-        try:
-            data = file.read().decode('utf-8-sig')
-            reader = csv.reader(io.StringIO(data))
-            header_row = next(reader, None) or []
-            headers = [str(h).strip() for h in header_row]
-            if [h.lower() for h in headers] != expected_headers:
-                messages.error(request, 'Tiêu đề cột CSV không hợp lệ. Yêu cầu: ' + ', '.join(expected_headers))
-                return redirect('users:import')
-            process_rows(reader)
-        except Exception as e:
-            messages.error(request, f'Lỗi đọc CSV: {e}')
-            return redirect('users:import')
-    else:
-        messages.error(request, 'Định dạng không hợp lệ. Hỗ trợ .xlsx hoặc .csv')
+        process_rows(reader)
+    except Exception as e:
+        messages.error(request, f'Lỗi đọc CSV: {e}')
         return redirect('users:import')
 
     if created_count or updated_count:
@@ -232,6 +203,30 @@ def user_import_view(request):
         messages.warning(request, 'Một số dòng lỗi:\n' + '\n'.join(errors[:10]) + ('' if len(errors) <= 10 else f"\n... và {len(errors)-10} lỗi khác"))
 
     return redirect('users:list')
+
+
+@permission_required('users.can_manage_users')
+@require_http_methods(["GET"]) 
+def user_import_template_view(request):
+    """Tải file CSV mẫu (UTF-8 BOM) cho import người dùng"""
+    expected_headers = ['username', 'first_name', 'last_name', 'email', 'role', 'employee_id', 'department_id']
+    sample_rows = [
+        ['employee01', 'An', 'Nguyễn', 'an.nguyen@example.com', 'employee', 'EMP001', '12'],
+        ['manager01', 'Bình', 'Trần', 'binh.tran@example.com', 'manager', 'EMP002', '13'],
+    ]
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(expected_headers)
+    for r in sample_rows:
+        writer.writerow(r)
+    content = output.getvalue()
+    output.close()
+    # Prepend UTF-8 BOM for Excel compatibility with Vietnamese characters
+    bom = '\ufeff'
+    from django.http import HttpResponse
+    response = HttpResponse((bom + content), content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="user_import_template.csv"'
+    return response
 
 
 @permission_required('users.can_edit_users')
