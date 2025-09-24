@@ -13,6 +13,27 @@ class Office(models.Model):
     """Văn phòng"""
     name = models.CharField(max_length=100, unique=True, help_text="Tên văn phòng")
     description = models.TextField(blank=True, help_text="Mô tả văn phòng")
+    
+    # Quản lý cấp cao
+    director = models.ForeignKey(
+        'User', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='directed_offices',
+        help_text="Giám đốc Văn phòng",
+        limit_choices_to={'role__in': ['admin', 'manager']}
+    )
+    deputy_director = models.ForeignKey(
+        'User', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='deputy_directed_offices',
+        help_text="Phó Giám đốc Văn phòng",
+        limit_choices_to={'role__in': ['admin', 'manager']}
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -35,6 +56,27 @@ class Department(models.Model):
         help_text="Văn phòng"
     )
     description = models.TextField(blank=True, help_text="Mô tả phòng ban")
+    
+    # Quản lý phòng ban
+    manager = models.ForeignKey(
+        'User', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='managed_departments',
+        help_text="Trưởng phòng",
+        limit_choices_to={'role__in': ['admin', 'manager']}
+    )
+    deputy_manager = models.ForeignKey(
+        'User', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='deputy_managed_departments',
+        help_text="Phó phòng",
+        limit_choices_to={'role__in': ['admin', 'manager']}
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -247,6 +289,98 @@ class User(AbstractUser):
     def can_manage_departments_new(self):
         """Kiểm tra có thể quản lý departments không (mới)"""
         return self.has_perm('users.can_manage_departments')
+    
+    # Management Structure Helper Methods
+    def get_managed_offices(self):
+        """Lấy danh sách văn phòng mà user này quản lý (Director/Deputy Director)"""
+        from apps.users.models import Office
+        return Office.objects.filter(
+            models.Q(director=self) | models.Q(deputy_director=self)
+        )
+    
+    def get_managed_departments(self):
+        """Lấy danh sách phòng ban mà user này quản lý (Manager/Deputy Manager)"""
+        from apps.users.models import Department
+        return Department.objects.filter(
+            models.Q(manager=self) | models.Q(deputy_manager=self)
+        )
+    
+    def is_office_director(self, office=None):
+        """Kiểm tra có phải Giám đốc Văn phòng không"""
+        if office:
+            return office.director == self
+        from apps.users.models import Office
+        return Office.objects.filter(director=self).exists()
+    
+    def is_office_deputy_director(self, office=None):
+        """Kiểm tra có phải Phó Giám đốc Văn phòng không"""
+        if office:
+            return office.deputy_director == self
+        from apps.users.models import Office
+        return Office.objects.filter(deputy_director=self).exists()
+    
+    def is_department_manager(self, department=None):
+        """Kiểm tra có phải Trưởng phòng không"""
+        if department:
+            return department.manager == self
+        from apps.users.models import Department
+        return Department.objects.filter(manager=self).exists()
+    
+    def is_department_deputy_manager(self, department=None):
+        """Kiểm tra có phải Phó phòng không"""
+        if department:
+            return department.deputy_manager == self
+        from apps.users.models import Department
+        return Department.objects.filter(deputy_manager=self).exists()
+    
+    def can_view_office_data(self, office):
+        """Kiểm tra có thể xem dữ liệu của văn phòng không"""
+        return (self.is_superuser or 
+                self.is_office_director(office) or 
+                self.is_office_deputy_director(office) or
+                self.is_admin_user)
+    
+    def can_view_department_data(self, department):
+        """Kiểm tra có thể xem dữ liệu của phòng ban không"""
+        return (self.is_superuser or 
+                self.is_department_manager(department) or 
+                self.is_department_deputy_manager(department) or
+                self.can_view_office_data(department.office) or
+                self.is_admin_user)
+    
+    def can_approve_absence_for_department(self, department):
+        """Kiểm tra có thể phê duyệt đơn vắng mặt cho phòng ban không"""
+        return (self.is_superuser or 
+                self.is_department_manager(department) or 
+                self.is_department_deputy_manager(department) or
+                self.can_view_office_data(department.office) or
+                self.is_hr_user)
+    
+    def get_approval_permissions(self):
+        """Lấy danh sách quyền phê duyệt của user"""
+        permissions = []
+        
+        # Office level permissions
+        managed_offices = self.get_managed_offices()
+        for office in managed_offices:
+            if self.is_office_director(office):
+                permissions.append(f"office_director_{office.id}")
+            if self.is_office_deputy_director(office):
+                permissions.append(f"office_deputy_{office.id}")
+        
+        # Department level permissions
+        managed_departments = self.get_managed_departments()
+        for department in managed_departments:
+            if self.is_department_manager(department):
+                permissions.append(f"department_manager_{department.id}")
+            if self.is_department_deputy_manager(department):
+                permissions.append(f"department_deputy_{department.id}")
+        
+        # HR permissions
+        if self.is_hr_user():
+            permissions.append("hr_approval")
+        
+        return permissions
     
     def can_view_checkin_reports_new(self):
         """Kiểm tra có thể xem báo cáo checkin không (mới)"""

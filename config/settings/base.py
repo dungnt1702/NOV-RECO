@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "apps.personal",
     "apps.users",
     "apps.automation_test",
+    "apps.absence",
+    "apps.notifications",
 ]
 
 MIDDLEWARE = [
