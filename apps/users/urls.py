@@ -11,6 +11,10 @@ from .views import (
     department_create_view,
     department_update_view,
     department_delete_view,
+    office_list_view,
+    office_create_view,
+    office_update_view,
+    office_delete_view,
     user_list_api,
     user_create_api,
     user_update_api,
@@ -36,6 +40,12 @@ urlpatterns = [
     path("detail/<int:user_id>/", user_detail_view, name="detail"),
     path("delete/<int:user_id>/", user_delete_view, name="delete"),
     path("toggle/<int:user_id>/", user_toggle_active_view, name="toggle"),
+    
+    # Office management views
+    path("offices/", office_list_view, name="office_list"),
+    path("offices/create/", office_create_view, name="office_create"),
+    path("offices/update/<int:office_id>/", office_update_view, name="office_update"),
+    path("offices/delete/<int:office_id>/", office_delete_view, name="office_delete"),
     
     # Department management views
     path("departments/", department_list_view, name="department_list"),

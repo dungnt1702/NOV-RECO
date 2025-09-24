@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Xóa Văn phòng - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/users/create.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="users-page">
+    <div class="container">
+        <div class="page-header">
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>⚠️ Xóa Văn phòng</h1>
+                    <p>Xác nhận xóa văn phòng: {{ office.name }}</p>
+                </div>
+                <div class="header-actions">
+                    <a href="{% url 'users:office_list' %}" class="btn btn-secondary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="delete-warning">
+                <div class="warning-icon">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <h3>Cảnh báo!</h3>
+                <p>Bạn có chắc chắn muốn xóa văn phòng <strong>"{{ office.name }}"</strong>?</p>
+                <div class="warning-details">
+                    <p><strong>Lưu ý:</strong> Việc xóa văn phòng sẽ:</p>
+                    <ul>
+                        <li>Xóa tất cả phòng ban thuộc văn phòng này</li>
+                        <li>Ảnh hưởng đến nhân viên thuộc các phòng ban đó</li>
+                        <li>Không thể hoàn tác sau khi xóa</li>
+                    </ul>
+                </div>
+            </div>
+
+            <form method="post" class="delete-form">
+                {% csrf_token %}
+                
+                <div class="form-actions">
+                    <a href="{% url 'users:office_list' %}" class="btn btn-secondary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Hủy
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Xác nhận xóa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.delete-warning {
+    text-align: center;
+    padding: 2rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.warning-icon {
+    color: #dc2626;
+    margin-bottom: 1rem;
+}
+
+.delete-warning h3 {
+    color: #dc2626;
+    margin-bottom: 1rem;
+}
+
+.warning-details {
+    text-align: left;
+    background: white;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.warning-details ul {
+    margin: 0.5rem 0 0 1rem;
+}
+
+.warning-details li {
+    margin-bottom: 0.25rem;
+}
+</style>
+{% endblock %}

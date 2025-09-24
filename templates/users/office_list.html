@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quản lý Văn phòng - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/users/department_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="users-page">
+<div class="container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-text">
+                <h1>🏢 Quản lý Văn phòng</h1>
+                <p>Danh sách các văn phòng và số lượng phòng ban</p>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'users:office_create' %}" class="btn btn-primary">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Tạo văn phòng
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        {% if offices %}
+            <!-- Desktop Table View -->
+            <div class="table-container desktop-view">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="table-header">
+                                    <span>Tên văn phòng</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="table-header">
+                                    <span>Số phòng ban</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="table-header">
+                                    <span>Tổng nhân viên</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                    </svg>
+                                </div>
+                            </th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for office in offices %}
+                        <tr>
+                            <td>
+                                <div class="dept-info">
+                                    <div class="dept-icon">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="dept-details">
+                                        <span class="dept-name">{{ office.name }}</span>
+                                        {% if office.description %}
+                                            <small class="dept-description">{{ office.description }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="employee-count">
+                                    <span class="count-number">{{ office.department_count }}</span>
+                                    <span class="count-label">phòng ban</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="employee-count">
+                                    <span class="count-number">{{ office.user_count }}</span>
+                                    <span class="count-label">nhân viên</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'users:department_list' %}?office={{ office.id }}" class="btn btn-sm btn-primary">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                        </svg>
+                                        Xem phòng ban
+                                    </a>
+                                    <a href="{% url 'users:office_update' office.id %}" class="btn btn-sm btn-outline">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                        Sửa
+                                    </a>
+                                    <a href="{% url 'users:office_delete' office.id %}" class="btn btn-sm btn-danger">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Xóa
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="card-container mobile-view">
+                {% for office in offices %}
+                <div class="data-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="title-icon">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                            <div class="title-text">
+                                <h3>{{ office.name }}</h3>
+                                {% if office.description %}
+                                    <p>{{ office.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="card-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">{{ office.department_count }}</span>
+                                <span class="stat-label">Phòng ban</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">{{ office.user_count }}</span>
+                                <span class="stat-label">Nhân viên</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <div class="card-actions">
+                            <a href="{% url 'users:department_list' %}?office={{ office.id }}" class="btn btn-primary">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                                Xem phòng ban
+                            </a>
+                            <a href="{% url 'users:office_update' office.id %}" class="btn btn-outline">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                Sửa
+                            </a>
+                            <a href="{% url 'users:office_delete' office.id %}" class="btn btn-danger">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                                Xóa
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                </div>
+                <h3>Chưa có văn phòng nào</h3>
+                <p>Bắt đầu bằng cách tạo văn phòng đầu tiên</p>
+                <a href="{% url 'users:office_create' %}" class="btn btn-primary">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Tạo văn phòng
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from apps.users.models import User, UserRole, Department
+from apps.users.models import User, UserRole, Department, Office
 from apps.users.forms import UserCreateForm, UserUpdateForm
 from apps.users.serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer
 from apps.users.permissions import permission_required
@@ -175,8 +175,18 @@ def department_list_view(request):
         user_count=Count('user')
     ).order_by('office__name', 'name')
     
+    # Filter by office
+    office_filter = request.GET.get('office')
+    if office_filter:
+        departments = departments.filter(office_id=office_filter)
+    
+    # Get all offices for filter dropdown
+    offices = Office.objects.all().order_by('name')
+    
     context = {
         'departments': departments,
+        'offices': offices,
+        'current_office': office_filter,
     }
     return render(request, 'users/department_list.html', context)
 
@@ -291,3 +301,79 @@ def department_list_api(request):
         for dept in departments
     ]
     return Response(data)
+
+
+# Office Management Views
+@permission_required('users.can_view_offices')
+def office_list_view(request):
+    """Danh sách văn phòng"""
+    offices = Office.objects.annotate(
+        department_count=Count('department'),
+        user_count=Count('department__user')
+    ).order_by('name')
+    
+    context = {
+        'offices': offices,
+    }
+    return render(request, 'users/office_list.html', context)
+
+
+@permission_required('users.can_create_offices')
+def office_create_view(request):
+    """Tạo văn phòng mới"""
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description', '')
+        
+        if name:
+            office = Office.objects.create(
+                name=name,
+                description=description
+            )
+            messages.success(request, f'Tạo văn phòng {office.name} thành công!')
+            return redirect('users:office_list')
+        else:
+            messages.error(request, 'Tên văn phòng không được để trống!')
+    
+    return render(request, 'users/office_create.html')
+
+
+@permission_required('users.can_edit_offices')
+def office_update_view(request, office_id):
+    """Cập nhật văn phòng"""
+    office = get_object_or_404(Office, id=office_id)
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description', '')
+        
+        if name:
+            office.name = name
+            office.description = description
+            office.save()
+            messages.success(request, f'Cập nhật văn phòng {office.name} thành công!')
+            return redirect('users:office_list')
+        else:
+            messages.error(request, 'Tên văn phòng không được để trống!')
+    
+    context = {
+        'office': office,
+    }
+    return render(request, 'users/office_update.html', context)
+
+
+@permission_required('users.can_delete_offices')
+def office_delete_view(request, office_id):
+    """Xóa văn phòng"""
+    office = get_object_or_404(Office, id=office_id)
+    
+    if request.method == 'POST':
+        office_name = office.name
+        office.delete()
+        messages.success(request, f'Xóa văn phòng {office_name} thành công!')
+        return redirect('users:office_list')
+    
+    context = {
+        'office': office,
+    }
+    return render(request, 'users/office_delete.html', context)

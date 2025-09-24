@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cập nhật Văn phòng - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/users/create.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="users-page">
+    <div class="container">
+        <div class="page-header">
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>🏢 Cập nhật Văn phòng</h1>
+                    <p>Cập nhật thông tin văn phòng: {{ office.name }}</p>
+                </div>
+                <div class="header-actions">
+                    <a href="{% url 'users:office_list' %}" class="btn btn-secondary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <form method="post" class="create-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="name" class="form-label">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        Tên văn phòng *
+                    </label>
+                    <input type="text" id="name" name="name" class="form-control" value="{{ office.name }}" required placeholder="VD: VP Hà Nội">
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="form-label">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                        </svg>
+                        Mô tả
+                    </label>
+                    <textarea id="description" name="description" class="form-control" rows="4" placeholder="Mô tả về văn phòng...">{{ office.description }}</textarea>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'users:office_list' %}" class="btn btn-secondary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Hủy
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Cập nhật
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
