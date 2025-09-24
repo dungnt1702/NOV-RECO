@@ -4,69 +4,109 @@
 {% block title %}Tạo Văn phòng - NOV-RECO{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/users/create.css' %}">
+<link rel="stylesheet" href="{% static 'css/users/office_forms.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="users-page">
-    <div class="container">
-        <div class="page-header">
-            <div class="header-content">
-                <div class="header-text">
-                    <h1>🏢 Tạo Văn phòng</h1>
-                    <p>Tạo văn phòng mới trong hệ thống</p>
-                </div>
-                <div class="header-actions">
-                    <a href="{% url 'users:office_list' %}" class="btn btn-secondary">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                        </svg>
-                        Quay lại
-                    </a>
-                </div>
-            </div>
+<div class="office-form-page">
+    <div class="office-form-container">
+        <div class="office-form-header">
+            <h1>🏢 Tạo Văn phòng</h1>
+            <p>Tạo văn phòng mới trong hệ thống</p>
         </div>
 
-        <div class="content-card">
-            <form method="post" class="create-form">
-                {% csrf_token %}
-                
-                <div class="form-group">
-                    <label for="name" class="form-label">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+        <div class="office-form-card">
+            <div class="office-form-card-header">
+                <h2>
+                    <div class="icon">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
-                        Tên văn phòng *
-                    </label>
-                    <input type="text" id="name" name="name" class="form-control" required placeholder="VD: VP Hà Nội">
-                </div>
+                    </div>
+                    Thông tin văn phòng mới
+                </h2>
+            </div>
 
-                <div class="form-group">
-                    <label for="description" class="form-label">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
-                        </svg>
-                        Mô tả
-                    </label>
-                    <textarea id="description" name="description" class="form-control" rows="4" placeholder="Mô tả về văn phòng..."></textarea>
-                </div>
+            <div class="office-form-body">
+                <form method="post" id="officeCreateForm">
+                    {% csrf_token %}
+                    
+                    <div class="office-form-group">
+                        <label for="name" class="office-form-label">
+                            <div class="icon">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                            Tên văn phòng *
+                        </label>
+                        <input type="text" id="name" name="name" class="office-form-input" required placeholder="VD: VP Hà Nội">
+                    </div>
 
-                <div class="form-actions">
-                    <a href="{% url 'users:office_list' %}" class="btn btn-secondary">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                        Hủy
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        Tạo văn phòng
-                    </button>
-                </div>
-            </form>
+                    <div class="office-form-group">
+                        <label for="description" class="office-form-label">
+                            <div class="icon">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                                </svg>
+                            </div>
+                            Mô tả
+                        </label>
+                        <textarea id="description" name="description" class="office-form-textarea" rows="4" placeholder="Mô tả về văn phòng..."></textarea>
+                    </div>
+
+                    <div class="office-form-actions">
+                        <a href="{% url 'users:office_list' %}" class="office-form-btn office-form-btn-secondary">
+                            <div class="icon">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </div>
+                            Hủy
+                        </a>
+                        <button type="submit" class="office-form-btn office-form-btn-primary">
+                            <div class="icon">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            Tạo văn phòng
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('officeCreateForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    form.addEventListener('submit', function() {
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+    });
+    
+    // Add input validation
+    const nameInput = document.getElementById('name');
+    const descriptionInput = document.getElementById('description');
+    
+    nameInput.addEventListener('input', function() {
+        if (this.value.trim().length > 0) {
+            this.classList.remove('error');
+            this.classList.add('success');
+        } else {
+            this.classList.remove('success');
+        }
+    });
+    
+    // Auto-resize textarea
+    descriptionInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+    });
+});
+</script>
 {% endblock %}
