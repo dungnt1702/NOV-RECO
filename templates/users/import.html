@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/users/office_forms.css' %}">
+<link rel="stylesheet" href="{% static 'css/users/import.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -15,18 +16,19 @@
       <p>Tải lên file .csv (UTF-8, nên có BOM) với tiêu đề cột: username, first_name, last_name, email, role, employee_id, department_id</p>
     </div>
 
-    {% if not has_openpyxl %}
-      <div class="alert alert-warning" role="alert" style="margin-bottom: 16px;">
-        Máy chủ chưa cài openpyxl, chỉ xem hướng dẫn. Vui lòng cài đặt để dùng import.
-      </div>
-    {% endif %}
+    
 
     <div class="office-form-card">
       <form method="post" enctype="multipart/form-data" class="office-form">
         {% csrf_token %}
         <div class="office-form-group">
-          <label class="office-form-label">Chọn file Excel (.xlsx)</label>
-          <input type="file" name="file" accept=".csv" class="office-form-input" required>
+          <label class="office-form-label">Chọn file CSV (UTF-8)</label>
+          <label class="import-dropzone">
+            <input type="file" name="file" accept=".csv" required>
+            <div class="dz-icon"><i class="fas fa-file-csv"></i></div>
+            <div class="dz-text">Kéo thả file vào đây hoặc bấm để chọn</div>
+            <div class="dz-hint">Hỗ trợ: .csv (UTF-8, khuyến nghị có BOM)</div>
+          </label>
         </div>
         <div class="office-form-group">
           <label class="office-form-label">Phòng ban mặc định (nếu file không có department_id)</label>
