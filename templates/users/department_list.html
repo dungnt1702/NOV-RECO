@@ -122,7 +122,18 @@
                                 </a>
                             </td>
                             <td>
+                                {% if dept.manager %}
+                                    <div class="manager-info">
+                                        <div class="manager-name">{{ dept.manager.get_full_name }}</div>
+                                        {% if dept.deputy_manager %}
+                                            <div class="deputy-manager">
+                                                <small class="text-muted">Phó: {{ dept.deputy_manager.get_full_name }}</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
                                     <span class="text-muted">Chưa có</span>
+                                {% endif %}
                             </td>
                             <td>
                                 <div class="action-buttons">
@@ -173,7 +184,17 @@
                                 <span class="stat-label">Nhân viên</span>
                             </div>
                             <div class="stat-item">
-                                <span class="text-muted">Chưa có trưởng phòng</span>
+                                {% if dept.manager %}
+                                    <div class="manager-info">
+                                        <span class="stat-label">Trưởng phòng:</span>
+                                        <span class="stat-value">{{ dept.manager.get_full_name }}</span>
+                                        {% if dept.deputy_manager %}
+                                            <br><small class="text-muted">Phó: {{ dept.deputy_manager.get_full_name }}</small>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted">Chưa có trưởng phòng</span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

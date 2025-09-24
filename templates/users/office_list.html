@@ -58,6 +58,14 @@
                                     </svg>
                                 </div>
                             </th>
+                            <th>
+                                <div class="table-header">
+                                    <span>Giám đốc</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                                    </svg>
+                                </div>
+                            </th>
                             <th>Thao tác</th>
                         </tr>
                     </thead>
@@ -90,6 +98,20 @@
                                     <span class="count-number">{{ office.user_count }}</span>
                                     <span class="count-label">nhân viên</span>
                                 </a>
+                            </td>
+                            <td>
+                                {% if office.director %}
+                                    <div class="director-info">
+                                        <div class="director-name">{{ office.director.get_full_name }}</div>
+                                        {% if office.deputy_director %}
+                                            <div class="deputy-director">
+                                                <small class="text-muted">Phó: {{ office.deputy_director.get_full_name }}</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted">Chưa có</span>
+                                {% endif %}
                             </td>
                             <td>
                                 <div class="action-buttons">
@@ -149,6 +171,19 @@
                                 <span class="stat-number">{{ office.user_count }}</span>
                                 <span class="stat-label">Nhân viên</span>
                             </a>
+                            <div class="stat-item">
+                                {% if office.director %}
+                                    <div class="director-info">
+                                        <span class="stat-label">Giám đốc:</span>
+                                        <span class="stat-value">{{ office.director.get_full_name }}</span>
+                                        {% if office.deputy_director %}
+                                            <br><small class="text-muted">Phó: {{ office.deputy_director.get_full_name }}</small>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted">Chưa có giám đốc</span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     

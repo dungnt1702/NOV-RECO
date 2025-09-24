@@ -9,8 +9,7 @@ urlpatterns = [
     path('list/', views.absence_list_view, name='list'),
     path('detail/<int:absence_id>/', views.absence_detail_view, name='detail'),
     path('approval/', views.approval_view, name='approval'),
-    path('approve/<int:absence_id>/', views.approve_request_view, name='approve'),
-    path('workflow-config/', views.workflow_config_view, name='workflow_config'),
+    path('approve/<int:absence_id>/', views.approval_view, name='approve'),
     
     # API Views
     path('api/types/', api_views.absence_types_api, name='api_types'),

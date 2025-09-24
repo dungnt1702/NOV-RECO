@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_permissions %}
+
+{% block title %}Danh sách đơn vắng mặt{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/absence/list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-list-alt"></i>
+                    Danh sách đơn vắng mặt
+                </h1>
+                <p class="page-subtitle">Quản lý và theo dõi các đơn vắng mặt</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="filter-card">
+                <div class="filter-header">
+                    <h3 class="filter-title">
+                        <i class="fas fa-filter"></i>
+                        Bộ lọc
+                    </h3>
+                    <button class="btn btn-outline-primary btn-sm filter-toggle" id="filterToggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="filter-body collapsed" id="filterBody">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Trạng thái</label>
+                                <select id="statusFilter" class="form-control">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="pending">Đang chờ phê duyệt</option>
+                                    <option value="approved">Đã phê duyệt</option>
+                                    <option value="rejected">Đã từ chối</option>
+                                    <option value="cancelled">Đã hủy</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Loại vắng mặt</label>
+                                <select id="typeFilter" class="form-control">
+                                    <option value="">Tất cả loại</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Phòng ban</label>
+                                <select id="departmentFilter" class="form-control">
+                                    <option value="">Tất cả phòng ban</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Nhân viên</label>
+                                <select id="userFilter" class="form-control">
+                                    <option value="">Tất cả nhân viên</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Từ ngày</label>
+                                <input type="date" id="startDateFilter" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Đến ngày</label>
+                                <input type="date" id="endDateFilter" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn btn-primary" id="applyFilters">
+                            <i class="fas fa-search"></i>
+                            Áp dụng bộ lọc
+                        </button>
+                        <button class="btn btn-secondary" id="resetFilters">
+                            <i class="fas fa-undo"></i>
+                            Đặt lại
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Section -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="actions-bar">
+                <div class="actions-left">
+                    <a href="{% url 'absence:request' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Tạo đơn mới
+                    </a>
+                    <button class="btn btn-success" id="exportBtn">
+                        <i class="fas fa-download"></i>
+                        Xuất Excel
+                    </button>
+                </div>
+                <div class="actions-right">
+                    <div class="view-toggle">
+                        <button class="btn btn-outline-primary active" id="tableViewBtn">
+                            <i class="fas fa-table"></i>
+                        </button>
+                        <button class="btn btn-outline-primary" id="cardViewBtn">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table View -->
+    <div class="row" id="tableView">
+        <div class="col-12">
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="absenceTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nhân viên</th>
+                                <th>Loại vắng mặt</th>
+                                <th>Ngày bắt đầu</th>
+                                <th>Ngày kết thúc</th>
+                                <th>Số ngày</th>
+                                <th>Trạng thái</th>
+                                <th>Cấp độ phê duyệt</th>
+                                <th>Người phê duyệt</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="absenceTableBody">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card View -->
+    <div class="row" id="cardView" style="display: none;">
+        <div class="col-12">
+            <div class="card-grid" id="absenceCardGrid">
+                <!-- Cards will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav aria-label="Pagination">
+                <ul class="pagination justify-content-center" id="pagination">
+                    <!-- Pagination will be loaded here -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="row" id="emptyState" style="display: none;">
+        <div class="col-12">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>Không có đơn vắng mặt</h3>
+                <p>Chưa có đơn vắng mặt nào được tạo hoặc không tìm thấy kết quả phù hợp với bộ lọc.</p>
+                <a href="{% url 'absence:request' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Tạo đơn mới
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-eye"></i>
+                    Chi tiết đơn vắng mặt
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailModalBody">
+                <!-- Detail content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/absence/list.js' %}"></script>
+{% endblock %}

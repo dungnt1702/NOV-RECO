@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_permissions %}
+
+{% block title %}Chi tiết đơn vắng mặt{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/absence/detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-file-alt"></i>
+                    Chi tiết đơn vắng mặt
+                </h1>
+                <p class="page-subtitle">Thông tin chi tiết và lịch sử phê duyệt</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Request Info Card -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-info-circle"></i>
+                        Thông tin đơn vắng mặt
+                    </h3>
+                    <div class="status-badge" id="statusBadge">
+                        <!-- Status will be loaded here -->
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Nhân viên:</label>
+                                <span class="info-value" id="employeeName">--</span>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Phòng ban:</label>
+                                <span class="info-value" id="departmentName">--</span>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Loại vắng mặt:</label>
+                                <span class="info-value" id="absenceType">--</span>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Ngày tạo:</label>
+                                <span class="info-value" id="createdAt">--</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Ngày bắt đầu:</label>
+                                <span class="info-value" id="startDate">--</span>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Ngày kết thúc:</label>
+                                <span class="info-value" id="endDate">--</span>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Tổng số ngày:</label>
+                                <span class="info-value" id="totalDays">--</span>
+                            </div>
+                            <div class="info-item">
+                                <label class="info-label">Cập nhật cuối:</label>
+                                <span class="info-value" id="updatedAt">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-item full-width">
+                        <label class="info-label">Lý do vắng mặt:</label>
+                        <div class="info-value" id="reason">--</div>
+                    </div>
+                    
+                    <div class="info-item full-width" id="attachmentSection" style="display: none;">
+                        <label class="info-label">Tệp đính kèm:</label>
+                        <div class="attachment-info" id="attachmentInfo">
+                            <!-- Attachment info will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Card -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-sitemap"></i>
+                        Quy trình phê duyệt
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="workflow-timeline" id="workflowTimeline">
+                        <!-- Workflow steps will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Approval History Card -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-history"></i>
+                        Lịch sử phê duyệt
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="approval-history" id="approvalHistory">
+                        <!-- Approval history will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Actions Card -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-tools"></i>
+                        Thao tác
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="action-buttons" id="actionButtons">
+                        <!-- Action buttons will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Status Card -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-line"></i>
+                        Trạng thái hiện tại
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="status-info">
+                        <div class="status-item">
+                            <label class="status-label">Trạng thái:</label>
+                            <span class="status-value" id="currentStatus">--</span>
+                        </div>
+                        <div class="status-item">
+                            <label class="status-label">Cấp độ phê duyệt:</label>
+                            <span class="status-value" id="currentLevel">--</span>
+                        </div>
+                        <div class="status-item">
+                            <label class="status-label">Người phê duyệt:</label>
+                            <span class="status-value" id="currentApprover">--</span>
+                        </div>
+                        <div class="status-item" id="timeoutSection" style="display: none;">
+                            <label class="status-label">Thời hạn:</label>
+                            <span class="status-value" id="timeoutInfo">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Info Card -->
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-link"></i>
+                        Thông tin liên quan
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="related-info">
+                        <div class="related-item">
+                            <label class="related-label">Workflow:</label>
+                            <span class="related-value" id="workflowInfo">--</span>
+                        </div>
+                        <div class="related-item">
+                            <label class="related-label">Thời gian chờ:</label>
+                            <span class="related-value" id="waitingTime">--</span>
+                        </div>
+                        <div class="related-item">
+                            <label class="related-label">Số lần nhắc nhở:</label>
+                            <span class="related-value" id="reminderCount">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Approval Modal -->
+<div class="modal fade" id="approvalModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-gavel"></i>
+                    Phê duyệt đơn vắng mặt
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="approval-form">
+                    <div class="approval-actions">
+                        <div class="form-group">
+                            <label class="form-label">Quyết định</label>
+                            <div class="approval-buttons">
+                                <button type="button" class="btn btn-success approval-btn" data-action="approved">
+                                    <i class="fas fa-check"></i>
+                                    Phê duyệt
+                                </button>
+                                <button type="button" class="btn btn-danger approval-btn" data-action="rejected">
+                                    <i class="fas fa-times"></i>
+                                    Từ chối
+                                </button>
+                                <button type="button" class="btn btn-warning approval-btn" data-action="delegated">
+                                    <i class="fas fa-user-friends"></i>
+                                    Ủy quyền
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="approvalComment" class="form-label">Bình luận</label>
+                            <textarea id="approvalComment" class="form-control" rows="3" 
+                                placeholder="Nhập bình luận về quyết định của bạn..."></textarea>
+                        </div>
+                        
+                        <div class="form-group" id="delegationSection" style="display: none;">
+                            <label for="delegateTo" class="form-label">Ủy quyền cho</label>
+                            <select id="delegateTo" class="form-control">
+                                <option value="">-- Chọn người ủy quyền --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="submitApproval">
+                    <i class="fas fa-paper-plane"></i>
+                    Gửi quyết định
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/absence/detail.js' %}"></script>
+{% endblock %}

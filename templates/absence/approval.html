@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_permissions %}
+
+{% block title %}Phê duyệt đơn vắng mặt{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/absence/approval.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-check-circle"></i>
+                    Phê duyệt đơn vắng mặt
+                </h1>
+                <p class="page-subtitle">Xem xét và phê duyệt các đơn vắng mặt đang chờ</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="filter-card">
+                <div class="filter-header">
+                    <h3 class="filter-title">
+                        <i class="fas fa-filter"></i>
+                        Bộ lọc
+                    </h3>
+                    <button class="btn btn-outline-primary btn-sm filter-toggle" id="filterToggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="filter-body collapsed" id="filterBody">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Cấp độ phê duyệt</label>
+                                <select id="levelFilter" class="form-control">
+                                    <option value="">Tất cả cấp độ</option>
+                                    <option value="department_manager">Trưởng phòng</option>
+                                    <option value="department_deputy">Phó phòng</option>
+                                    <option value="office_director">Giám đốc Văn phòng</option>
+                                    <option value="office_deputy">Phó Giám đốc</option>
+                                    <option value="hr_approval">HR</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Loại vắng mặt</label>
+                                <select id="typeFilter" class="form-control">
+                                    <option value="">Tất cả loại</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Phòng ban</label>
+                                <select id="departmentFilter" class="form-control">
+                                    <option value="">Tất cả phòng ban</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="form-label">Ưu tiên</label>
+                                <select id="priorityFilter" class="form-control">
+                                    <option value="">Tất cả</option>
+                                    <option value="urgent">Khẩn cấp</option>
+                                    <option value="normal">Bình thường</option>
+                                    <option value="low">Thấp</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn btn-primary" id="applyFilters">
+                            <i class="fas fa-search"></i>
+                            Áp dụng bộ lọc
+                        </button>
+                        <button class="btn btn-secondary" id="resetFilters">
+                            <i class="fas fa-undo"></i>
+                            Đặt lại
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card pending">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="pendingCount">0</h3>
+                    <p>Chờ phê duyệt</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card urgent">
+                <div class="stat-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="urgentCount">0</h3>
+                    <p>Khẩn cấp</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card overdue">
+                <div class="stat-icon">
+                    <i class="fas fa-hourglass-end"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="overdueCount">0</h3>
+                    <p>Quá hạn</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card today">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 id="todayCount">0</h3>
+                    <p>Hôm nay</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approval List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="approval-list" id="approvalList">
+                <!-- Approval items will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="row" id="emptyState" style="display: none;">
+        <div class="col-12">
+            <div class="empty-state">
+                <i class="fas fa-check-circle"></i>
+                <h3>Không có đơn cần phê duyệt</h3>
+                <p>Tất cả đơn vắng mặt đã được xử lý hoặc không có đơn nào thuộc quyền phê duyệt của bạn.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Approval Modal -->
+<div class="modal fade" id="approvalModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-gavel"></i>
+                    Phê duyệt đơn vắng mặt
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="approval-form">
+                    <div class="request-details" id="requestDetails">
+                        <!-- Request details will be loaded here -->
+                    </div>
+                    
+                    <div class="approval-actions">
+                        <div class="form-group">
+                            <label class="form-label">Quyết định</label>
+                            <div class="approval-buttons">
+                                <button type="button" class="btn btn-success approval-btn" data-action="approved">
+                                    <i class="fas fa-check"></i>
+                                    Phê duyệt
+                                </button>
+                                <button type="button" class="btn btn-danger approval-btn" data-action="rejected">
+                                    <i class="fas fa-times"></i>
+                                    Từ chối
+                                </button>
+                                <button type="button" class="btn btn-warning approval-btn" data-action="delegated">
+                                    <i class="fas fa-user-friends"></i>
+                                    Ủy quyền
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="approvalComment" class="form-label">Bình luận</label>
+                            <textarea id="approvalComment" class="form-control" rows="3" 
+                                placeholder="Nhập bình luận về quyết định của bạn..."></textarea>
+                        </div>
+                        
+                        <div class="form-group" id="delegationSection" style="display: none;">
+                            <label for="delegateTo" class="form-label">Ủy quyền cho</label>
+                            <select id="delegateTo" class="form-control">
+                                <option value="">-- Chọn người ủy quyền --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="submitApproval">
+                    <i class="fas fa-paper-plane"></i>
+                    Gửi quyết định
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-eye"></i>
+                    Chi tiết đơn vắng mặt
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailModalBody">
+                <!-- Detail content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/absence/approval.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_permissions %}
+
+{% block title %}Tạo đơn vắng mặt{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/absence/request.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-calendar-times"></i>
+                    Tạo đơn vắng mặt
+                </h1>
+                <p class="page-subtitle">Điền thông tin để tạo đơn vắng mặt mới</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="absence-form-card">
+                <form id="absenceRequestForm" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Thông tin cơ bản
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="absence_type" class="form-label">
+                                <i class="fas fa-tag"></i>
+                                Loại vắng mặt <span class="required">*</span>
+                            </label>
+                            <select id="absence_type" name="absence_type" class="form-control" required>
+                                <option value="">-- Chọn loại vắng mặt --</option>
+                            </select>
+                            <div class="form-help">Chọn loại vắng mặt phù hợp với lý do của bạn</div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="start_date" class="form-label">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Ngày bắt đầu <span class="required">*</span>
+                                </label>
+                                <input type="date" id="start_date" name="start_date" class="form-control" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="end_date" class="form-label">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Ngày kết thúc <span class="required">*</span>
+                                </label>
+                                <input type="date" id="end_date" name="end_date" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="start_time" class="form-label">
+                                    <i class="fas fa-clock"></i>
+                                    Giờ bắt đầu
+                                </label>
+                                <input type="time" id="start_time" name="start_time" class="form-control">
+                                <div class="form-help">Để trống nếu nghỉ cả ngày</div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="end_time" class="form-label">
+                                    <i class="fas fa-clock"></i>
+                                    Giờ kết thúc
+                                </label>
+                                <input type="time" id="end_time" name="end_time" class="form-control">
+                                <div class="form-help">Để trống nếu nghỉ cả ngày</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calculator"></i>
+                                Tổng số ngày
+                            </label>
+                            <div class="total-days-display">
+                                <span id="total_days">0</span> ngày
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-file-alt"></i>
+                            Chi tiết đơn
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="reason" class="form-label">
+                                <i class="fas fa-comment"></i>
+                                Lý do vắng mặt <span class="required">*</span>
+                            </label>
+                            <textarea id="reason" name="reason" class="form-control" rows="4" required 
+                                placeholder="Mô tả chi tiết lý do vắng mặt..."></textarea>
+                            <div class="form-help">Mô tả rõ ràng lý do vắng mặt để được phê duyệt nhanh chóng</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="attachment" class="form-label">
+                                <i class="fas fa-paperclip"></i>
+                                Tệp đính kèm
+                            </label>
+                            <div class="file-upload-area" id="fileUploadArea">
+                                <input type="file" id="attachment" name="attachment" class="file-input" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                <div class="file-upload-content">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Kéo thả tệp vào đây hoặc <span class="file-link">chọn tệp</span></p>
+                                    <small>Hỗ trợ: PDF, DOC, DOCX, JPG, PNG (tối đa 10MB)</small>
+                                </div>
+                            </div>
+                            <div class="file-preview" id="filePreview"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Thông tin workflow
+                        </h3>
+                        
+                        <div class="workflow-info" id="workflowInfo">
+                            <div class="workflow-steps">
+                                <div class="workflow-step">
+                                    <i class="fas fa-user"></i>
+                                    <span>Nhân viên</span>
+                                </div>
+                                <div class="workflow-arrow">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                                <div class="workflow-step">
+                                    <i class="fas fa-user-tie"></i>
+                                    <span>Trưởng phòng</span>
+                                </div>
+                                <div class="workflow-arrow">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                                <div class="workflow-step">
+                                    <i class="fas fa-user-shield"></i>
+                                    <span>HR</span>
+                                </div>
+                            </div>
+                            <div class="workflow-details" id="workflowDetails">
+                                <p>Workflow sẽ được hiển thị sau khi chọn loại vắng mặt</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="history.back()">
+                            <i class="fas fa-arrow-left"></i>
+                            Quay lại
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            Gửi đơn vắng mặt
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/absence/request.js' %}"></script>
+{% endblock %}

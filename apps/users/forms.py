@@ -107,10 +107,22 @@ class DepartmentForm(forms.ModelForm):
         label='Văn phòng'
     )
     description = forms.CharField(widget=forms.Textarea, required=False, label='Mô tả')
+    manager = forms.ModelChoiceField(
+        queryset=User.objects.filter(role__in=['admin', 'manager']),
+        required=False,
+        empty_label="Chọn trưởng phòng",
+        label='Trưởng phòng'
+    )
+    deputy_manager = forms.ModelChoiceField(
+        queryset=User.objects.filter(role__in=['admin', 'manager']),
+        required=False,
+        empty_label="Chọn phó phòng",
+        label='Phó phòng'
+    )
 
     class Meta:
         model = Department
-        fields = ['name', 'office', 'description']
+        fields = ['name', 'office', 'description', 'manager', 'deputy_manager']
 
     def clean_name(self):
         name = self.cleaned_data.get('name')
@@ -124,4 +136,39 @@ class DepartmentForm(forms.ModelForm):
             else:
                 if Department.objects.filter(name=name, office=office).exists():
                     raise forms.ValidationError(f'Tên phòng ban "{name}" đã tồn tại trong {office.name}')
+        return name
+
+
+class OfficeForm(forms.ModelForm):
+    """Form văn phòng"""
+    name = forms.CharField(max_length=100, required=True, label='Tên văn phòng')
+    description = forms.CharField(widget=forms.Textarea, required=False, label='Mô tả')
+    director = forms.ModelChoiceField(
+        queryset=User.objects.filter(role__in=['admin', 'manager']),
+        required=False,
+        empty_label="Chọn giám đốc văn phòng",
+        label='Giám đốc Văn phòng'
+    )
+    deputy_director = forms.ModelChoiceField(
+        queryset=User.objects.filter(role__in=['admin', 'manager']),
+        required=False,
+        empty_label="Chọn phó giám đốc văn phòng",
+        label='Phó Giám đốc Văn phòng'
+    )
+
+    class Meta:
+        model = Office
+        fields = ['name', 'description', 'director', 'deputy_director']
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if name:
+            name = name.strip()
+            # Kiểm tra trùng lặp
+            if self.instance.pk:
+                if Office.objects.filter(name=name).exclude(pk=self.instance.pk).exists():
+                    raise forms.ValidationError(f'Tên văn phòng "{name}" đã tồn tại')
+            else:
+                if Office.objects.filter(name=name).exists():
+                    raise forms.ValidationError(f'Tên văn phòng "{name}" đã tồn tại')
         return name

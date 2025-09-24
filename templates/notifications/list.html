@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_permissions %}
+
+{% block title %}Thông báo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/notifications/list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-bell"></i>
+                    Thông báo
+                </h1>
+                <p class="page-subtitle">Quản lý và xem các thông báo của bạn</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="notification-tabs">
+                <ul class="nav nav-tabs" id="notificationTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                            <i class="fas fa-list"></i>
+                            Tất cả
+                            <span class="badge" id="allCount">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="unread-tab" data-bs-toggle="tab" data-bs-target="#unread" type="button" role="tab">
+                            <i class="fas fa-envelope"></i>
+                            Chưa đọc
+                            <span class="badge" id="unreadCount">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="absence-tab" data-bs-toggle="tab" data-bs-target="#absence" type="button" role="tab">
+                            <i class="fas fa-calendar-times"></i>
+                            Vắng mặt
+                            <span class="badge" id="absenceCount">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="system-tab" data-bs-toggle="tab" data-bs-target="#system" type="button" role="tab">
+                            <i class="fas fa-cog"></i>
+                            Hệ thống
+                            <span class="badge" id="systemCount">0</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="row">
+        <div class="col-12">
+            <div class="tab-content" id="notificationTabContent">
+                <!-- All Notifications -->
+                <div class="tab-pane fade show active" id="all" role="tabpanel">
+                    <div class="notification-list" id="allNotifications">
+                        <!-- Notifications will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Unread Notifications -->
+                <div class="tab-pane fade" id="unread" role="tabpanel">
+                    <div class="notification-list" id="unreadNotifications">
+                        <!-- Unread notifications will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Absence Notifications -->
+                <div class="tab-pane fade" id="absence" role="tabpanel">
+                    <div class="notification-list" id="absenceNotifications">
+                        <!-- Absence notifications will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- System Notifications -->
+                <div class="tab-pane fade" id="system" role="tabpanel">
+                    <div class="notification-list" id="systemNotifications">
+                        <!-- System notifications will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="notification-actions">
+                <button class="btn btn-primary" id="markAllReadBtn">
+                    <i class="fas fa-check-double"></i>
+                    Đánh dấu tất cả đã đọc
+                </button>
+                <button class="btn btn-secondary" id="clearReadBtn">
+                    <i class="fas fa-trash"></i>
+                    Xóa thông báo đã đọc
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="row" id="emptyState" style="display: none;">
+        <div class="col-12">
+            <div class="empty-state">
+                <i class="fas fa-bell-slash"></i>
+                <h3>Không có thông báo</h3>
+                <p>Bạn chưa có thông báo nào hoặc không tìm thấy kết quả phù hợp.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Detail Modal -->
+<div class="modal fade" id="notificationModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificationModalTitle">
+                    <i class="fas fa-bell"></i>
+                    Chi tiết thông báo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="notificationModalBody">
+                <!-- Notification detail will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="markAsReadBtn">
+                    <i class="fas fa-check"></i>
+                    Đánh dấu đã đọc
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/notifications/list.js' %}"></script>
+{% endblock %}
