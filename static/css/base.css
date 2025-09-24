@@ -651,6 +651,7 @@ svg {
 
     .nav-menu.active {
         left: 0;
+        padding-bottom: 80px;
     }
 
     .nav-menu li a {
