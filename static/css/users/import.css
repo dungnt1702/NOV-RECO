@@ -14,6 +14,7 @@
 
 .office-form-card {
   margin-bottom: 16px;
+  padding: 16px;
 }
 
 .office-form-group {
@@ -24,6 +25,15 @@
   margin-top: 12px;
   gap: 10px !important;
   flex-wrap: wrap;
+}
+
+.import-guidance {
+  color: #e6edf3;
+  line-height: 1.75;
+  font-size: 14.5px;
+}
+.import-guidance code {
+  color: #f0abfc;
 }
 .import-dropzone {
   border: 2px dashed #334155;
