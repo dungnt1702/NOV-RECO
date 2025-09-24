@@ -36,7 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('resetFilters').addEventListener('click', resetFilters);
 
         // Export button
-        document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            exportToExcel();
+        });
     }
 
     async function loadInitialData() {
@@ -451,7 +453,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    window.exportToExcel = function() {
+    // Export function
+    function exportToExcel() {
         if (filteredData.length === 0) {
             showNotification('Không có dữ liệu để xuất', 'warning');
             return;
@@ -489,7 +492,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    };
+    }
 
     // Utility functions
     function formatDate(dateString) {
