@@ -11,6 +11,8 @@ urlpatterns = [
     path('approval/', views.approval_view, name='approval'),
     path('approve/<int:absence_id>/', views.approval_view, name='approve'),
     path('workflow-config/', views.workflow_config_view, name='workflow_config'),
+    path('workflow/create/', views.workflow_create_view, name='workflow_create'),
+    path('workflow/update/<int:workflow_id>/', views.workflow_update_view, name='workflow_update'),
     
     # API Views
     path('api/types/', api_views.absence_types_api, name='api_types'),

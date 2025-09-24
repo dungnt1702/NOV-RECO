@@ -156,3 +156,88 @@ def workflow_config_view(request):
         'departments': departments,
         'absence_types': absence_types
     })
+
+
+@login_required
+@permission_required('absence.can_manage_absence_types')
+def workflow_create_view(request):
+    """Trang tạo workflow mới"""
+    if request.method == 'POST':
+        try:
+            data = request.POST
+            department = get_object_or_404(Department, id=data.get('department'))
+            absence_type = get_object_or_404(AbsenceType, id=data.get('absence_type'))
+            
+            workflow = ApprovalWorkflow.objects.create(
+                department=department,
+                absence_type=absence_type,
+                requires_department_manager=data.get('requires_department_manager') == 'on',
+                requires_department_deputy=data.get('requires_department_deputy') == 'on',
+                requires_office_director=data.get('requires_office_director') == 'on',
+                requires_office_deputy=data.get('requires_office_deputy') == 'on',
+                requires_hr_approval=data.get('requires_hr_approval') == 'on',
+                department_manager_timeout_hours=int(data.get('department_manager_timeout_hours', 24)),
+                department_deputy_timeout_hours=int(data.get('department_deputy_timeout_hours', 24)),
+                office_director_timeout_hours=int(data.get('office_director_timeout_hours', 48)),
+                office_deputy_timeout_hours=int(data.get('office_deputy_timeout_hours', 48)),
+                hr_timeout_hours=int(data.get('hr_timeout_hours', 48)),
+                send_reminder_before_hours=int(data.get('send_reminder_before_hours', 2)),
+                max_reminders=int(data.get('max_reminders', 3)),
+                is_active=data.get('is_active') == 'on'
+            )
+            
+            messages.success(request, f'Workflow đã được tạo thành công cho {workflow.department.full_name} - {workflow.absence_type.name}')
+            return redirect('absence:workflow_config')
+            
+        except Exception as e:
+            messages.error(request, f'Lỗi khi tạo workflow: {str(e)}')
+    
+    departments = Department.objects.select_related('office').all()
+    absence_types = AbsenceType.objects.all()
+    
+    return render(request, 'absence/workflow_create.html', {
+        'departments': departments,
+        'absence_types': absence_types
+    })
+
+
+@login_required
+@permission_required('absence.can_manage_absence_types')
+def workflow_update_view(request, workflow_id):
+    """Trang sửa workflow"""
+    workflow = get_object_or_404(ApprovalWorkflow, id=workflow_id)
+    
+    if request.method == 'POST':
+        try:
+            data = request.POST
+            workflow.department = get_object_or_404(Department, id=data.get('department'))
+            workflow.absence_type = get_object_or_404(AbsenceType, id=data.get('absence_type'))
+            workflow.requires_department_manager = data.get('requires_department_manager') == 'on'
+            workflow.requires_department_deputy = data.get('requires_department_deputy') == 'on'
+            workflow.requires_office_director = data.get('requires_office_director') == 'on'
+            workflow.requires_office_deputy = data.get('requires_office_deputy') == 'on'
+            workflow.requires_hr_approval = data.get('requires_hr_approval') == 'on'
+            workflow.department_manager_timeout_hours = int(data.get('department_manager_timeout_hours', 24))
+            workflow.department_deputy_timeout_hours = int(data.get('department_deputy_timeout_hours', 24))
+            workflow.office_director_timeout_hours = int(data.get('office_director_timeout_hours', 48))
+            workflow.office_deputy_timeout_hours = int(data.get('office_deputy_timeout_hours', 48))
+            workflow.hr_timeout_hours = int(data.get('hr_timeout_hours', 48))
+            workflow.send_reminder_before_hours = int(data.get('send_reminder_before_hours', 2))
+            workflow.max_reminders = int(data.get('max_reminders', 3))
+            workflow.is_active = data.get('is_active') == 'on'
+            workflow.save()
+            
+            messages.success(request, f'Workflow đã được cập nhật thành công cho {workflow.department.full_name} - {workflow.absence_type.name}')
+            return redirect('absence:workflow_config')
+            
+        except Exception as e:
+            messages.error(request, f'Lỗi khi cập nhật workflow: {str(e)}')
+    
+    departments = Department.objects.select_related('office').all()
+    absence_types = AbsenceType.objects.all()
+    
+    return render(request, 'absence/workflow_update.html', {
+        'workflow': workflow,
+        'departments': departments,
+        'absence_types': absence_types
+    })
