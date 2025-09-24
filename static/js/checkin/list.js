@@ -194,9 +194,9 @@ function renderCheckinsTable(items = null) {
         </tr>
       `;
     } else {
-      tbody.innerHTML = checkinsToRender.map(checkin => `
+      tbody.innerHTML = checkinsToRender.map((checkin, idx) => `
         <tr>
-          <td>${checkin.id}</td>
+          <td>${startIndex + idx + 1}</td>
           <td>${checkin.user_name || 'N/A'}</td>
           <td class="area-cell">
             <i class="fas fa-map-marker-alt"></i>${checkin.area_name || 'N/A'}
@@ -205,7 +205,7 @@ function renderCheckinsTable(items = null) {
             ${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}
           </td>
           <td>
-            <span class="distance-badge">${formatDistanceNumber(checkin.distance_m || 0)}</span>
+            <span class="distance-cell">${formatDistanceNumber(checkin.distance_m || 0)}</span>
           </td>
           <td>
             <span class="checkin-type-badge ${checkin.checkin_type === '1' ? 'work' : 'visitor'}">
