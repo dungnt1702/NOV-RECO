@@ -23,35 +23,39 @@
     </div>
 
     <!-- Tabs -->
-    <div class="row mb-4">
+    <div class="row mb-3">
         <div class="col-12">
             <div class="notification-tabs">
                 <ul class="nav nav-tabs" id="notificationTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
                             <i class="fas fa-list"></i>
-                            Tất cả
+                            <span class="d-none d-md-inline">Tất cả</span>
+                            <span class="d-md-none">Tất cả</span>
                             <span class="badge" id="allCount">0</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="unread-tab" data-bs-toggle="tab" data-bs-target="#unread" type="button" role="tab">
                             <i class="fas fa-envelope"></i>
-                            Chưa đọc
+                            <span class="d-none d-md-inline">Chưa đọc</span>
+                            <span class="d-md-none">Chưa đọc</span>
                             <span class="badge" id="unreadCount">0</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="absence-tab" data-bs-toggle="tab" data-bs-target="#absence" type="button" role="tab">
                             <i class="fas fa-calendar-times"></i>
-                            Vắng mặt
+                            <span class="d-none d-md-inline">Vắng mặt</span>
+                            <span class="d-md-none">Vắng mặt</span>
                             <span class="badge" id="absenceCount">0</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="system-tab" data-bs-toggle="tab" data-bs-target="#system" type="button" role="tab">
                             <i class="fas fa-cog"></i>
-                            Hệ thống
+                            <span class="d-none d-md-inline">Hệ thống</span>
+                            <span class="d-md-none">Hệ thống</span>
                             <span class="badge" id="systemCount">0</span>
                         </button>
                     </li>
@@ -96,16 +100,18 @@
     </div>
 
     <!-- Actions -->
-    <div class="row mt-4">
+    <div class="row mt-3">
         <div class="col-12">
             <div class="notification-actions">
                 <button class="btn btn-primary" id="markAllReadBtn">
                     <i class="fas fa-check-double"></i>
-                    Đánh dấu tất cả đã đọc
+                    <span class="d-none d-md-inline">Đánh dấu tất cả đã đọc</span>
+                    <span class="d-md-none">Đánh dấu đã đọc</span>
                 </button>
                 <button class="btn btn-secondary" id="clearReadBtn">
                     <i class="fas fa-trash"></i>
-                    Xóa thông báo đã đọc
+                    <span class="d-none d-md-inline">Xóa thông báo đã đọc</span>
+                    <span class="d-md-none">Xóa đã đọc</span>
                 </button>
             </div>
         </div>
