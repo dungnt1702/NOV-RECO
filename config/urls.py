@@ -20,6 +20,8 @@ urlpatterns = [
     path("dashboard/", include("apps.dashboard.urls")),
     path("users/", include("apps.users.urls")),
     path("automation-test/", include("apps.automation_test.urls")),
+    path("absence/", include("apps.absence.urls")),
+    path("notifications/", include("apps.notifications.urls")),
 ]
 
 if settings.DEBUG:

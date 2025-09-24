@@ -92,6 +92,46 @@
                     </li>
                 {% endif %}
                 
+                <!-- Absence Management -->
+                {% if user.is_authenticated %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">
+                            <i class="fas fa-calendar-times"></i>
+                            Quản lý Vắng mặt
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="{% url 'absence:request' %}">
+                                    <i class="fas fa-plus"></i>
+                                    Tạo đơn vắng mặt
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'absence:list' %}">
+                                    <i class="fas fa-list"></i>
+                                    Danh sách đơn
+                                </a>
+                            </li>
+                            {% if user|has_permission:'absence.can_approve_absence' %}
+                            <li>
+                                <a href="{% url 'absence:approval' %}">
+                                    <i class="fas fa-check-circle"></i>
+                                    Phê duyệt đơn
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% if user|has_permission:'absence.can_manage_absence_types' %}
+                            <li>
+                                <a href="{% url 'absence:workflow_config' %}">
+                                    <i class="fas fa-cogs"></i>
+                                    Cấu hình workflow
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                {% endif %}
+                
                 <!-- Admin Panel -->
                 {% if user|in_group:'Super Admin' or user|in_group:'Admin' or user|in_group:'Manager' %}
                     <li>
@@ -114,6 +154,28 @@
         <div class="nav-right">
             <div class="user-info">
                 {% if user.is_authenticated %}
+                    <!-- Notification Bell -->
+                    <div class="notification-bell">
+                        <a href="#" class="notification-toggle" id="notificationToggle" title="Thông báo">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notificationBadge">0</span>
+                        </a>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-header">
+                                <h6>Thông báo</h6>
+                                <span class="unread-count" id="unreadCount">0 thông báo chưa đọc</span>
+                            </div>
+                            <div class="notification-list" id="notificationList">
+                                <!-- Notifications will be loaded here -->
+                            </div>
+                            <div class="notification-footer">
+                                <a href="{% url 'notifications:list' %}" class="view-all-btn">
+                                    <i class="fas fa-eye"></i> Xem tất cả
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <a href="{% url 'personal:profile' %}" class="user-profile-link" title="Thông tin cá nhân">
                         <div class="user-avatar">
                             {% if user.avatar %}
