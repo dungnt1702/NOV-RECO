@@ -92,7 +92,7 @@ def checkin_success_view(request, checkin_id=None):
         try:
             checkin = Checkin.objects.get(id=checkin_id, user=request.user)
             success_data = {
-                'user_name': checkin.user.full_name,
+                'user_name': checkin.user.get_full_name(),
                 'user_email': checkin.user.email,
                 'user_department': (
                     checkin.user.department.name
@@ -123,7 +123,7 @@ def checkin_success_view(request, checkin_id=None):
 
     # Default success data if no checkin_id provided
     success_data = {
-        'user_name': request.user.full_name,
+        'user_name': request.user.get_full_name(),
         'user_email': request.user.email,
         'user_department': (
             request.user.department.name
@@ -320,7 +320,7 @@ def checkin_user_info_api(request):
         'username': request.user.username,
         'first_name': request.user.first_name,
         'last_name': request.user.last_name,
-        'full_name': request.user.full_name,
+        'full_name': request.user.get_full_name(),
         'email': request.user.email,
         'role': request.user.role,
         'department': (request.user.department.name
