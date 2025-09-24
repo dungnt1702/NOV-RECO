@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/users.css' %}">
+<link rel="stylesheet" href="{% static 'css/users/user_filter.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -17,8 +18,19 @@
   </div>
 
   <!-- Search and Filter -->
-  <div class="search-filter-section" id="usersFilterSection">
-    <div class="search-form">
+  <div class="search-filter-section collapsed" id="usersFilterSection">
+    <div class="filter-header">
+      <div class="filter-title">
+        <i class="fas fa-filter"></i>
+        <span>Bộ lọc</span>
+      </div>
+      <div class="filter-actions">
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="filterToggleBtn">
+          Thu gọn
+        </button>
+      </div>
+    </div>
+    <div class="search-form filter-body">
       <div class="search-input-group">
         <input type="text" placeholder="Nhập tên hoặc email..." class="form-control search-input" id="nameSearch">
         <input type="text" placeholder="Mã nhân viên" class="form-control" id="employeeIdSearch">
@@ -40,7 +52,6 @@
             <option value="{{ value }}">{{ label }}</option>
           {% endfor %}
         </select>
-        <button type="button" class="btn btn-secondary" id="toggleFilter">Thu gọn</button>
       </div>
     </div>
   </div>

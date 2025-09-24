@@ -184,12 +184,13 @@ async function loadUsers() {
 }
 // Initialize office/department/role/name/employee filters and preselect from path
 function initializeAdvancedFilters() {
-    const toggleBtn = document.getElementById('toggleFilter');
+    const toggleBtn = document.getElementById('filterToggleBtn');
     const section = document.getElementById('usersFilterSection');
     if (toggleBtn && section) {
         section.classList.add('collapsed');
         toggleBtn.addEventListener('click', () => {
             section.classList.toggle('collapsed');
+            toggleBtn.textContent = section.classList.contains('collapsed') ? 'Mở rộng' : 'Thu gọn';
         });
     }
 
