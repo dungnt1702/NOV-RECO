@@ -1,4 +1,30 @@
 /* Import page custom styles */
+.office-form-page {
+  padding: 24px 12px;
+}
+
+.office-form-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.office-form-header {
+  margin-bottom: 20px;
+}
+
+.office-form-card {
+  margin-bottom: 16px;
+}
+
+.office-form-group {
+  margin-bottom: 16px;
+}
+
+.office-form-actions {
+  margin-top: 12px;
+  gap: 10px !important;
+  flex-wrap: wrap;
+}
 .import-dropzone {
   border: 2px dashed #334155;
   background: #0b1220;
