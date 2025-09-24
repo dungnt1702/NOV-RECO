@@ -7,6 +7,7 @@ urlpatterns = [
     # Web Views
     path('request/', views.absence_request_view, name='request'),
     path('list/', views.absence_list_view, name='list'),
+    path('history/', views.absence_history_view, name='history'),
     path('detail/<int:absence_id>/', views.absence_detail_view, name='detail'),
     path('approval/', views.approval_view, name='approval'),
     path('approve/<int:absence_id>/', views.approval_view, name='approve'),

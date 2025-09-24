@@ -107,6 +107,12 @@
                                 </a>
                             </li>
                             <li>
+                                <a href="{% url 'absence:history' %}">
+                                    <i class="fas fa-history"></i>
+                                    Lịch sử đơn của tôi
+                                </a>
+                            </li>
+                            <li>
                                 <a href="{% url 'absence:list' %}">
                                     <i class="fas fa-list"></i>
                                     Danh sách đơn
@@ -223,14 +229,14 @@
         <span class="nav-label">Lịch sử</span>
     </a>
     
-    <a href="{% url 'absence:list' %}" class="nav-item {% if request.resolver_match and request.resolver_match.url_name|default:'' == 'list' and request.resolver_match.namespace == 'absence' %}active{% endif %}">
+    <a href="{% url 'absence:request' %}" class="nav-item {% if request.resolver_match and request.resolver_match.url_name|default:'' == 'request' and request.resolver_match.namespace == 'absence' %}active{% endif %}">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
         </svg>
         <span class="nav-label">Vắng mặt</span>
     </a>
     
-    <a href="{% url 'checkin:list' %}" class="nav-item {% if request.resolver_match and request.resolver_match.url_name|default:'' == 'list' and request.resolver_match.namespace == 'checkin' %}active{% endif %}">
+    <a href="{% url 'absence:list' %}" class="nav-item {% if request.resolver_match and request.resolver_match.url_name|default:'' == 'list' and request.resolver_match.namespace == 'absence' %}active{% endif %}">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
         </svg>

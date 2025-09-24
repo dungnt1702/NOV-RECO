@@ -102,6 +102,38 @@ def absence_list_view(request):
 
 
 @login_required
+def absence_history_view(request):
+    """Trang lịch sử đơn vắng mặt của người dùng"""
+    # Chỉ hiển thị đơn của người dùng đang đăng nhập
+    absence_requests = AbsenceRequest.objects.filter(user=request.user)
+    
+    # Filter theo trạng thái
+    status_filter = request.GET.get('status')
+    if status_filter:
+        absence_requests = absence_requests.filter(status=status_filter)
+    
+    # Filter theo loại vắng mặt
+    type_filter = request.GET.get('type')
+    if type_filter:
+        absence_requests = absence_requests.filter(absence_type_id=type_filter)
+    
+    # Pagination
+    paginator = Paginator(absence_requests.order_by('-created_at'), 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Context data
+    absence_types = AbsenceType.objects.filter(is_active=True)
+    
+    return render(request, 'absence/history.html', {
+        'page_obj': page_obj,
+        'absence_types': absence_types,
+        'current_status': status_filter,
+        'current_type': type_filter
+    })
+
+
+@login_required
 def absence_detail_view(request, absence_id):
     """Trang chi tiết đơn vắng mặt"""
     absence_request = get_object_or_404(AbsenceRequest, id=absence_id)

@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lịch sử đơn vắng mặt{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/absence/history.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-content">
+        <h1 class="page-title">
+            <i class="fas fa-history"></i>
+            Lịch sử đơn vắng mặt
+        </h1>
+        <p class="page-subtitle">Xem lịch sử các đơn vắng mặt của bạn</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Filter Card -->
+    <div class="filter-card">
+        <div class="filter-header">
+            <h5><i class="fas fa-filter"></i> Bộ lọc</h5>
+            <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#filterBody" aria-expanded="false">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+        <div class="collapse" id="filterBody">
+            <div class="filter-body">
+                <form method="get" class="filter-form">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="status" class="form-label">Trạng thái</label>
+                            <select name="status" id="status" class="form-select">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Chờ phê duyệt</option>
+                                <option value="approved" {% if current_status == 'approved' %}selected{% endif %}>Đã phê duyệt</option>
+                                <option value="rejected" {% if current_status == 'rejected' %}selected{% endif %}>Đã từ chối</option>
+                                <option value="cancelled" {% if current_status == 'cancelled' %}selected{% endif %}>Đã hủy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="type" class="form-label">Loại vắng mặt</label>
+                            <select name="type" id="type" class="form-select">
+                                <option value="">Tất cả loại</option>
+                                {% for absence_type in absence_types %}
+                                <option value="{{ absence_type.id }}" {% if current_type == absence_type.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ absence_type.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-search"></i> Lọc
+                            </button>
+                            <a href="{% url 'absence:history' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Xóa bộ lọc
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="results-card">
+        {% if page_obj %}
+            <!-- Desktop Table -->
+            <div class="table-responsive d-none d-md-block">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Loại vắng mặt</th>
+                            <th>Ngày bắt đầu</th>
+                            <th>Ngày kết thúc</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày tạo</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in page_obj %}
+                        <tr>
+                            <td><strong>#{{ request.id }}</strong></td>
+                            <td>{{ request.absence_type.name }}</td>
+                            <td>{{ request.start_date|date:"d/m/Y" }}</td>
+                            <td>{{ request.end_date|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="badge status-{{ request.status }}">
+                                    {% if request.status == 'pending' %}
+                                        <i class="fas fa-clock"></i> Chờ phê duyệt
+                                    {% elif request.status == 'approved' %}
+                                        <i class="fas fa-check"></i> Đã phê duyệt
+                                    {% elif request.status == 'rejected' %}
+                                        <i class="fas fa-times"></i> Đã từ chối
+                                    {% elif request.status == 'cancelled' %}
+                                        <i class="fas fa-ban"></i> Đã hủy
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>{{ request.created_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'absence:detail' request.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> Xem
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="d-md-none">
+                {% for request in page_obj %}
+                <div class="absence-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <strong>#{{ request.id }}</strong>
+                            <span class="badge status-{{ request.status }}">
+                                {% if request.status == 'pending' %}
+                                    <i class="fas fa-clock"></i> Chờ phê duyệt
+                                {% elif request.status == 'approved' %}
+                                    <i class="fas fa-check"></i> Đã phê duyệt
+                                {% elif request.status == 'rejected' %}
+                                    <i class="fas fa-times"></i> Đã từ chối
+                                {% elif request.status == 'cancelled' %}
+                                    <i class="fas fa-ban"></i> Đã hủy
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="label">Loại vắng mặt:</span>
+                            <span class="value">{{ request.absence_type.name }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Ngày bắt đầu:</span>
+                            <span class="value">{{ request.start_date|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Ngày kết thúc:</span>
+                            <span class="value">{{ request.end_date|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Ngày tạo:</span>
+                            <span class="value">{{ request.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'absence:detail' request.id %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Pagination">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if current_status %}&status={{ current_status }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h4>Chưa có đơn vắng mặt nào</h4>
+                <p>Bạn chưa tạo đơn vắng mặt nào. Hãy tạo đơn đầu tiên của bạn!</p>
+                <a href="{% url 'absence:request' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Tạo đơn vắng mặt
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/absence/history.js' %}"></script>
+{% endblock %}
