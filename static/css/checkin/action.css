@@ -36,7 +36,57 @@
     color: #0A5597;
     font-size: 28px;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Checkin Type Selection */
+.checkin-type-selection {
+    margin-bottom: 20px;
+}
+
+.type-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.type-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    background: white;
+    color: #6c757d;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.type-btn:hover {
+    border-color: #0A5597;
+    color: #0A5597;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(10, 85, 151, 0.15);
+}
+
+.type-btn.active {
+    background: #0A5597;
+    border-color: #0A5597;
+    color: white;
+    box-shadow: 0 4px 12px rgba(10, 85, 151, 0.3);
+}
+
+.type-btn i {
+    font-size: 16px;
+}
+
+.type-btn span {
+    font-size: 14px;
 }
 
 .checkin-page .checkin-subtitle {

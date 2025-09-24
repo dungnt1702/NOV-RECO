@@ -212,6 +212,11 @@ function renderCheckinsTable(items = null) {
           <td>
             <span class="distance-badge">${formatDistance(checkin.distance_m || 0)}</span>
           </td>
+          <td>
+            <span class="checkin-type-badge ${checkin.checkin_type === '1' ? 'work' : 'visitor'}">
+              ${checkin.checkin_type_display || 'N/A'}
+            </span>
+          </td>
           <td>${formatDate(checkin.created_at)}</td>
           <td>${checkin.note || '-'}</td>
           <td>
@@ -288,6 +293,11 @@ function renderMobileCards(items = null) {
           <div class="mobile-card-row">
             <span class="mobile-card-label">📏 Khoảng cách:</span>
             <span class="mobile-card-value">${formatDistanceNumber(checkin.distance_m || 0)}</span>
+          </div>
+          
+          <div class="mobile-card-row">
+            <span class="mobile-card-label">🏷️ Loại checkin:</span>
+            <span class="mobile-card-value">${checkin.checkin_type_display || 'N/A'}</span>
           </div>
           
           <div class="mobile-card-row">

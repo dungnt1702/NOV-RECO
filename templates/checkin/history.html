@@ -45,6 +45,14 @@
                     </select>
                 </div>
                 <div class="filter-group">
+                    <label for="checkinTypeFilter">Loại checkin:</label>
+                    <select id="checkinTypeFilter" class="form-control">
+                        <option value="">Tất cả loại</option>
+                        <option value="1">Chấm công</option>
+                        <option value="2">Tiếp khách</option>
+                    </select>
+                </div>
+                <div class="filter-group">
                     <button id="applyFilters" class="btn btn-primary">
                         <i class="fas fa-filter"></i> Lọc
                     </button>
@@ -70,6 +78,9 @@
                             </th>
                             <th class="sortable" data-sort="distance_m">
                                 Khoảng cách <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="checkin_type">
+                                Loại checkin <i class="fas fa-sort sort-icon"></i>
                             </th>
                             <th class="sortable" data-sort="note">
                                 Ghi chú <i class="fas fa-sort sort-icon"></i>

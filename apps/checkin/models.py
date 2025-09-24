@@ -2,6 +2,11 @@ from django.conf import settings
 from django.db import models
 
 
+class CheckinType(models.TextChoices):
+    WORK = '1', 'Chấm công'
+    VISITOR = '2', 'Tiếp khách'
+
+
 class Checkin(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
@@ -13,6 +18,12 @@ class Checkin(models.Model):
     lng = models.FloatField()
     photo = models.ImageField(upload_to="checkins/%Y/%m/%d/")
     note = models.CharField(max_length=255, blank=True)
+    checkin_type = models.CharField(
+        max_length=1,
+        choices=CheckinType.choices,
+        default=CheckinType.WORK,
+        help_text="Loại check-in"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     distance_m = models.FloatField(null=True, blank=True)
     ip = models.GenericIPAddressField(null=True, blank=True)

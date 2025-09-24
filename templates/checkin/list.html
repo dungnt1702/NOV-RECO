@@ -57,6 +57,14 @@
                     <input type="date" id="dateTo" class="form-control">
                 </div>
                 <div class="filter-group">
+                    <label for="checkinTypeFilter">Loại checkin:</label>
+                    <select id="checkinTypeFilter" class="form-control">
+                        <option value="">Tất cả loại</option>
+                        <option value="1">Chấm công</option>
+                        <option value="2">Tiếp khách</option>
+                    </select>
+                </div>
+                <div class="filter-group">
                     <label for="itemsPerPage">Hiển thị:</label>
                     <select id="itemsPerPage" class="form-control">
                         <option value="10">10</option>
@@ -95,6 +103,9 @@
                             </th>
                             <th class="sortable" data-sort="distance_m">
                                 Khoảng cách <i class="fas fa-sort sort-icon"></i>
+                            </th>
+                            <th class="sortable" data-sort="checkin_type">
+                                Loại checkin <i class="fas fa-sort sort-icon"></i>
                             </th>
                             <th class="sortable active" data-sort="created_at">
                                 Thời gian <i class="fas fa-sort-down sort-icon"></i>

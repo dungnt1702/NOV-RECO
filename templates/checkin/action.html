@@ -16,6 +16,21 @@
             <h1 class="checkin-title">
                 Check-in
             </h1>
+            
+            <!-- Checkin Type Selection -->
+            <div class="checkin-type-selection">
+                <div class="type-buttons">
+                    <button type="button" id="workTypeBtn" class="type-btn active" data-type="1">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Chấm công</span>
+                    </button>
+                    <button type="button" id="visitorTypeBtn" class="type-btn" data-type="2">
+                        <i class="fas fa-handshake"></i>
+                        <span>Tiếp khách</span>
+                    </button>
+                </div>
+                <input type="hidden" id="checkinType" name="checkin_type" value="1">
+            </div>
         </div>
 
         <div class="checkin-content">

@@ -15,14 +15,17 @@ class CheckinSerializer(serializers.ModelSerializer):
     area_name = serializers.CharField(
         source='area.name', read_only=True
     )
+    checkin_type_display = serializers.CharField(
+        source='get_checkin_type_display', read_only=True
+    )
     photo_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Checkin
         fields = [
             'id', 'user', 'user_name', 'area', 'area_name', 'lat', 'lng',
-            'photo', 'photo_url', 'note', 'created_at', 'distance_m',
-            'ip', 'user_agent'
+            'photo', 'photo_url', 'note', 'checkin_type', 'checkin_type_display', 
+            'created_at', 'distance_m', 'ip', 'user_agent'
         ]
         read_only_fields = [
             'id', 'user', 'created_at', 'distance_m', 'ip', 'user_agent'
@@ -64,13 +67,17 @@ class CheckinListSerializer(serializers.ModelSerializer):
     area_name = serializers.CharField(
         source='area.name', read_only=True
     )
+    checkin_type_display = serializers.CharField(
+        source='get_checkin_type_display', read_only=True
+    )
     photo_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Checkin
         fields = [
             'id', 'user', 'user_name', 'area', 'area_name', 'lat', 'lng',
-            'photo', 'photo_url', 'note', 'created_at', 'distance_m'
+            'photo', 'photo_url', 'note', 'checkin_type', 'checkin_type_display', 
+            'created_at', 'distance_m'
         ]
         read_only_fields = ['id', 'user', 'created_at', 'distance_m']
 

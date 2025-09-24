@@ -28,8 +28,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeMap();
     loadUserInfo();
     setupEventListeners();
+    setupCheckinTypeSelection();
     updateSubmitButtonState();
     checkBrowserSupport();
+    // Auto get location on page load
+    autoGetLocation();
     console.log('Checkin page initialization complete');
 });
 
@@ -870,6 +873,75 @@ async function testCameraPermission() {
     }
 }
 
+
+// Setup checkin type selection
+function setupCheckinTypeSelection() {
+    const workBtn = document.getElementById('workTypeBtn');
+    const visitorBtn = document.getElementById('visitorTypeBtn');
+    const checkinTypeInput = document.getElementById('checkinType');
+    
+    if (workBtn && visitorBtn && checkinTypeInput) {
+        workBtn.addEventListener('click', function() {
+            workBtn.classList.add('active');
+            visitorBtn.classList.remove('active');
+            checkinTypeInput.value = '1';
+        });
+        
+        visitorBtn.addEventListener('click', function() {
+            visitorBtn.classList.add('active');
+            workBtn.classList.remove('active');
+            checkinTypeInput.value = '2';
+        });
+    }
+}
+
+// Auto get location on page load
+function autoGetLocation() {
+    console.log('Auto getting location...');
+    
+    // Check if geolocation is supported
+    if (!navigator.geolocation) {
+        console.log('Geolocation not supported');
+        return;
+    }
+    
+    // Check if location permission is already granted
+    if (navigator.permissions) {
+        navigator.permissions.query({name: 'geolocation'}).then(function(result) {
+            if (result.state === 'granted') {
+                console.log('Location permission already granted, getting location...');
+                getCurrentLocation();
+            } else if (result.state === 'prompt') {
+                console.log('Location permission prompt, getting location...');
+                getCurrentLocation();
+            } else {
+                console.log('Location permission denied, showing button...');
+                showLocationButton();
+            }
+        }).catch(function(error) {
+            console.log('Permission query failed, trying to get location...');
+            getCurrentLocation();
+        });
+    } else {
+        // Fallback for browsers that don't support permissions API
+        console.log('Permissions API not supported, trying to get location...');
+        getCurrentLocation();
+    }
+}
+
+// Show location button when permission is denied
+function showLocationButton() {
+    const locationStatus = document.getElementById('locationStatus');
+    const getLocationBtn = document.getElementById('getLocationBtn');
+    
+    if (locationStatus) {
+        locationStatus.style.display = 'none';
+    }
+    
+    if (getLocationBtn) {
+        getLocationBtn.style.display = 'flex';
+    }
+}
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', function() {

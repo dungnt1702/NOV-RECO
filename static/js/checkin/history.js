@@ -416,7 +416,7 @@ function renderCheckins(checkins = null) {
         
         const emptyStateTable = `
             <tr>
-                <td colspan="7" class="empty-state-cell">
+                <td colspan="8" class="empty-state-cell">
                     <div class="empty-state">
                         <i class="fas fa-inbox"></i>
                         <h3>Không có check-in nào</h3>
@@ -455,6 +455,11 @@ function renderCheckins(checkins = null) {
                         <div class="mobile-card-row">
                             <span class="mobile-card-label">📏 Khoảng cách:</span>
                             <span class="mobile-card-value">${formatDistanceNumber(checkin.distance_m)}</span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">🏷️ Loại checkin:</span>
+                            <span class="mobile-card-value">${checkin.checkin_type_display || 'N/A'}</span>
                         </div>
                         
                         <div class="mobile-card-row">
@@ -511,6 +516,13 @@ function renderCheckins(checkins = null) {
                 <td>
                     <div class="distance-cell">
                         ${formatDistanceNumber(checkin.distance_m)}
+                    </div>
+                </td>
+                <td>
+                    <div class="checkin-type-cell">
+                        <span class="checkin-type-badge ${checkin.checkin_type === '1' ? 'work' : 'visitor'}">
+                            ${checkin.checkin_type_display || 'N/A'}
+                        </span>
                     </div>
                 </td>
                 <td>

@@ -35,6 +35,7 @@ def checkin_submit_view(request):
         lng = float(request.POST.get('lng', 0))
         note = request.POST.get('note', '')
         area_id = request.POST.get('area_id')
+        checkin_type = request.POST.get('checkin_type', '1')  # Default to '1' (Chấm công)
         # Lấy ảnh
         photo = request.FILES.get('photo')
         if not photo:
@@ -52,6 +53,7 @@ def checkin_submit_view(request):
             lng=lng,
             photo=photo,
             note=note,
+            checkin_type=checkin_type,
             ip=request.META.get('REMOTE_ADDR'),
             user_agent=request.META.get('HTTP_USER_AGENT', ''),
         )
