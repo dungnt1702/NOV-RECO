@@ -80,6 +80,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderNotifications() {
+        // Hide global empty state
+        document.getElementById('emptyState').style.display = 'none';
+        
+        // Show notification actions
+        document.querySelector('.notification-actions').style.display = 'flex';
+        
+        // Show current tab content
+        document.querySelectorAll('.tab-pane').forEach(tab => {
+            tab.classList.remove('show', 'active');
+        });
+        document.getElementById(currentTab).classList.add('show', 'active');
+        
         // Filter notifications based on current tab
         switch (currentTab) {
             case 'unread':
@@ -339,10 +351,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showEmptyState() {
-        document.getElementById('emptyState').style.display = 'block';
+        // Hide all tab content
+        document.querySelectorAll('.tab-pane').forEach(tab => {
+            tab.classList.remove('show', 'active');
+        });
+        
+        // Clear all notification lists
         document.querySelectorAll('.notification-list').forEach(el => {
             el.innerHTML = '';
         });
+        
+        // Show empty state
+        document.getElementById('emptyState').style.display = 'block';
+        
+        // Hide notification actions
+        document.querySelector('.notification-actions').style.display = 'none';
     }
 
     // Utility functions
