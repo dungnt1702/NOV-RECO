@@ -7,6 +7,7 @@ from rest_framework import status
 
 from .models import AbsenceType, AbsenceRequest, ApprovalWorkflow
 from .workflow_engine import WorkflowEngine
+from apps.users.models import Department
 
 
 @api_view(['GET'])

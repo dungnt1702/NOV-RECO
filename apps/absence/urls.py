@@ -1,5 +1,5 @@
 from django.urls import path, include
-from . import views, api_views
+from . import views, api_views, api_views_workflow
 
 app_name = 'absence'
 
@@ -18,4 +18,8 @@ urlpatterns = [
     path('api/create/', api_views.create_absence_request_api, name='api_create'),
     path('api/approve/<int:absence_id>/', api_views.approve_request_api, name='api_approve'),
     path('api/status/<int:absence_id>/', api_views.workflow_status_api, name='api_status'),
+    
+    # Workflow API
+    path('api/workflow/', api_views_workflow.workflow_api, name='api_workflow'),
+    path('api/workflow/<int:workflow_id>/', api_views_workflow.workflow_detail_api, name='api_workflow_detail'),
 ]
