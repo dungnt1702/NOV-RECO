@@ -116,17 +116,17 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="employee-count">
+                                <a href="{% url 'users:list_by_department' dept.id %}" class="employee-count" title="Xem nhân viên thuộc {{ dept.full_name }}">
                                     <span class="count-number">{{ dept.user_count }}</span>
                                     <span class="count-label">nhân viên</span>
-                                </div>
+                                </a>
                             </td>
                             <td>
                                 <span class="text-muted">Chưa có</span>
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="/users/?department={{ dept.id }}" class="btn btn-sm btn-primary">
+                            <a href="{% url 'users:list_by_department' dept.id %}" class="btn btn-sm btn-primary">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                                         </svg>
@@ -180,7 +180,7 @@
                     
                     <div class="card-footer">
                         <div class="card-actions">
-                            <a href="/users/?department={{ dept.id }}" class="btn btn-primary">
+                            <a href="{% url 'users:list_by_department' dept.id %}" class="btn btn-primary">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                                 </svg>

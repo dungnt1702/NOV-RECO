@@ -36,6 +36,7 @@ urlpatterns = [
     # User management views
     path("list/", user_list_view, name="list"),
     path("list/office_id/<int:office_id>/", user_list_view, name="list_by_office"),
+    path("list/department_id/<int:department_id>/", user_list_view, name="list_by_department"),
     path("create/", user_create_view, name="create"),
     path("update/<int:user_id>/", user_update_view, name="update"),
     path("detail/<int:user_id>/", user_detail_view, name="detail"),

@@ -33,7 +33,7 @@ def debug_current_user(request):
 
 
 @permission_required('users.can_view_users')
-def user_list_view(request, office_id=None):
+def user_list_view(request, office_id=None, department_id=None):
     """Danh sách người dùng"""
     users = User.objects.all().order_by('-date_joined')
     
@@ -42,8 +42,8 @@ def user_list_view(request, office_id=None):
     if role_filter:
         users = users.filter(role=role_filter)
     
-    # Filter by department
-    dept_filter = request.GET.get('department')
+    # Filter by department (prefer path param)
+    dept_filter = department_id or request.GET.get('department')
     if dept_filter:
         users = users.filter(department_id=dept_filter)
     
