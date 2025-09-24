@@ -12,29 +12,19 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    color: #28a745; /* Default green color for no notifications */
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 2.84 9.74 6.99 12.13.39.29.92.29 1.31 0C17.16 18.74 20 14.25 20 9c0-3.87-3.13-7-7-7zm0 2c2.76 0 5 2.24 5 5 0 4.97-2.66 9.12-6.25 11.25C10.66 18.12 8 13.97 8 9c0-2.76 2.24-5 5-5zm0 1c-2.21 0-4 1.79-4 4 0 3.86 2.12 7.17 5 8.9 2.88-1.73 5-5.04 5-8.9 0-2.21-1.79-4-4-4z"/></svg>') center/contain no-repeat;
+    background-size: 24px 24px;
     text-decoration: none;
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: none;
 }
 
 .notification-toggle:hover {
-    background: rgba(255, 255, 255, 0.2);
     transform: scale(1.05);
 }
 
 .notification-toggle i {
-    font-size: 20px; /* Larger bell icon */
-}
-
-/* Change bell color based on notification count */
-.notification-toggle[data-count="0"] i {
-    color: #28a745; /* Green when no notifications */
-}
-
-.notification-toggle[data-count]:not([data-count="0"]) i {
-    color: #dc3545; /* Red when has notifications */
+    display: none; /* Hide the icon since we're using background image */
 }
 
 .notification-badge {
@@ -42,25 +32,31 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.8);
+    background: transparent;
     color: white;
     border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 10px;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid white;
+    border: none;
     animation: pulse 2s infinite;
     z-index: 2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-/* Badge with 0 count should be gray */
+/* Badge with 0 count should be white */
 .notification-badge[data-count="0"] {
-    background: rgba(108, 117, 125, 0.8);
+    color: white;
     animation: none;
+}
+
+/* Badge with count > 0 should be red */
+.notification-badge[data-count]:not([data-count="0"]) {
+    color: #dc3545;
 }
 
 .notification-badge.hidden {
@@ -271,16 +267,13 @@
     .notification-toggle {
         width: 28px;
         height: 28px;
-    }
-    
-    .notification-toggle i {
-        font-size: 16px;
+        background-size: 20px 20px;
     }
     
     .notification-badge {
-        width: 16px;
-        height: 16px;
-        font-size: 9px;
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
     }
     
     .notification-dropdown {
