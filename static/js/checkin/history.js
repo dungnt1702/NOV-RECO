@@ -122,6 +122,11 @@ function setupEventListeners() {
         areaFilter.addEventListener('change', applyFilters);
     }
 
+    const checkinTypeFilter = document.getElementById('checkinTypeFilter');
+    if (checkinTypeFilter) {
+        checkinTypeFilter.addEventListener('change', applyFilters);
+    }
+
     // Apply Filters button
     const applyBtn = document.getElementById('applyFilters');
     if (applyBtn) {
@@ -312,6 +317,7 @@ function applyFilters() {
     const dateFrom = document.getElementById('dateFrom')?.value || '';
     const dateTo = document.getElementById('dateTo')?.value || '';
     const area = document.getElementById('areaFilter')?.value || '';
+    const checkinType = document.getElementById('checkinTypeFilter')?.value || '';
     
     filteredCheckins = allCheckins.filter(checkin => {
         // Search filter
@@ -339,6 +345,11 @@ function applyFilters() {
             return false;
         }
         
+        // Checkin type filter
+        if (checkinType && checkin.checkin_type !== checkinType) {
+            return false;
+        }
+        
         return true;
     });
     
@@ -352,6 +363,7 @@ function clearFilters() {
     document.getElementById('date-from').value = '';
     document.getElementById('date-to').value = '';
     document.getElementById('area-filter').value = '';
+    document.getElementById('checkinTypeFilter').value = '';
     
     // Reset to all check-ins
     filteredCheckins = [...allCheckins];

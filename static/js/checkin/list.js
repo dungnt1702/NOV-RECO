@@ -505,6 +505,7 @@ function applyFilters() {
   const departmentId = document.getElementById('departmentFilter')?.value || '';
   const userId = document.getElementById('userFilter')?.value || '';
   const areaId = document.getElementById('areaFilter')?.value || '';
+  const checkinType = document.getElementById('checkinTypeFilter')?.value || '';
 
   // Get original data (not filtered data)
   const originalData = window.originalCheckins || allCheckins;
@@ -523,6 +524,9 @@ function applyFilters() {
     // Area filter
     if (areaId && checkin.area_id !== parseInt(areaId)) return false;
 
+    // Checkin type filter
+    if (checkinType && checkin.checkin_type !== checkinType) return false;
+
     return true;
   });
 
@@ -539,11 +543,13 @@ function clearFilters() {
   const dateFrom = document.getElementById('date-from');
   const dateTo = document.getElementById('date-to');
   const userFilter = document.getElementById('user-filter');
+  const checkinTypeFilter = document.getElementById('checkinTypeFilter');
   
   if (searchInput) searchInput.value = '';
   if (dateFrom) dateFrom.value = '';
   if (dateTo) dateTo.value = '';
   if (userFilter) userFilter.value = '';
+  if (checkinTypeFilter) checkinTypeFilter.value = '';
   
   // Reset pagination component with all data
   if (window.paginationComponent) {
@@ -753,5 +759,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const dateTo = document.getElementById('dateTo');
   if (dateTo) {
     dateTo.addEventListener('change', applyFilters);
+  }
+
+  // Checkin type filter
+  const checkinTypeFilter = document.getElementById('checkinTypeFilter');
+  if (checkinTypeFilter) {
+    checkinTypeFilter.addEventListener('change', applyFilters);
   }
 });
