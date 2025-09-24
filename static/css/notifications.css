@@ -13,7 +13,7 @@
     height: 40px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
-    color: white;
+    color: #28a745; /* Default green color for no notifications */
     text-decoration: none;
     transition: all 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -26,6 +26,15 @@
 
 .notification-toggle i {
     font-size: 16px;
+}
+
+/* Change bell color based on notification count */
+.notification-toggle[data-count="0"] i {
+    color: #28a745; /* Green when no notifications */
+}
+
+.notification-toggle[data-count]:not([data-count="0"]) i {
+    color: #dc3545; /* Red when has notifications */
 }
 
 .notification-badge {

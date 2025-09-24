@@ -69,6 +69,7 @@ class NotificationManager {
         // Always show badge with count (0 if no unread notifications)
         this.badge.textContent = count > 99 ? '99+' : count;
         this.badge.setAttribute('data-count', count);
+        this.toggle.setAttribute('data-count', count); // Add data-count to toggle for CSS styling
         this.badge.classList.remove('hidden');
         this.unreadCount.textContent = `${count} thông báo chưa đọc`;
     }
