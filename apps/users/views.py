@@ -460,20 +460,21 @@ def office_list_view(request):
 def office_create_view(request):
     """Tạo văn phòng mới"""
     if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description', '')
-        
-        if name:
-            office = Office.objects.create(
-                name=name,
-                description=description
-            )
-            messages.success(request, f'Tạo văn phòng {office.name} thành công!')
+        form = OfficeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Tạo văn phòng {form.instance.name} thành công!')
             return redirect('users:office_list')
         else:
-            messages.error(request, 'Tên văn phòng không được để trống!')
+            messages.error(request, 'Có lỗi xảy ra khi tạo văn phòng!')
+    else:
+        form = OfficeForm()
     
-    return render(request, 'users/office_create.html')
+    users = User.objects.filter(groups__name__in=['Admin', 'Manager']).order_by('first_name', 'last_name')
+    return render(request, 'users/office_create.html', {
+        'form': form,
+        'users': users
+    })
 
 
 @permission_required('users.can_edit_offices')
@@ -482,20 +483,21 @@ def office_update_view(request, office_id):
     office = get_object_or_404(Office, id=office_id)
     
     if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description', '')
-        
-        if name:
-            office.name = name
-            office.description = description
-            office.save()
+        form = OfficeForm(request.POST, instance=office)
+        if form.is_valid():
+            form.save()
             messages.success(request, f'Cập nhật văn phòng {office.name} thành công!')
             return redirect('users:office_list')
         else:
-            messages.error(request, 'Tên văn phòng không được để trống!')
+            messages.error(request, 'Có lỗi xảy ra khi cập nhật văn phòng!')
+    else:
+        form = OfficeForm(instance=office)
     
+    users = User.objects.filter(groups__name__in=['Admin', 'Manager']).order_by('first_name', 'last_name')
     context = {
         'office': office,
+        'form': form,
+        'users': users,
     }
     return render(request, 'users/office_update.html', context)
 
