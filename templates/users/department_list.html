@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/users/department_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/users/department_filter.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -29,10 +30,10 @@
 
     <div class="content-card">
         <!-- Filter Section -->
-        <div class="filter-section">
+        <div class="filter-section" id="filterSection">
             <div class="filter-controls">
-                <div class="filter-group">
-                    <label for="officeFilter" class="filter-label">Văn phòng:</label>
+                <div class="filter-group" id="filterGroup">
+                    <label for="officeFilter" class="filter-label">Văn phòng</label>
                     <select id="officeFilter" class="filter-select">
                         <option value="">Tất cả văn phòng</option>
                         {% for office in offices %}
@@ -43,16 +44,20 @@
                     </select>
                 </div>
                 <div class="filter-actions">
-                    <button type="button" class="btn btn-primary" onclick="applyOfficeFilter()">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-                        </svg>
+                    <button type="button" class="filter-btn filter-btn-primary" onclick="applyOfficeFilter()" id="filterBtn">
+                        <div class="icon">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                            </svg>
+                        </div>
                         Lọc
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="resetOfficeFilter()">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
+                    <button type="button" class="filter-btn filter-btn-secondary" onclick="resetOfficeFilter()" id="resetBtn">
+                        <div class="icon">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                        </div>
                         Reset
                     </button>
                 </div>
@@ -227,9 +232,81 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterSection = document.getElementById('filterSection');
+    const filterGroup = document.getElementById('filterGroup');
+    const officeFilter = document.getElementById('officeFilter');
+    const filterBtn = document.getElementById('filterBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    
+    // Check if there's an active filter
+    function updateFilterState() {
+        const hasActiveFilter = officeFilter.value !== '';
+        
+        if (hasActiveFilter) {
+            filterSection.classList.add('has-active-filter');
+            filterGroup.classList.add('has-selection');
+        } else {
+            filterSection.classList.remove('has-active-filter');
+            filterGroup.classList.remove('has-selection');
+        }
+    }
+    
+    // Initialize filter state
+    updateFilterState();
+    
+    // Update filter state when selection changes
+    officeFilter.addEventListener('change', updateFilterState);
+    
+    // Add loading state to buttons
+    function setButtonLoading(button, isLoading) {
+        if (isLoading) {
+            button.classList.add('loading');
+            button.disabled = true;
+        } else {
+            button.classList.remove('loading');
+            button.disabled = false;
+        }
+    }
+    
+    // Add ripple effect to buttons
+    function addRippleEffect(button, event) {
+        const ripple = document.createElement('span');
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = event.clientX - rect.left - size / 2;
+        const y = event.clientY - rect.top - size / 2;
+        
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.classList.add('ripple');
+        
+        button.appendChild(ripple);
+        
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+    }
+    
+    // Add ripple effect to filter buttons
+    filterBtn.addEventListener('click', function(e) {
+        addRippleEffect(this, e);
+    });
+    
+    resetBtn.addEventListener('click', function(e) {
+        addRippleEffect(this, e);
+    });
+});
+
 function applyOfficeFilter() {
     const officeFilter = document.getElementById('officeFilter');
+    const filterBtn = document.getElementById('filterBtn');
     const officeId = officeFilter.value;
+    
+    // Add loading state
+    filterBtn.classList.add('loading');
+    filterBtn.disabled = true;
     
     let url = new URL(window.location);
     if (officeId) {
@@ -238,13 +315,50 @@ function applyOfficeFilter() {
         url.searchParams.delete('office');
     }
     
-    window.location.href = url.toString();
+    // Add a small delay for better UX
+    setTimeout(() => {
+        window.location.href = url.toString();
+    }, 300);
 }
 
 function resetOfficeFilter() {
+    const resetBtn = document.getElementById('resetBtn');
+    
+    // Add loading state
+    resetBtn.classList.add('loading');
+    resetBtn.disabled = true;
+    
     let url = new URL(window.location);
     url.searchParams.delete('office');
-    window.location.href = url.toString();
+    
+    // Add a small delay for better UX
+    setTimeout(() => {
+        window.location.href = url.toString();
+    }, 300);
 }
 </script>
+
+<style>
+/* Ripple effect for buttons */
+.filter-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+</style>
 {% endblock %}
