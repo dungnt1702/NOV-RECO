@@ -141,3 +141,18 @@ def approval_view(request):
     return render(request, 'absence/approval.html', {
         'page_obj': page_obj
     })
+
+
+@login_required
+@permission_required('absence.can_manage_absence_types')
+def workflow_config_view(request):
+    """Trang cấu hình workflow phê duyệt"""
+    workflows = ApprovalWorkflow.objects.select_related('department', 'absence_type').all()
+    departments = Department.objects.select_related('office').all()
+    absence_types = AbsenceType.objects.all()
+    
+    return render(request, 'absence/workflow_config.html', {
+        'workflows': workflows,
+        'departments': departments,
+        'absence_types': absence_types
+    })

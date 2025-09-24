@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_permissions %}
+
+{% block title %}Cấu hình Workflow{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/absence/workflow_config.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-cogs"></i>
+                    Cấu hình Workflow
+                </h1>
+                <p class="page-subtitle">Quản lý quy trình phê duyệt đơn vắng mặt</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="actions-bar">
+                <div class="actions-left">
+                    <button class="btn btn-primary" id="addWorkflowBtn">
+                        <i class="fas fa-plus"></i>
+                        Thêm Workflow
+                    </button>
+                </div>
+                <div class="actions-right">
+                    <button class="btn btn-secondary" id="refreshBtn">
+                        <i class="fas fa-sync"></i>
+                        Làm mới
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workflow List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="workflow-list" id="workflowList">
+                {% for workflow in workflows %}
+                <div class="workflow-card">
+                    <div class="workflow-header">
+                        <div class="workflow-info">
+                            <h3 class="workflow-title">{{ workflow.department.full_name }}</h3>
+                            <p class="workflow-subtitle">{{ workflow.absence_type.name }}</p>
+                        </div>
+                        <div class="workflow-actions">
+                            <button class="btn btn-outline-primary btn-sm" onclick="editWorkflow({{ workflow.id }})">
+                                <i class="fas fa-edit"></i>
+                                Sửa
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteWorkflow({{ workflow.id }})">
+                                <i class="fas fa-trash"></i>
+                                Xóa
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="workflow-body">
+                        <div class="workflow-steps">
+                            {% if workflow.requires_department_manager %}
+                            <div class="workflow-step">
+                                <i class="fas fa-user-tie"></i>
+                                <span>Trưởng phòng</span>
+                                <small>{{ workflow.department_manager_timeout_hours }}h</small>
+                            </div>
+                            {% endif %}
+                            
+                            {% if workflow.requires_department_deputy %}
+                            <div class="workflow-step">
+                                <i class="fas fa-user-friends"></i>
+                                <span>Phó phòng</span>
+                                <small>{{ workflow.department_deputy_timeout_hours }}h</small>
+                            </div>
+                            {% endif %}
+                            
+                            {% if workflow.requires_office_director %}
+                            <div class="workflow-step">
+                                <i class="fas fa-crown"></i>
+                                <span>Giám đốc VP</span>
+                                <small>{{ workflow.office_director_timeout_hours }}h</small>
+                            </div>
+                            {% endif %}
+                            
+                            {% if workflow.requires_office_deputy %}
+                            <div class="workflow-step">
+                                <i class="fas fa-user-shield"></i>
+                                <span>Phó Giám đốc</span>
+                                <small>{{ workflow.office_deputy_timeout_hours }}h</small>
+                            </div>
+                            {% endif %}
+                            
+                            {% if workflow.requires_hr_approval %}
+                            <div class="workflow-step">
+                                <i class="fas fa-user-check"></i>
+                                <span>HR</span>
+                                <small>{{ workflow.hr_timeout_hours }}h</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="workflow-settings">
+                            <div class="setting-item">
+                                <span class="setting-label">Nhắc nhở:</span>
+                                <span class="setting-value">{{ workflow.send_reminder_before_hours }}h trước hết hạn</span>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">Số lần nhắc:</span>
+                                <span class="setting-value">{{ workflow.max_reminders }}</span>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">Trạng thái:</span>
+                                <span class="setting-value">
+                                    {% if workflow.is_active %}
+                                        <span class="badge badge-success">Hoạt động</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">Tạm dừng</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="fas fa-cogs"></i>
+                    <h3>Chưa có workflow nào</h3>
+                    <p>Hãy tạo workflow đầu tiên để cấu hình quy trình phê duyệt.</p>
+                    <button class="btn btn-primary" onclick="addWorkflow()">
+                        <i class="fas fa-plus"></i>
+                        Tạo workflow
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Workflow Modal -->
+<div class="modal fade" id="workflowModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="workflowModalTitle">
+                    <i class="fas fa-cogs"></i>
+                    Cấu hình Workflow
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="workflowForm">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label">Phòng ban</label>
+                        <select id="department" name="department" class="form-control" required>
+                            <option value="">-- Chọn phòng ban --</option>
+                            {% for dept in departments %}
+                                <option value="{{ dept.id }}">{{ dept.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Loại vắng mặt</label>
+                        <select id="absence_type" name="absence_type" class="form-control" required>
+                            <option value="">-- Chọn loại vắng mặt --</option>
+                            {% for type in absence_types %}
+                                <option value="{{ type.id }}">{{ type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="workflow-config">
+                        <h6>Quy trình phê duyệt</h6>
+                        
+                        <div class="approval-step">
+                            <div class="step-header">
+                                <input type="checkbox" id="requires_department_manager" name="requires_department_manager">
+                                <label for="requires_department_manager">Trưởng phòng</label>
+                            </div>
+                            <div class="step-settings">
+                                <div class="form-group">
+                                    <label class="form-label">Thời gian phê duyệt (giờ)</label>
+                                    <input type="number" id="department_manager_timeout_hours" name="department_manager_timeout_hours" 
+                                           class="form-control" min="1" max="168" value="24">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="approval-step">
+                            <div class="step-header">
+                                <input type="checkbox" id="requires_department_deputy" name="requires_department_deputy">
+                                <label for="requires_department_deputy">Phó phòng</label>
+                            </div>
+                            <div class="step-settings">
+                                <div class="form-group">
+                                    <label class="form-label">Thời gian phê duyệt (giờ)</label>
+                                    <input type="number" id="department_deputy_timeout_hours" name="department_deputy_timeout_hours" 
+                                           class="form-control" min="1" max="168" value="24">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="approval-step">
+                            <div class="step-header">
+                                <input type="checkbox" id="requires_office_director" name="requires_office_director">
+                                <label for="requires_office_director">Giám đốc Văn phòng</label>
+                            </div>
+                            <div class="step-settings">
+                                <div class="form-group">
+                                    <label class="form-label">Thời gian phê duyệt (giờ)</label>
+                                    <input type="number" id="office_director_timeout_hours" name="office_director_timeout_hours" 
+                                           class="form-control" min="1" max="168" value="48">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="approval-step">
+                            <div class="step-header">
+                                <input type="checkbox" id="requires_office_deputy" name="requires_office_deputy">
+                                <label for="requires_office_deputy">Phó Giám đốc Văn phòng</label>
+                            </div>
+                            <div class="step-settings">
+                                <div class="form-group">
+                                    <label class="form-label">Thời gian phê duyệt (giờ)</label>
+                                    <input type="number" id="office_deputy_timeout_hours" name="office_deputy_timeout_hours" 
+                                           class="form-control" min="1" max="168" value="48">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="approval-step">
+                            <div class="step-header">
+                                <input type="checkbox" id="requires_hr_approval" name="requires_hr_approval" checked>
+                                <label for="requires_hr_approval">HR</label>
+                            </div>
+                            <div class="step-settings">
+                                <div class="form-group">
+                                    <label class="form-label">Thời gian phê duyệt (giờ)</label>
+                                    <input type="number" id="hr_timeout_hours" name="hr_timeout_hours" 
+                                           class="form-control" min="1" max="168" value="48">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="workflow-settings">
+                        <h6>Cài đặt thông báo</h6>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Nhắc nhở trước khi hết hạn (giờ)</label>
+                            <input type="number" id="send_reminder_before_hours" name="send_reminder_before_hours" 
+                                   class="form-control" min="1" max="24" value="2">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Số lần nhắc nhở tối đa</label>
+                            <input type="number" id="max_reminders" name="max_reminders" 
+                                   class="form-control" min="1" max="10" value="3">
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="is_active" name="is_active" class="form-check-input" checked>
+                                <label for="is_active" class="form-check-label">Workflow hoạt động</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="saveWorkflowBtn">
+                    <i class="fas fa-save"></i>
+                    Lưu Workflow
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/absence/workflow_config.js' %}"></script>
+{% endblock %}
