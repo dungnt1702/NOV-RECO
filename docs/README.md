@@ -1,48 +1,52 @@
-# NOV-RECO Check-in System
+# 📚 NOV-RECO Documentation
 
-Hệ thống quản lý check-in thông minh cho công ty NOV-RECO.
+Tài liệu tổng hợp cho hệ thống NOV-RECO Check-in Management.
 
-## 🚀 Quick Start
+## 📁 Cấu trúc thư mục
 
-### macOS/Linux
-```bash
-./data/scripts/run.sh
-```
+### 🏗️ [System](./system/)
+Tài liệu cốt lõi về hệ thống
+- `README.md` - Tổng quan dự án
+- `TEST_README.md` - Hướng dẫn testing
 
-### Windows
-```cmd
-data\scripts\run.bat
-```
+### 🤖 [Automation](./automation/)
+Tài liệu về hệ thống automation testing
+- Các tài liệu về automation test features
+- Hướng dẫn sử dụng automation test dashboard
+- Các bản fix và cải tiến
 
-## 📋 Features
+### 🚀 [Deployment](./deployment/)
+Tài liệu triển khai và vận hành
+- `DEPLOYMENT.md` - Hướng dẫn deployment chi tiết
+- `README-SERVER.md` - Cấu hình server
 
-- ✅ **User Management**: Quản lý người dùng với phân quyền
-- ✅ **Check-in System**: Hệ thống check-in với GPS và camera
-- ✅ **Area Management**: Quản lý khu vực làm việc
-- ✅ **History Tracking**: Theo dõi lịch sử check-in
-- ✅ **Dashboard**: Bảng điều khiển cho từng loại người dùng
-- ✅ **Mobile Responsive**: Tương thích với thiết bị di động
+### 👨‍💻 [Development](./development/)
+Tài liệu phát triển
+- `DEVELOPMENT.md` - Hướng dẫn phát triển
+- `INSTALLATION.md` - Hướng dẫn cài đặt
 
-## 🎯 User Roles
+### 🔐 [Permissions](./permissions/)
+Tài liệu hệ thống phân quyền
+- `PERMISSION_SYSTEM_MIGRATION.md` - Quá trình migration
+- `PERMISSION_SYSTEM_COMPLETION.md` - Tổng kết hoàn thành
 
-- **Admin**: Toàn quyền hệ thống
-- **Manager**: Quản lý nhân viên và xem báo cáo
-- **Employee**: Check-in và xem lịch sử cá nhân
+### 🧪 [Testing](./testing/)
+Tài liệu testing
+- `README.md` - Hướng dẫn testing tổng quan
 
-## 🌐 Access
+### 👥 [User Guides](./user-guides/)
+Hướng dẫn người dùng
+- `USER_GUIDE.md` - Hướng dẫn sử dụng
+- `QUICK-REFERENCE.md` - Tham khảo nhanh
 
-- **Homepage**: http://localhost:3000
-- **Admin Panel**: http://localhost:3000/admin
+## 🔗 Liên kết nhanh
 
-## 🔑 Default Login
+- [Hướng dẫn cài đặt](./development/INSTALLATION.md)
+- [Hướng dẫn deployment](./deployment/DEPLOYMENT.md)
+- [Hướng dẫn sử dụng](./user-guides/USER_GUIDE.md)
+- [Tham khảo nhanh](./user-guides/QUICK-REFERENCE.md)
+- [Hệ thống phân quyền](./permissions/PERMISSION_SYSTEM_COMPLETION.md)
 
-- **Super Admin**: `superadmin` / `admin123`
-- **Manager**: `quanly` / `quanly123`
-- **Employee**: `nhanvien1` / `nhanvien123`
+## 📝 Ghi chú
 
-## 📚 Documentation
-
-- [Installation Guide](INSTALLATION.md)
-- [User Guide](USER_GUIDE.md)
-- [Development Guide](DEVELOPMENT.md)
-- [Scripts Documentation](SCRIPTS.md)
+Tài liệu được tổ chức theo chức năng để dễ dàng tìm kiếm và tham khảo. Mỗi thư mục có README.md riêng để mô tả nội dung bên trong.
