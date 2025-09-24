@@ -50,6 +50,11 @@ def user_list_view(request, office_id=None, department_id=None):
     # Filter by office (through department)
     # Prefer path param office_id, fallback to query param
     office_filter = office_id or request.GET.get('office')
+    # Infer office from department if missing
+    if dept_filter and not office_filter:
+        dept_obj = Department.objects.select_related('office').filter(id=dept_filter).first()
+        if dept_obj and dept_obj.office_id:
+            office_filter = str(dept_obj.office_id)
     if office_filter:
         users = users.filter(department__office_id=office_filter)
     
