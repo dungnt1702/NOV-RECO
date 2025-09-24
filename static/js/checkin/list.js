@@ -56,6 +56,51 @@ function exportCurrentToCSV() {
   URL.revokeObjectURL(url);
 }
 
+// Export to XLSX using local SheetJS if available
+function exportCurrentToXLSX() {
+  const hasXLSX = typeof XLSX !== 'undefined' && XLSX && typeof XLSX.utils !== 'undefined';
+  if (!hasXLSX) {
+    console.warn('XLSX library not found, falling back to CSV');
+    exportCurrentToCSV();
+    return;
+  }
+
+  const data = (typeof window !== 'undefined' && window.paginationComponent && typeof window.paginationComponent.getAllItems === 'function')
+    ? window.paginationComponent.getAllItems()
+    : (window.originalCheckins && allCheckins.length && allCheckins.length <= (window.originalCheckins.length))
+      ? allCheckins
+      : (window.originalCheckins || allCheckins);
+
+  const header = ['Số thứ tự', 'Nhân viên', 'Khu vực', 'Tọa độ (lat)', 'Tọa độ (lng)', 'Khoảng cách (mét)', 'Loại checkin', 'Thời gian', 'Ghi chú'];
+  const rows = data.map((c, idx) => [
+    idx + 1,
+    c.user_name || '',
+    c.area_name || '',
+    c.lat != null ? Number(c.lat).toFixed(6) : '',
+    c.lng != null ? Number(c.lng).toFixed(6) : '',
+    c.distance_m != null ? Number(c.distance_m).toFixed(2) : '',
+    c.checkin_type_display || '',
+    c.created_at || '',
+    c.note || ''
+  ]);
+
+  const wsData = [header, ...rows];
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Checkins');
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = `checkins_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function normalizePhotoSrc(photoUrl, photoField) {
   if (photoUrl) return photoUrl;
   if (!photoField) return null;
@@ -784,7 +829,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const exportBtn = document.getElementById('exportExcelBtn');
   if (exportBtn) {
     exportBtn.addEventListener('click', function() {
-      exportCurrentToCSV();
+      exportCurrentToXLSX();
     });
   }
 
