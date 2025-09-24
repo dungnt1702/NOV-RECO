@@ -652,8 +652,17 @@
     cursor: pointer;
 }
 
+#filtersPanel {
+    max-height: 600px;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.4s ease-out, opacity 0.3s ease-out;
+    opacity: 1;
+}
+
 #filtersPanel.collapsed {
-    display: none;
+    max-height: 0;
+    padding: 0 20px;
+    opacity: 0;
 }
 
 /* Pagination */

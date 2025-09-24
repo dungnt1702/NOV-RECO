@@ -23,12 +23,26 @@
   font-weight: 600;
 }
 
+.users-page .search-filter-section .filter-toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+.users-page .search-filter-section.collapsed .filter-toggle-icon {
+  transform: rotate(180deg);
+}
+
 .users-page .search-filter-section .filter-body {
   padding: 12px;
+  max-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out, padding 0.4s ease-out, opacity 0.3s ease-out;
+  opacity: 1;
 }
 
 .users-page .search-filter-section.collapsed .filter-body {
-  display: none;
+  max-height: 0;
+  padding: 0 12px;
+  opacity: 0;
 }
 
 .users-page .search-input-group {

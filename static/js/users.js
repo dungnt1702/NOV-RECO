@@ -186,11 +186,18 @@ async function loadUsers() {
 function initializeAdvancedFilters() {
     const toggleBtn = document.getElementById('filterToggleBtn');
     const section = document.getElementById('usersFilterSection');
+    const toggleIcon = document.querySelector('.filter-toggle-icon');
+    
     if (toggleBtn && section) {
         section.classList.add('collapsed');
         toggleBtn.addEventListener('click', () => {
             section.classList.toggle('collapsed');
             toggleBtn.textContent = section.classList.contains('collapsed') ? 'Mở rộng' : 'Thu gọn';
+            
+            // Rotate icon
+            if (toggleIcon) {
+                toggleIcon.style.transform = section.classList.contains('collapsed') ? 'rotate(180deg)' : 'rotate(0deg)';
+            }
         });
     }
 
