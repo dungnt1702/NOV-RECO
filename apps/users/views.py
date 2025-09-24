@@ -47,6 +47,11 @@ def user_list_view(request):
     if dept_filter:
         users = users.filter(department_id=dept_filter)
     
+    # Filter by office (through department)
+    office_filter = request.GET.get('office')
+    if office_filter:
+        users = users.filter(department__office_id=office_filter)
+    
     # Search
     search = request.GET.get('search')
     if search:
@@ -70,6 +75,7 @@ def user_list_view(request):
         'role_choices': UserRole.choices,
         'current_role': role_filter,
         'current_dept': dept_filter,
+        'current_office': office_filter,
         'current_search': search,
     }
     return render(request, 'users/user_list.html', context)
