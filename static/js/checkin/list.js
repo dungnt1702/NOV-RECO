@@ -210,7 +210,7 @@ function renderCheckinsTable(items = null) {
             ${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}
           </td>
           <td>
-            <span class="distance-badge">${formatDistance(checkin.distance_m || 0)}</span>
+            <span class="distance-badge">${formatDistanceNumber(checkin.distance_m || 0)}</span>
           </td>
           <td>
             <span class="checkin-type-badge ${checkin.checkin_type === '1' ? 'work' : 'visitor'}">
