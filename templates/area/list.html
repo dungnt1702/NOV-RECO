@@ -54,7 +54,33 @@
 
             <!-- Areas List -->
             <div class="area-list-section">
-                <div id="areasList" class="areas-list">
+                <!-- Desktop Table View -->
+                <div id="areasTableContainer" class="areas-table-container d-none d-lg-block">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên khu vực</th>
+                                <th>Mô tả</th>
+                                <th>Tọa độ</th>
+                                <th>Bán kính</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="areasTableBody">
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Card View -->
+                <div id="areasList" class="areas-list d-lg-none">
                     <div class="loading">
                         <i class="fas fa-spinner fa-spin"></i> Đang tải...
                     </div>

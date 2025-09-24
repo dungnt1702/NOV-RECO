@@ -80,11 +80,42 @@ async function loadAreas() {
 
 // Display areas in the list
 function displayAreas() {
-    const areasList = document.getElementById('areasList');
-    if (!areasList) {
-        console.error('Areas list container not found');
+    // Display desktop table
+    displayAreasTable();
+    
+    // Display mobile cards
+    displayAreasCards();
+}
+
+// Display areas in table format (desktop)
+function displayAreasTable() {
+    const tableBody = document.getElementById('areasTableBody');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = '';
+
+    if (areas.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center">
+                    <i class="fas fa-inbox"></i>
+                    <p class="mb-0">Không có khu vực nào</p>
+                </td>
+            </tr>
+        `;
         return;
     }
+
+    areas.forEach(area => {
+        const row = createAreaTableRow(area);
+        tableBody.appendChild(row);
+    });
+}
+
+// Display areas in card format (mobile)
+function displayAreasCards() {
+    const areasList = document.getElementById('areasList');
+    if (!areasList) return;
     
     areasList.innerHTML = '';
 
@@ -104,7 +135,34 @@ function displayAreas() {
     });
 }
 
-// Create area item element
+// Create area table row element
+function createAreaTableRow(area) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td>${area.id}</td>
+        <td><strong>${area.name}</strong></td>
+        <td>${area.description || 'Không có mô tả'}</td>
+        <td>${area.lat.toFixed(6)}, ${area.lng.toFixed(6)}</td>
+        <td>${area.radius_m}m</td>
+        <td>
+            <span class="badge ${area.is_active ? 'badge-success' : 'badge-secondary'}">
+                ${area.is_active ? 'Hoạt động' : 'Tạm dừng'}
+            </span>
+        </td>
+        <td>${new Date(area.created_at).toLocaleDateString('vi-VN')}</td>
+        <td>
+            <button class="btn btn-primary btn-sm me-1" onclick="editArea(${area.id})">
+                <i class="fas fa-edit"></i> Sửa
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deleteArea(${area.id})">
+                <i class="fas fa-trash"></i> Xóa
+            </button>
+        </td>
+    `;
+    return tr;
+}
+
+// Create area item element (mobile cards)
 function createAreaItem(area) {
     const div = document.createElement('div');
     div.className = 'area-item';
