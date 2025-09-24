@@ -15,6 +15,7 @@ from .views import (
     user_create_api,
     user_update_api,
     department_list_api,
+    debug_current_user,
 )
 
 def debug_user_view(request):
@@ -27,7 +28,7 @@ urlpatterns = [
     # Index -> users list
     path("", lambda request: redirect("users:list"), name="index"),
     # Debug view
-    path("debug/", debug_user_view, name="debug"),
+    path("debug/", debug_current_user, name="debug"),
     # User management views
     path("list/", user_list_view, name="list"),
     path("create/", user_create_view, name="create"),

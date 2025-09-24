@@ -13,6 +13,25 @@ from apps.users.serializers import UserSerializer, UserCreateSerializer, UserUpd
 from apps.users.permissions import permission_required
 
 
+def debug_current_user(request):
+    """Debug current user permissions"""
+    if not request.user.is_authenticated:
+        return render(request, 'debug_user.html', {'error': 'Not authenticated'})
+    
+    user = request.user
+    context = {
+        'user': user,
+        'is_superuser': user.is_superuser,
+        'groups': [g.name for g in user.groups.all()],
+        'permissions': {
+            'can_edit_users': user.has_perm('users.can_edit_users'),
+            'can_view_users': user.has_perm('users.can_view_users'),
+            'can_manage_users': user.has_perm('users.can_manage_users'),
+        }
+    }
+    return render(request, 'debug_user.html', context)
+
+
 @permission_required('users.can_view_users')
 def user_list_view(request):
     """Danh sách người dùng"""
@@ -80,21 +99,21 @@ def user_create_view(request):
 @permission_required('users.can_edit_users')
 def user_update_view(request, user_id):
     """Cập nhật thông tin người dùng"""
-    user = get_object_or_404(User, id=user_id)
+    target_user = get_object_or_404(User, id=user_id)
     
     if request.method == 'POST':
-        form = UserUpdateForm(request.POST, instance=user)
+        form = UserUpdateForm(request.POST, instance=target_user)
         if form.is_valid():
             form.save()
-            messages.success(request, f'Cập nhật thông tin {user.get_full_name()} thành công!')
+            messages.success(request, f'Cập nhật thông tin {target_user.get_full_name()} thành công!')
             return redirect('users:list')
     else:
-        form = UserUpdateForm(instance=user)
+        form = UserUpdateForm(instance=target_user)
     
     departments = Department.objects.all()
     context = {
         'form': form,
-        'user': user,
+        'target_user': target_user,  # Đổi tên biến để tránh xung đột
         'departments': departments,
         'role_choices': UserRole.choices,
     }

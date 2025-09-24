@@ -8,6 +8,7 @@ class UserCreateForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=True, label='Tên')
     last_name = forms.CharField(max_length=30, required=True, label='Họ')
     email = forms.EmailField(required=True, label='Email')
+    employee_id = forms.CharField(max_length=20, required=False, label='Mã nhân viên')
     role = forms.ChoiceField(choices=UserRole.choices, label='Vai trò')
     department = forms.ModelChoiceField(
         queryset=Department.objects.all(),
@@ -34,7 +35,7 @@ class UserCreateForm(UserCreationForm):
     class Meta:
         model = User
         fields = (
-            'username', 'first_name', 'last_name', 'email', 'role', 'department',
+            'username', 'first_name', 'last_name', 'email', 'employee_id', 'role', 'department',
             'phone', 'date_of_birth', 'gender', 'address', 'position', 'hire_date'
         )
 
@@ -50,6 +51,7 @@ class UserUpdateForm(forms.ModelForm):
     first_name = forms.CharField(max_length=30, required=True, label='Tên')
     last_name = forms.CharField(max_length=30, required=True, label='Họ')
     email = forms.EmailField(required=True, label='Email')
+    employee_id = forms.CharField(max_length=20, required=False, label='Mã nhân viên')
     role = forms.ChoiceField(choices=UserRole.choices, label='Vai trò')
     department = forms.ModelChoiceField(
         queryset=Department.objects.all(),
@@ -83,7 +85,7 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = (
-            'username', 'first_name', 'last_name', 'email', 'role', 'department',
+            'username', 'first_name', 'last_name', 'email', 'employee_id', 'role', 'department',
             'phone', 'avatar', 'date_of_birth', 'gender', 'address',
             'emergency_contact', 'emergency_phone', 'position', 'hire_date',
             'salary', 'work_schedule', 'skills', 'notes', 'is_active_employee'

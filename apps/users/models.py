@@ -32,6 +32,14 @@ class User(AbstractUser):
         help_text="Vai trò người dùng"
     )
     
+    employee_id = models.CharField(
+        max_length=20,
+        unique=True,
+        blank=True,
+        null=True,
+        help_text="Mã nhân viên"
+    )
+    
     department = models.ForeignKey(
         Department,
         on_delete=models.SET_NULL,
@@ -157,10 +165,6 @@ class User(AbstractUser):
         """Tên hiển thị của user"""
         return self.full_name
 
-    @property
-    def employee_id(self):
-        """ID nhân viên (sử dụng user ID)"""
-        return self.id
     
     # Django Permissions Helper Methods
     def is_super_admin(self):

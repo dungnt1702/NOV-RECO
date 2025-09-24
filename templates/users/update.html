@@ -18,7 +18,7 @@
             <i class="fas fa-user-edit text-primary me-3"></i>
             Cập nhật người dùng
           </h1>
-          <p class="text-muted mb-0">{{ user.get_full_name }}</p>
+          <p class="text-muted mb-0">{{ target_user.get_full_name }}</p>
         </div>
         <a href="{% url 'users:list' %}" class="btn btn-outline-secondary">
           <i class="fas fa-arrow-left me-2"></i>
@@ -164,28 +164,22 @@
                       {% endfor %}
                     </div>
                   {% endif %}
+                  <div class="form-text">ID: {{ target_user.id }}</div>
                 </div>
               </div>
 
-              {% if form.is_active %}
               <div class="row">
                 <div class="col-12">
                   <div class="form-check">
-                    {{ form.is_active }}
-                    <label for="{{ form.is_active.id_for_label }}" class="form-check-label">
+                    <input type="checkbox" class="form-check-input" id="is_active" 
+                           {% if target_user.is_active %}checked{% endif %} disabled>
+                    <label for="is_active" class="form-check-label">
                       Tài khoản hoạt động
                     </label>
+                    <div class="form-text">Trạng thái: {% if target_user.is_active %}Hoạt động{% else %}Không hoạt động{% endif %}</div>
                   </div>
-                  {% if form.is_active.errors %}
-                    <div class="invalid-feedback d-block">
-                      {% for error in form.is_active.errors %}
-                        {{ error }}
-                      {% endfor %}
-                    </div>
-                  {% endif %}
                 </div>
               </div>
-              {% endif %}
             </div>
 
             <!-- Actions -->
