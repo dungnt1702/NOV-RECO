@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadNotifications() {
         try {
             showLoading(true);
-            const response = await fetch('/notifications/api/list/');
+            const response = await fetch('/notifications/api/');
             const data = await response.json();
             
             if (data.success) {
