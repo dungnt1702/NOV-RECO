@@ -12,7 +12,7 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 2.84 9.74 6.99 12.13.39.29.92.29 1.31 0C17.16 18.74 20 14.25 20 9c0-3.87-3.13-7-7-7zm0 2c2.76 0 5 2.24 5 5 0 4.97-2.66 9.12-6.25 11.25C10.66 18.12 8 13.97 8 9c0-2.76 2.24-5 5-5zm0 1c-2.21 0-4 1.79-4 4 0 3.86 2.12 7.17 5 8.9 2.88-1.73 5-5.04 5-8.9 0-2.21-1.79-4-4-4z"/></svg>') center/contain no-repeat;
+    background: url('/static/images/bell.png') center/contain no-repeat;
     background-size: 24px 24px;
     text-decoration: none;
     transition: all 0.3s ease;
