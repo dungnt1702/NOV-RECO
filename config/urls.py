@@ -22,6 +22,7 @@ urlpatterns = [
     path("automation-test/", include("apps.automation_test.urls")),
     path("absence/", include("apps.absence.urls")),
     path("notifications/", include("apps.notifications.urls")),
+    path("", include("apps.core.urls")),
 ]
 
 if settings.DEBUG:
