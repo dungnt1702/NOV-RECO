@@ -10,9 +10,13 @@ let currentDateRange = '7';
 let websocket = null;
 let reconnectAttempts = 0;
 let maxReconnectAttempts = 5;
+let testData = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard Main loaded');
+    
+    // Initialize test data
+    initializeTestData();
     
     // Initialize dashboard
     initializeDashboard();
@@ -35,6 +39,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+function initializeTestData() {
+    // Initialize test data if available
+    if (window.DashboardTestData) {
+        testData = window.DashboardTestData.exportAllData();
+        console.log('Test data initialized:', testData);
+    } else {
+        console.warn('Test data not available, using fallback data');
+        testData = generateFallbackData();
+    }
+}
+
+function generateFallbackData() {
+    return {
+        users: [
+            { id: 1, full_name: 'Admin User', role: 'admin', department: 'IT' },
+            { id: 2, full_name: 'Manager User', role: 'manager', department: 'Sales' },
+            { id: 3, full_name: 'Employee User', role: 'employee', department: 'Tech' }
+        ],
+        checkins: [
+            { id: 1, user_name: 'Admin User', area_name: 'Văn phòng chính', checkin_type: 'check-in', created_at: new Date().toISOString() },
+            { id: 2, user_name: 'Manager User', area_name: 'Khu vực A', checkin_type: 'check-out', created_at: new Date().toISOString() }
+        ],
+        dashboard_stats: {
+            today_checkins: 15,
+            week_checkins: 85,
+            month_checkins: 320,
+            total_employees: 25,
+            total_areas: 4
+        }
+    };
+}
+
 function initializeDashboard() {
     // Add loading states to cards
     const cards = document.querySelectorAll('.dashboard-card');
@@ -42,12 +78,121 @@ function initializeDashboard() {
         card.classList.add('loading');
     });
     
+    // Load real data
+    loadDashboardData();
+    
     // Remove loading states after a short delay
     setTimeout(() => {
         cards.forEach(card => {
             card.classList.remove('loading');
         });
     }, 500);
+}
+
+function loadDashboardData() {
+    if (!testData) return;
+    
+    // Update stat cards with real data
+    updateStatCards(testData.dashboard_stats);
+    
+    // Update activity list
+    updateActivityList(testData.checkins.slice(0, 5));
+    
+    // Update department stats if available
+    if (testData.departments) {
+        updateDepartmentStats(testData.departments);
+    }
+}
+
+function updateStatCards(stats) {
+    // Update today check-ins
+    const todayCheckins = document.querySelector('.stat-card:nth-child(1) h3');
+    if (todayCheckins) {
+        todayCheckins.textContent = stats.today_checkins || 0;
+    }
+    
+    // Update week check-ins
+    const weekCheckins = document.querySelector('.stat-card:nth-child(2) h3');
+    if (weekCheckins) {
+        weekCheckins.textContent = stats.week_checkins || 0;
+    }
+    
+    // Update month check-ins
+    const monthCheckins = document.querySelector('.stat-card:nth-child(3) h3');
+    if (monthCheckins) {
+        monthCheckins.textContent = stats.month_checkins || 0;
+    }
+    
+    // Update total employees
+    const totalEmployees = document.querySelector('.stat-card:nth-child(4) h3');
+    if (totalEmployees) {
+        totalEmployees.textContent = stats.total_employees || 0;
+    }
+    
+    // Update total areas
+    const totalAreas = document.querySelector('.stat-card:nth-child(5) h3');
+    if (totalAreas) {
+        totalAreas.textContent = stats.total_areas || 0;
+    }
+}
+
+function updateActivityList(activities) {
+    const activityList = document.querySelector('.activity-list');
+    if (!activityList || !activities) return;
+    
+    activityList.innerHTML = '';
+    
+    activities.forEach(activity => {
+        const activityItem = document.createElement('div');
+        activityItem.className = 'activity-item';
+        activityItem.innerHTML = `
+            <div class="activity-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="activity-content">
+                <p><strong>${activity.user_name}</strong> đã ${activity.checkin_type} tại <strong>${activity.area_name}</strong></p>
+                <span class="activity-time">${formatDateTime(activity.created_at)}</span>
+            </div>
+            <div class="activity-icon">
+                <i class="fas fa-${activity.checkin_type === 'check-in' ? 'sign-in-alt' : 'sign-out-alt'}"></i>
+            </div>
+        `;
+        activityList.appendChild(activityItem);
+    });
+}
+
+function updateDepartmentStats(departments) {
+    const departmentList = document.querySelector('.department-list');
+    if (!departmentList || !departments) return;
+    
+    departmentList.innerHTML = '';
+    
+    departments.slice(0, 5).forEach(dept => {
+        const deptItem = document.createElement('div');
+        deptItem.className = 'department-item';
+        deptItem.innerHTML = `
+            <div class="department-info">
+                <h4>${dept.name}</h4>
+                <p>${dept.office}</p>
+            </div>
+            <div class="department-count">
+                <span class="count">${dept.employee_count}</span>
+                <span class="label">nhân viên</span>
+            </div>
+        `;
+        departmentList.appendChild(deptItem);
+    });
+}
+
+function formatDateTime(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
 }
 
 function setupRealTimeUpdates() {
@@ -62,11 +207,49 @@ function setupWebSocketConnection() {
     // Check if WebSocket is supported
     if (!window.WebSocket) {
         console.log('WebSocket not supported, falling back to polling');
+        setupWebSocketSimulation();
         return;
     }
     
     // Connect to WebSocket
     connectWebSocket();
+}
+
+function setupWebSocketSimulation() {
+    // Simulate WebSocket connection for testing
+    console.log('Setting up WebSocket simulation for testing');
+    
+    // Simulate connection after 2 seconds
+    setTimeout(() => {
+        showConnectionStatus('connected');
+        
+        // Simulate periodic updates
+        setInterval(() => {
+            if (testData && testData.realtime_data) {
+                const realtimeData = testData.realtime_data;
+                
+                // Randomly send different types of updates
+                const updateTypes = ['stats_update', 'activity_update', 'checkin_alert', 'notification'];
+                const randomType = updateTypes[Math.floor(Math.random() * updateTypes.length)];
+                
+                switch (randomType) {
+                    case 'stats_update':
+                        handleWebSocketMessage(realtimeData.stats_update);
+                        break;
+                    case 'activity_update':
+                        handleWebSocketMessage(realtimeData.activity_update);
+                        break;
+                    case 'checkin_alert':
+                        handleWebSocketMessage(realtimeData.checkin_alert);
+                        break;
+                    case 'notification':
+                        handleWebSocketMessage(realtimeData.notification);
+                        break;
+                }
+            }
+        }, 30000); // Every 30 seconds
+        
+    }, 2000);
 }
 
 function connectWebSocket() {

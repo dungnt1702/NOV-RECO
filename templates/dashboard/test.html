@@ -1,0 +1,457 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Test Page - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/main.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard/module-framework.css' %}">
+<style>
+.test-controls {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-width: 300px;
+}
+
+.test-controls h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    color: #2d3748;
+}
+
+.test-btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.test-btn:hover {
+    background: #5a67d8;
+}
+
+.test-btn.secondary {
+    background: #718096;
+}
+
+.test-btn.secondary:hover {
+    background: #4a5568;
+}
+
+.test-info {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.8rem;
+    max-width: 400px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.test-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: #48bb78;
+}
+
+.test-info pre {
+    margin: 0;
+    white-space: pre-wrap;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-main">
+    <!-- Test Controls -->
+    <div class="test-controls">
+        <h3>🧪 Test Controls</h3>
+        <button class="test-btn" onclick="testWebSocket()">Test WebSocket</button>
+        <button class="test-btn" onclick="testCharts()">Test Charts</button>
+        <button class="test-btn" onclick="testThemes()">Test Themes</button>
+        <button class="test-btn" onclick="testModules()">Test Modules</button>
+        <button class="test-btn" onclick="testExport()">Test Export</button>
+        <button class="test-btn" onclick="testNotifications()">Test Notifications</button>
+        <button class="test-btn secondary" onclick="clearTestInfo()">Clear Info</button>
+    </div>
+
+    <!-- Test Info -->
+    <div class="test-info" id="testInfo">
+        <h4>Test Information</h4>
+        <pre id="testOutput">Ready for testing...</pre>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-flask"></i>
+            Dashboard Test Page
+        </h1>
+        <p class="page-subtitle">Test tất cả tính năng dashboard với dữ liệu mẫu</p>
+    </div>
+
+    <div class="container-fluid dashboard-grid">
+        <!-- Left Column -->
+        <div class="dashboard-left">
+            <!-- General Check-in Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-title">Check-in Hôm nay</p>
+                        <h3 id="todayCheckins">0</h3>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-title">Check-in Tuần này</p>
+                        <h3 id="weekCheckins">0</h3>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-title">Check-in Tháng này</p>
+                        <h3 id="monthCheckins">0</h3>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-title">Tổng số nhân viên</p>
+                        <h3 id="totalEmployees">0</h3>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <p class="stat-title">Tổng số khu vực</p>
+                        <h3 id="totalAreas">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-history"></i> Hoạt động gần đây</h3>
+                </div>
+                <div class="card-content">
+                    <div class="activity-list" id="activityList">
+                        <!-- Activity items will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="dashboard-right">
+            <!-- Advanced Analytics Section -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-line"></i> Phân tích nâng cao</h3>
+                    <div class="chart-controls">
+                        <select id="chartType" class="chart-select">
+                            <option value="attendance">Check-in theo ngày</option>
+                            <option value="department">Hiệu suất phòng ban</option>
+                            <option value="time">Phân tích thời gian</option>
+                        </select>
+                        <select id="dateRange" class="chart-select">
+                            <option value="7">7 ngày qua</option>
+                            <option value="30">30 ngày qua</option>
+                            <option value="90">3 tháng qua</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="charts-container">
+                        <div class="chart-wrapper">
+                            <canvas id="mainChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-legend" id="chartLegend"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Charts Section -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie"></i> Thống kê bổ sung</h3>
+                </div>
+                <div class="card-content">
+                    <div class="charts-grid">
+                        <div class="chart-item">
+                            <canvas id="departmentChart" width="200" height="150"></canvas>
+                        </div>
+                        <div class="chart-item">
+                            <canvas id="timeChart" width="200" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Customization -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-cog"></i> Tùy chỉnh Dashboard</h3>
+                </div>
+                <div class="card-content">
+                    <div class="customization-controls">
+                        <div class="control-group">
+                            <label for="themeSelect">Giao diện:</label>
+                            <select id="themeSelect" class="custom-select">
+                                <option value="default">Mặc định</option>
+                                <option value="dark">Tối</option>
+                                <option value="light">Sáng</option>
+                                <option value="colorful">Màu sắc</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="layoutSelect">Bố cục:</label>
+                            <select id="layoutSelect" class="custom-select">
+                                <option value="grid">Lưới</option>
+                                <option value="list">Danh sách</option>
+                                <option value="compact">Gọn</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="refreshRate">Tần suất cập nhật:</label>
+                            <select id="refreshRate" class="custom-select">
+                                <option value="30">30 giây</option>
+                                <option value="60">1 phút</option>
+                                <option value="300">5 phút</option>
+                                <option value="0">Tắt</option>
+                            </select>
+                        </div>
+                        <button class="customize-btn" id="resetSettings">
+                            <i class="fas fa-undo"></i>
+                            <span>Đặt lại</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export & Actions -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-download"></i> Xuất báo cáo</h3>
+                </div>
+                <div class="card-content">
+                    <div class="export-actions">
+                        <button class="export-btn" id="exportPDF">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>Xuất PDF</span>
+                        </button>
+                        <button class="export-btn" id="exportExcel">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Xuất Excel</span>
+                        </button>
+                        <button class="export-btn" id="exportImage">
+                            <i class="fas fa-image"></i>
+                            <span>Xuất ảnh</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module Integration Area -->
+            <div class="module-integration-area">
+                <h3><i class="fas fa-puzzle-piece"></i> Tích hợp Module</h3>
+                <p>Thêm các module tùy chỉnh để mở rộng chức năng dashboard</p>
+                <button class="integration-btn" id="addModuleBtn">
+                    <i class="fas fa-plus"></i>
+                    Thêm Module
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/dashboard/test-data.js' %}"></script>
+<script src="{% static 'js/dashboard/module-framework.js' %}"></script>
+<script src="{% static 'js/dashboard/main.js' %}"></script>
+<script>
+// Test functions
+function logTest(message) {
+    const output = document.getElementById('testOutput');
+    const timestamp = new Date().toLocaleTimeString();
+    output.textContent += `[${timestamp}] ${message}\n`;
+    output.scrollTop = output.scrollHeight;
+}
+
+function clearTestInfo() {
+    document.getElementById('testOutput').textContent = 'Ready for testing...\n';
+}
+
+function testWebSocket() {
+    logTest('Testing WebSocket simulation...');
+    if (window.DashboardModuleFramework) {
+        logTest('WebSocket simulation started');
+        showConnectionStatus('connected');
+    } else {
+        logTest('WebSocket simulation not available');
+    }
+}
+
+function testCharts() {
+    logTest('Testing charts...');
+    if (mainChart) {
+        mainChart.update();
+        logTest('Main chart updated');
+    }
+    if (departmentChart) {
+        departmentChart.update();
+        logTest('Department chart updated');
+    }
+    if (timeChart) {
+        timeChart.update();
+        logTest('Time chart updated');
+    }
+}
+
+function testThemes() {
+    logTest('Testing theme switching...');
+    const themes = ['default', 'dark', 'light', 'colorful'];
+    let currentIndex = 0;
+    
+    const interval = setInterval(() => {
+        const theme = themes[currentIndex];
+        applyTheme(theme);
+        logTest(`Applied theme: ${theme}`);
+        currentIndex++;
+        
+        if (currentIndex >= themes.length) {
+            clearInterval(interval);
+            logTest('Theme testing completed');
+        }
+    }, 2000);
+}
+
+function testModules() {
+    logTest('Testing module integration...');
+    if (window.DashboardModuleFramework) {
+        // Test registering a module
+        const testModule = window.DashboardModuleFramework.registerModule('testModule', {
+            title: 'Test Module',
+            type: 'metric',
+            description: 'Test module for testing',
+            api: {
+                getData: function() {
+                    return Promise.resolve({
+                        success: true,
+                        data: { value: Math.floor(Math.random() * 100) }
+                    });
+                }
+            }
+        });
+        
+        logTest('Test module registered');
+        
+        // Activate module
+        window.DashboardModuleFramework.activateModule('testModule');
+        logTest('Test module activated');
+        
+        // Register widget
+        const testWidget = window.DashboardModuleFramework.registerWidget('testModule', 'testWidget', {
+            title: 'Test Widget',
+            type: 'metric',
+            description: 'Test widget'
+        });
+        
+        logTest('Test widget registered');
+        
+        // Render widget
+        const container = document.createElement('div');
+        container.id = 'test-widget-container';
+        document.querySelector('.dashboard-right').appendChild(container);
+        
+        window.DashboardModuleFramework.renderWidget('testModule', 'testWidget', container.id);
+        logTest('Test widget rendered');
+    } else {
+        logTest('Module framework not available');
+    }
+}
+
+function testExport() {
+    logTest('Testing export functionality...');
+    // Test PDF export
+    if (typeof exportToPDF === 'function') {
+        exportToPDF();
+        logTest('PDF export triggered');
+    }
+    
+    // Test Excel export
+    if (typeof exportToExcel === 'function') {
+        exportToExcel();
+        logTest('Excel export triggered');
+    }
+    
+    // Test Image export
+    if (typeof exportToImage === 'function') {
+        exportToImage();
+        logTest('Image export triggered');
+    }
+}
+
+function testNotifications() {
+    logTest('Testing notifications...');
+    
+    // Test check-in alert
+    if (typeof showCheckinAlert === 'function') {
+        showCheckinAlert({
+            user_name: 'Test User',
+            area_name: 'Test Area'
+        });
+        logTest('Check-in alert shown');
+    }
+    
+    // Test dashboard notification
+    if (typeof showDashboardNotification === 'function') {
+        showDashboardNotification({
+            title: 'Test Notification',
+            message: 'This is a test notification',
+            icon: 'fas fa-bell',
+            color: '#667eea'
+        });
+        logTest('Dashboard notification shown');
+    }
+}
+
+// Initialize test page
+document.addEventListener('DOMContentLoaded', function() {
+    logTest('Test page loaded');
+    logTest('All test functions available');
+});
+</script>
+{% endblock %}
