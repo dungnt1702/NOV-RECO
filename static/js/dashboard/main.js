@@ -595,6 +595,42 @@ function monitorPerformance() {
     requestAnimationFrame(measureFPS);
 }
 
+function destroyAllCharts() {
+    console.log('Destroying all existing charts...');
+    
+    // Destroy all chart instances
+    if (attendanceChart) {
+        attendanceChart.destroy();
+        attendanceChart = null;
+    }
+    if (departmentChart) {
+        departmentChart.destroy();
+        departmentChart = null;
+    }
+    if (timeChart) {
+        timeChart.destroy();
+        timeChart = null;
+    }
+    if (areaChart) {
+        areaChart.destroy();
+        areaChart = null;
+    }
+    if (weeklyChart) {
+        weeklyChart.destroy();
+        weeklyChart = null;
+    }
+    if (mainChart) {
+        mainChart.destroy();
+        mainChart = null;
+    }
+    if (absenceChart) {
+        absenceChart.destroy();
+        absenceChart = null;
+    }
+    
+    console.log('All charts destroyed successfully');
+}
+
 function refreshDashboard() {
     console.log('Refreshing dashboard...');
     
@@ -614,6 +650,9 @@ function refreshDashboard() {
     
     // Refresh data
     setTimeout(() => {
+        // Destroy existing charts first
+        destroyAllCharts();
+        
         // Re-initialize charts with fresh data (but don't override server stats)
         initializeCharts();
         
@@ -795,6 +834,13 @@ function initializeCharts() {
 function createMainChart() {
     const ctx = document.getElementById('mainChart');
     if (!ctx) return;
+    
+    // Check if chart already exists
+    if (mainChart) {
+        console.log('Main chart already exists, destroying first...');
+        mainChart.destroy();
+        mainChart = null;
+    }
     
     // Create main chart based on current type
     updateMainChart();
@@ -1196,6 +1242,14 @@ function createDepartmentChart() {
         console.log('departmentChart canvas not found');
         return;
     }
+    
+    // Check if chart already exists
+    if (departmentChart) {
+        console.log('Department chart already exists, destroying first...');
+        departmentChart.destroy();
+        departmentChart = null;
+    }
+    
     console.log('Creating department chart...');
     console.log('Canvas element:', ctx);
     console.log('Canvas dimensions:', ctx.width, 'x', ctx.height);
@@ -1371,6 +1425,14 @@ function createTimeChart() {
         console.log('timeChart canvas not found');
         return;
     }
+    
+    // Check if chart already exists
+    if (timeChart) {
+        console.log('Time chart already exists, destroying first...');
+        timeChart.destroy();
+        timeChart = null;
+    }
+    
     console.log('Creating time chart...');
     console.log('Canvas element:', ctx);
     console.log('Canvas dimensions:', ctx.width, 'x', ctx.height);
@@ -2928,6 +2990,13 @@ function createAreaChart() {
         return;
     }
     
+    // Check if chart already exists
+    if (areaChart) {
+        console.log('Area chart already exists, destroying first...');
+        areaChart.destroy();
+        areaChart = null;
+    }
+    
     console.log('Creating area chart...');
     
     if (typeof Chart === 'undefined') {
@@ -3017,6 +3086,13 @@ function createWeeklyChart() {
     if (!ctx) {
         console.log('weeklyChart canvas not found');
         return;
+    }
+    
+    // Check if chart already exists
+    if (weeklyChart) {
+        console.log('Weekly chart already exists, destroying first...');
+        weeklyChart.destroy();
+        weeklyChart = null;
     }
     
     console.log('Creating weekly chart...');
@@ -3109,6 +3185,13 @@ function createAbsenceChart() {
     if (!ctx) {
         console.log('absenceChart canvas not found');
         return;
+    }
+    
+    // Check if chart already exists
+    if (absenceChart) {
+        console.log('Absence chart already exists, destroying first...');
+        absenceChart.destroy();
+        absenceChart = null;
     }
     
     console.log('Creating absence chart...');
