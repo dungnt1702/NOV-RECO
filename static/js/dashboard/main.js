@@ -21,11 +21,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize dashboard
     initializeDashboard();
     
-    // Setup real-time updates (only on desktop)
-    if (!isMobile) {
-        setupRealTimeUpdates();
-        setupWebSocketConnection();
-    }
+    // Setup real-time updates (disabled for now)
+    // if (!isMobile) {
+    //     setupRealTimeUpdates();
+    //     setupWebSocketConnection();
+    // }
     
     // Setup interactive elements
     setupInteractiveElements();
