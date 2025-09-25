@@ -1058,11 +1058,30 @@ function createDepartmentChart() {
     let chartData;
     if (window.DashboardTestData && window.DashboardTestData.exportAllData) {
         const data = window.DashboardTestData.exportAllData();
-        chartData = data.departments.map(dept => ({
-            label: dept.name,
-            value: dept.employee_count
-        }));
+        if (data.departments && Array.isArray(data.departments)) {
+            chartData = data.departments.map(dept => ({
+                label: dept.name,
+                value: dept.employee_count
+            }));
+        } else {
+            chartData = [
+                { label: 'Kỹ thuật', value: 35 },
+                { label: 'Kinh doanh', value: 28 },
+                { label: 'Nhân sự', value: 22 },
+                { label: 'Kế toán', value: 15 }
+            ];
+        }
     } else {
+        chartData = [
+            { label: 'Kỹ thuật', value: 35 },
+            { label: 'Kinh doanh', value: 28 },
+            { label: 'Nhân sự', value: 22 },
+            { label: 'Kế toán', value: 15 }
+        ];
+    }
+    
+    // Ensure chartData is valid
+    if (!chartData || !Array.isArray(chartData) || chartData.length === 0) {
         chartData = [
             { label: 'Kỹ thuật', value: 35 },
             { label: 'Kinh doanh', value: 28 },
@@ -1170,22 +1189,35 @@ function createTimeChart() {
     let chartData;
     if (window.DashboardTestData && window.DashboardTestData.exportAllData) {
         const data = window.DashboardTestData.exportAllData();
-        chartData = data.charts.time;
+        if (data.charts && data.charts.time) {
+            chartData = data.charts.time;
+        } else {
+            chartData = {
+                labels: ['Sáng sớm (6-9h)', 'Buổi sáng (9-12h)', 'Buổi chiều (12-17h)', 'Buổi tối (17-22h)', 'Đêm (22-6h)'],
+                data: [45, 120, 85, 30, 15]
+            };
+        }
     } else {
         chartData = {
             labels: ['Sáng sớm (6-9h)', 'Buổi sáng (9-12h)', 'Buổi chiều (12-17h)', 'Buổi tối (17-22h)', 'Đêm (22-6h)'],
-            datasets: [{
-                data: [45, 120, 85, 30, 15]
-            }]
+            data: [45, 120, 85, 30, 15]
         };
     }
     
-    const total = chartData.datasets[0].data.reduce((sum, value) => sum + value, 0);
+    // Ensure chartData has the correct structure
+    if (!chartData || !chartData.labels || !chartData.data) {
+        chartData = {
+            labels: ['Sáng sớm (6-9h)', 'Buổi sáng (9-12h)', 'Buổi chiều (12-17h)', 'Buổi tối (17-22h)', 'Đêm (22-6h)'],
+            data: [45, 120, 85, 30, 15]
+        };
+    }
+    
+    const total = chartData.data.reduce((sum, value) => sum + value, 0);
     
     const data = {
         labels: chartData.labels,
         datasets: [{
-            data: chartData.datasets[0].data,
+            data: chartData.data,
             backgroundColor: [
                 'rgba(67, 233, 123, 0.8)',
                 'rgba(79, 172, 254, 0.8)',
