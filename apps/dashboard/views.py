@@ -46,7 +46,7 @@ def dashboard_main_view(request):
         # Thống kê theo phòng ban
         from apps.users.models import Department
         department_stats = Department.objects.annotate(
-            employee_count=Count('employees')
+            employee_count=Count('user')
         ).order_by('-employee_count')[:5]
         
         # Check-ins gần đây
