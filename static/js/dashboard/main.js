@@ -5,6 +5,7 @@ let timeChart = null;
 let areaChart = null;
 let weeklyChart = null;
 let mainChart = null;
+let absenceChart = null;
 let isMobile = window.innerWidth <= 768;
 
 // Update mobile detection on resize
@@ -682,6 +683,9 @@ function initializeCharts() {
         
         console.log('Creating weekly chart...');
         createWeeklyChart();
+        
+        console.log('Creating absence chart...');
+        createAbsenceChart();
         
         console.log('Charts initialization completed');
         
@@ -2938,5 +2942,97 @@ function createWeeklyChart() {
         console.log('Weekly chart created successfully');
     } catch (error) {
         console.error('Error creating weekly chart:', error);
+    }
+}
+
+// Create Absence Chart
+function createAbsenceChart() {
+    const ctx = document.getElementById('absenceChart');
+    if (!ctx) {
+        console.log('absenceChart canvas not found');
+        return;
+    }
+    
+    console.log('Creating absence chart...');
+    
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded');
+        return;
+    }
+    
+    const canvasContext = ctx.getContext('2d');
+    if (!canvasContext) {
+        console.error('Cannot get 2D context from canvas');
+        return;
+    }
+    
+    // Sample data for absence chart
+    const absenceData = {
+        labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+        data: [2, 1, 3, 0, 1, 0, 0]
+    };
+    
+    const data = {
+        labels: absenceData.labels,
+        datasets: [{
+            label: 'Vắng mặt',
+            data: absenceData.data,
+            backgroundColor: 'rgba(245, 87, 108, 0.2)',
+            borderColor: '#f5576c',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+        }]
+    };
+    
+    const config = {
+        type: 'bar',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 1,
+            layout: {
+                padding: {
+                    top: 20, bottom: 20, left: 20, right: 20
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        },
+                        boxWidth: 14,
+                        boxHeight: 14
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            }
+        }
+    };
+    
+    try {
+        absenceChart = new Chart(ctx, config);
+        console.log('Absence chart created successfully');
+    } catch (error) {
+        console.error('Error creating absence chart:', error);
     }
 }
