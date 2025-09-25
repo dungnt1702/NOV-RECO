@@ -434,34 +434,6 @@
                 </button>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h3><i class="fas fa-bolt"></i> Thao tác nhanh</h3>
-                </div>
-                <div class="card-content">
-                    <div class="quick-actions">
-                        <a href="{% url 'checkin:action' %}" class="action-btn">
-                            <i class="fas fa-plus"></i>
-                            <span>Check-in</span>
-                        </a>
-                        <a href="{% url 'checkin:history' %}" class="action-btn">
-                            <i class="fas fa-history"></i>
-                            <span>Lịch sử</span>
-                        </a>
-                        <a href="{% url 'absence:request' %}" class="action-btn">
-                            <i class="fas fa-calendar-times"></i>
-                            <span>Vắng mặt</span>
-                        </a>
-                        {% if user_role in 'admin,manager,hcns' %}
-                        <a href="{% url 'checkin:list' %}" class="action-btn">
-                            <i class="fas fa-list"></i>
-                            <span>Danh sách</span>
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
