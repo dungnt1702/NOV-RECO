@@ -7,6 +7,9 @@ let isMobile = window.innerWidth <= 768;
 let updateInterval = null;
 let currentChartType = 'attendance';
 let currentDateRange = '7';
+let websocket = null;
+let reconnectAttempts = 0;
+let maxReconnectAttempts = 5;
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard Main loaded');
@@ -17,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup real-time updates (only on desktop)
     if (!isMobile) {
         setupRealTimeUpdates();
+        setupWebSocketConnection();
     }
     
     // Setup interactive elements
@@ -52,6 +56,276 @@ function setupRealTimeUpdates() {
     
     // Update activity every 60 seconds (desktop only)
     setInterval(updateActivity, 60000);
+}
+
+function setupWebSocketConnection() {
+    // Check if WebSocket is supported
+    if (!window.WebSocket) {
+        console.log('WebSocket not supported, falling back to polling');
+        return;
+    }
+    
+    // Connect to WebSocket
+    connectWebSocket();
+}
+
+function connectWebSocket() {
+    try {
+        // Use wss:// for production, ws:// for development
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/dashboard/`;
+        
+        websocket = new WebSocket(wsUrl);
+        
+        websocket.onopen = function(event) {
+            console.log('WebSocket connected');
+            reconnectAttempts = 0;
+            showConnectionStatus('connected');
+        };
+        
+        websocket.onmessage = function(event) {
+            try {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            } catch (error) {
+                console.error('Error parsing WebSocket message:', error);
+            }
+        };
+        
+        websocket.onclose = function(event) {
+            console.log('WebSocket disconnected');
+            showConnectionStatus('disconnected');
+            
+            // Attempt to reconnect
+            if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++;
+                console.log(`Attempting to reconnect... (${reconnectAttempts}/${maxReconnectAttempts})`);
+                setTimeout(connectWebSocket, 5000 * reconnectAttempts);
+            } else {
+                console.log('Max reconnection attempts reached, falling back to polling');
+                showConnectionStatus('failed');
+            }
+        };
+        
+        websocket.onerror = function(error) {
+            console.error('WebSocket error:', error);
+            showConnectionStatus('error');
+        };
+        
+    } catch (error) {
+        console.error('Error setting up WebSocket:', error);
+        showConnectionStatus('error');
+    }
+}
+
+function handleWebSocketMessage(data) {
+    switch (data.type) {
+        case 'stats_update':
+            updateStatsFromWebSocket(data.data);
+            break;
+        case 'activity_update':
+            updateActivityFromWebSocket(data.data);
+            break;
+        case 'checkin_alert':
+            showCheckinAlert(data.data);
+            break;
+        case 'notification':
+            showDashboardNotification(data.data);
+            break;
+        default:
+            console.log('Unknown WebSocket message type:', data.type);
+    }
+}
+
+function updateStatsFromWebSocket(stats) {
+    // Update stat cards with new data
+    updateStatCards(stats);
+    
+    // Update charts if needed
+    if (mainChart) {
+        updateMainChart();
+    }
+}
+
+function updateActivityFromWebSocket(activities) {
+    // Update activity list with new data
+    updateActivityList(activities);
+}
+
+function showCheckinAlert(checkinData) {
+    // Show real-time check-in alert
+    const alert = document.createElement('div');
+    alert.className = 'checkin-alert';
+    alert.innerHTML = `
+        <div class="alert-content">
+            <div class="alert-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="alert-text">
+                <strong>${checkinData.user_name}</strong> vừa check-in tại <strong>${checkinData.area_name}</strong>
+            </div>
+            <button class="alert-close" onclick="this.parentElement.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    // Add styles
+    alert.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        max-width: 300px;
+        animation: slideInRight 0.3s ease;
+    `;
+    
+    document.body.appendChild(alert);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (alert.parentElement) {
+            alert.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.remove();
+                }
+            }, 300);
+        }
+    }, 5000);
+}
+
+function showDashboardNotification(notification) {
+    // Show dashboard-specific notification
+    const notificationEl = document.createElement('div');
+    notificationEl.className = 'dashboard-notification';
+    notificationEl.innerHTML = `
+        <div class="notification-content">
+            <div class="notification-icon">
+                <i class="fas fa-${notification.icon || 'bell'}"></i>
+            </div>
+            <div class="notification-text">
+                <strong>${notification.title}</strong>
+                <p>${notification.message}</p>
+            </div>
+            <button class="notification-close" onclick="this.parentElement.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    // Add styles
+    notificationEl.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: white;
+        color: #2d3748;
+        padding: 1rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        max-width: 350px;
+        border-left: 4px solid ${notification.color || '#667eea'};
+        animation: slideInRight 0.3s ease;
+    `;
+    
+    document.body.appendChild(notificationEl);
+    
+    // Auto remove after 8 seconds
+    setTimeout(() => {
+        if (notificationEl.parentElement) {
+            notificationEl.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => {
+                if (notificationEl.parentElement) {
+                    notificationEl.remove();
+                }
+            }, 300);
+        }
+    }, 8000);
+}
+
+function showConnectionStatus(status) {
+    // Remove existing status indicator
+    const existingStatus = document.getElementById('connection-status');
+    if (existingStatus) {
+        existingStatus.remove();
+    }
+    
+    // Create status indicator
+    const statusEl = document.createElement('div');
+    statusEl.id = 'connection-status';
+    statusEl.className = `connection-status ${status}`;
+    
+    let statusText, statusIcon, statusColor;
+    
+    switch (status) {
+        case 'connected':
+            statusText = 'Kết nối real-time';
+            statusIcon = 'fas fa-wifi';
+            statusColor = '#48bb78';
+            break;
+        case 'disconnected':
+            statusText = 'Mất kết nối';
+            statusIcon = 'fas fa-wifi-slash';
+            statusColor = '#ed8936';
+            break;
+        case 'failed':
+            statusText = 'Chế độ offline';
+            statusIcon = 'fas fa-exclamation-triangle';
+            statusColor = '#e53e3e';
+            break;
+        case 'error':
+            statusText = 'Lỗi kết nối';
+            statusIcon = 'fas fa-times-circle';
+            statusColor = '#e53e3e';
+            break;
+    }
+    
+    statusEl.innerHTML = `
+        <i class="${statusIcon}"></i>
+        <span>${statusText}</span>
+    `;
+    
+    // Add styles
+    statusEl.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: ${statusColor};
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: slideInUp 0.3s ease;
+    `;
+    
+    document.body.appendChild(statusEl);
+    
+    // Auto remove after 3 seconds for connected status
+    if (status === 'connected') {
+        setTimeout(() => {
+            if (statusEl.parentElement) {
+                statusEl.style.animation = 'slideOutDown 0.3s ease';
+                setTimeout(() => {
+                    if (statusEl.parentElement) {
+                        statusEl.remove();
+                    }
+                }, 300);
+            }
+        }, 3000);
+    }
 }
 
 function setupMobileOptimizations() {
