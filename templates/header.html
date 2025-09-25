@@ -178,21 +178,6 @@
                     </li>
                 {% endif %}
                 
-                <!-- Admin Panel -->
-                {% if user|in_group:'Super Admin' or user|in_group:'Admin' or user|in_group:'Manager' %}
-                    <li>
-                        <a href="/admin/">
-                            <i class="fas fa-cog"></i>
-                            Admin
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'automation_test:dashboard' %}">
-                            <i class="fas fa-flask"></i>
-                            Test
-                        </a>
-                    </li>
-                {% endif %}
             {% endif %}
         </ul>
         
