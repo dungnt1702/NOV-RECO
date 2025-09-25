@@ -2012,41 +2012,48 @@ function updateActivityList(activities) {
     const activityList = document.querySelector('.activity-list');
     if (!activityList) return;
     
-    // Clear existing activities
-    activityList.innerHTML = '';
+    // Use DocumentFragment for better performance
+    const fragment = document.createDocumentFragment();
     
-    if (activities.length === 0) {
-        activityList.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-inbox"></i>
-                <p>Chưa có hoạt động nào</p>
-            </div>
+    if (!activities || activities.length === 0) {
+        const emptyState = document.createElement('div');
+        emptyState.className = 'empty-state';
+        emptyState.innerHTML = `
+            <i class="fas fa-inbox"></i>
+            <p>Chưa có hoạt động nào</p>
         `;
-        return;
+        fragment.appendChild(emptyState);
+    } else {
+        // Add new activities
+        activities.forEach(activity => {
+            const activityItem = createActivityItem(activity);
+            fragment.appendChild(activityItem);
+        });
     }
     
-    // Add new activities
-    activities.forEach(activity => {
-        const activityItem = createActivityItem(activity);
-        activityList.appendChild(activityItem);
-    });
+    // Single DOM update
+    activityList.innerHTML = '';
+    activityList.appendChild(fragment);
 }
 
 function createActivityItem(activity) {
     const item = document.createElement('div');
     item.classList.add('activity-item');
     
-    if (activity.type === 'checkin') {
+    // Handle different data structures
+    const userName = activity.user_name || (activity.user && activity.user.name) || 'Unknown User';
+    const areaName = activity.area_name || (activity.area && activity.area.name) || 'Unknown Area';
+    const timeAgo = activity.time_ago || formatDateTime(activity.created_at);
+    const checkinType = activity.checkin_type || 'check-in';
+    
+    if (checkinType === 'check-in') {
         item.innerHTML = `
             <div class="activity-avatar">
-                ${activity.user.avatar ? 
-                    `<img src="${activity.user.avatar}" alt="${activity.user.name}">` :
-                    activity.user.name.charAt(0).toUpperCase()
-                }
+                <i class="fas fa-user-circle"></i>
             </div>
             <div class="activity-content">
-                <p><strong>${activity.user.name}</strong> đã check-in tại <strong>${activity.area.name}</strong></p>
-                <span class="activity-time">${activity.time_ago}</span>
+                <p><strong>${userName}</strong> đã check-in tại <strong>${areaName}</strong></p>
+                <span class="activity-time">${timeAgo}</span>
             </div>
         `;
     } else {
@@ -2055,13 +2062,34 @@ function createActivityItem(activity) {
                 <i class="fas fa-map-marker-alt"></i>
             </div>
             <div class="activity-content">
-                <p>Check-in tại <strong>${activity.area.name}</strong></p>
-                <span class="activity-time">${activity.time_ago}</span>
+                <p><strong>${userName}</strong> đã check-out tại <strong>${areaName}</strong></p>
+                <span class="activity-time">${timeAgo}</span>
             </div>
         `;
     }
     
     return item;
+}
+
+function formatDateTime(dateString) {
+    if (!dateString) return 'Vừa xong';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    
+    if (diffInSeconds < 60) {
+        return 'Vừa xong';
+    } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes} phút trước`;
+    } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours} giờ trước`;
+    } else {
+        const days = Math.floor(diffInSeconds / 86400);
+        return `${days} ngày trước`;
+    }
 }
 
 function animateNumber(element, newValue) {
