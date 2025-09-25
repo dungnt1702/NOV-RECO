@@ -657,6 +657,9 @@ function initializeCharts() {
     
     // Wait a bit for Chart.js to be fully loaded
     setTimeout(() => {
+        console.log('Chart.js version:', Chart.version);
+        console.log('Chart.js available:', typeof Chart);
+        
         // Initialize main chart
         createMainChart();
         
@@ -668,6 +671,26 @@ function initializeCharts() {
         createTimeChart();
         
         console.log('Charts initialization completed');
+        
+        // Check if charts were created successfully
+        setTimeout(() => {
+            console.log('Department chart after creation:', departmentChart);
+            console.log('Time chart after creation:', timeChart);
+            
+            // Check if charts are visible
+            const deptCanvas = document.getElementById('departmentChart');
+            const timeCanvas = document.getElementById('timeChart');
+            
+            if (deptCanvas) {
+                console.log('Department canvas visible:', deptCanvas.offsetWidth, 'x', deptCanvas.offsetHeight);
+                console.log('Department canvas style:', window.getComputedStyle(deptCanvas).display);
+            }
+            
+            if (timeCanvas) {
+                console.log('Time canvas visible:', timeCanvas.offsetWidth, 'x', timeCanvas.offsetHeight);
+                console.log('Time canvas style:', window.getComputedStyle(timeCanvas).display);
+            }
+        }, 500);
     }, 100);
     
     // Add color coding to stat cards
