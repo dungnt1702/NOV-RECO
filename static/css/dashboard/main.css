@@ -221,6 +221,15 @@
     }
 }
 
+/* Full Width Section */
+.dashboard-full-width {
+    width: 100%;
+    max-width: 1400px;
+    margin: 2rem auto 0 auto;
+    padding: 0 2rem;
+    box-sizing: border-box;
+}
+
 /* Dashboard Cards */
 .dashboard-card {
     background: rgba(255, 255, 255, 0.98);
