@@ -591,7 +591,66 @@ function monitorPerformance() {
     requestAnimationFrame(measureFPS);
 }
 
+function refreshDashboard() {
+    console.log('Refreshing dashboard...');
+    
+    // Show loading state
+    const refreshBtn = document.getElementById('refreshBtn');
+    const refreshIcon = refreshBtn.querySelector('i');
+    const refreshText = refreshBtn.querySelector('span');
+    
+    if (refreshBtn) {
+        refreshBtn.disabled = true;
+        refreshIcon.style.animation = 'spin 1s linear infinite';
+        refreshText.textContent = 'Đang tải...';
+    }
+    
+    // Update last updated time
+    updateLastUpdatedTime();
+    
+    // Refresh data
+    setTimeout(() => {
+        // Re-initialize charts with fresh data
+        initializeCharts();
+        
+        // Reset button state
+        if (refreshBtn) {
+            refreshBtn.disabled = false;
+            refreshIcon.style.animation = '';
+            refreshText.textContent = 'Làm mới';
+        }
+        
+        console.log('Dashboard refreshed successfully');
+    }, 1000);
+}
+
+function updateLastUpdatedTime() {
+    const lastUpdatedElement = document.getElementById('lastUpdated');
+    if (lastUpdatedElement) {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('vi-VN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        const dateString = now.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+        lastUpdatedElement.textContent = `Cập nhật lần cuối: ${timeString} - ${dateString}`;
+    }
+}
+
 function setupInteractiveElements() {
+    // Setup refresh button
+    const refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            refreshDashboard();
+        });
+    }
+    
     // Add hover effects to stat cards (desktop only)
     const statCards = document.querySelectorAll('.stat-card');
     statCards.forEach(card => {

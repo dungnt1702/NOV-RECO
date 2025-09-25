@@ -23,6 +23,7 @@ def dashboard_main_view(request):
         'user': user,
         'user_role': user.role,
         'today': today,
+        'now': timezone.now(),
     }
     
     # Thống kê check-in hôm nay
@@ -33,6 +34,12 @@ def dashboard_main_view(request):
     week_checkins = Checkin.objects.filter(created_at__date__gte=week_start).count()
     context['week_checkins'] = week_checkins
     
+    # Debug logging
+    print(f"Debug - Today: {today}")
+    print(f"Debug - Week start: {week_start}")
+    print(f"Debug - Today checkins: {today_checkins}")
+    print(f"Debug - Week checkins: {week_checkins}")
+    
     # Thống kê check-in tháng này
     month_checkins = Checkin.objects.filter(created_at__date__gte=month_start).count()
     context['month_checkins'] = month_checkins
@@ -40,12 +47,13 @@ def dashboard_main_view(request):
     # Thống kê theo vai trò
     if user.role in [UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS]:
         # Thống kê tổng quan cho quản lý
-        total_employees = User.objects.filter(role=UserRole.EMPLOYEE, is_active=True).count()
+        total_employees = User.objects.filter(is_active=True).count()  # Tất cả user active
         total_areas = Area.objects.filter(is_active=True).count()
         
         # Thống kê theo phòng ban
         from apps.users.models import Department
-        department_stats = Department.objects.annotate(
+        all_departments = Department.objects.all()
+        department_stats = all_departments.annotate(
             employee_count=Count('user')
         ).order_by('-employee_count')[:5]
         
@@ -55,10 +63,16 @@ def dashboard_main_view(request):
         context.update({
             'total_employees': total_employees,
             'total_areas': total_areas,
-            'total_departments': department_stats.count(),
+            'total_departments': all_departments.count(),
             'department_stats': department_stats,
             'recent_checkins': recent_checkins,
         })
+        
+        # Debug logging
+        print(f"Debug - Total employees: {total_employees}")
+        print(f"Debug - Total areas: {total_areas}")
+        print(f"Debug - Total departments: {all_departments.count()}")
+        print(f"Debug - Department stats count: {department_stats.count()}")
     else:
         # Thống kê cá nhân cho nhân viên
         user_today_checkins = Checkin.objects.filter(
