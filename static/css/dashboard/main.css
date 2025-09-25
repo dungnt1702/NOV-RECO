@@ -804,106 +804,270 @@
 
 @media (max-width: 768px) {
     .dashboard-main {
-        padding: 1rem 0;
+        padding: 0.5rem 0;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        overflow-x: hidden;
     }
     
     .page-header {
-        padding: 2rem 1.5rem;
-        margin: 0 1rem 1.5rem 1rem;
-        border-radius: 20px;
+        padding: 1.5rem 1rem;
+        margin: 0 0.5rem 1rem 0.5rem;
+        border-radius: 16px;
         backdrop-filter: blur(10px);
+        max-width: calc(100vw - 1rem);
     }
     
     .dashboard-grid {
-        padding: 0 1rem;
-        gap: 1.25rem;
+        padding: 0 0.5rem;
+        gap: 1rem;
+        max-width: 100vw;
+        overflow-x: hidden;
     }
     
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
+        gap: 0.75rem;
         padding: 0;
+        margin-bottom: 1rem;
     }
     
     .stat-card {
-        padding: 1.5rem;
-        border-radius: 20px;
-        margin: 0.25rem 0;
+        padding: 1rem;
+        border-radius: 16px;
+        margin: 0;
+        min-width: 0;
+        overflow: hidden;
     }
     
     .card-header {
-        padding: 1.5rem;
+        padding: 1rem;
+        font-size: 0.9rem;
     }
     
     .card-content {
-        padding: 1.5rem;
+        padding: 1rem;
     }
     
     .page-title {
         flex-direction: column;
         gap: 0.5rem;
+        text-align: center;
     }
     
     .page-title h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
+        line-height: 1.2;
     }
     
     .page-subtitle {
-        font-size: 1rem;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
     }
     
     .stat-card {
-        padding: 1rem;
-        border-radius: 15px;
         flex-direction: column;
         text-align: center;
         gap: 0.75rem;
+        min-height: 120px;
     }
     
     .stat-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.25rem;
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
         border-radius: 12px;
+        margin: 0 auto;
     }
     
     .stat-content h3 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
+        margin: 0.25rem 0;
     }
     
     .stat-content p {
-        font-size: 0.8rem;
-    }
-    
-    .card-header {
-        padding: 1rem;
-        border-radius: 15px 15px 0 0;
+        font-size: 0.75rem;
+        margin: 0;
+        line-height: 1.3;
     }
     
     .card-header h3 {
-        font-size: 1.1rem;
+        font-size: 1rem;
+        line-height: 1.3;
     }
     
-    .card-content {
-        padding: 1rem;
+    .dashboard-card {
+        margin-bottom: 1rem;
+        border-radius: 16px;
+        overflow: hidden;
     }
     
     .quick-actions {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem;
+        margin: 1rem 0;
+    }
+    
+    .activity-item {
+        padding: 0.75rem 0;
+        gap: 0.75rem;
+    }
+    
+    .activity-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+    
+    .activity-content p {
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+    
+    .activity-time {
+        font-size: 0.75rem;
+    }
+    
+    .charts-container {
+        height: 200px;
+        margin: 1rem 0;
+    }
+    
+    .chart-controls {
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .chart-select {
+        width: 100%;
+        font-size: 0.85rem;
+    }
+    
+    .export-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .export-btn {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 0.85rem;
+    }
+    
+    .customization-controls {
+        gap: 0.75rem;
+    }
+    
+    .control-group {
+        margin-bottom: 0.5rem;
+    }
+    
+    .custom-select {
+        font-size: 0.85rem;
+        padding: 0.6rem 0.8rem;
+    }
+    
+    .customize-btn {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 0.85rem;
     }
     
     .action-btn {
         padding: 1rem 0.75rem;
         border-radius: 12px;
     }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .dashboard-main {
+        padding: 0.25rem 0;
+    }
+    
+    .page-header {
+        padding: 1rem 0.75rem;
+        margin: 0 0.25rem 0.75rem 0.25rem;
+        border-radius: 12px;
+    }
+    
+    .dashboard-grid {
+        padding: 0 0.25rem;
+        gap: 0.75rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .stat-card {
+        padding: 0.75rem;
+        min-height: 100px;
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .stat-content h3 {
+        font-size: 1.2rem;
+    }
+    
+    .stat-content p {
+        font-size: 0.7rem;
+    }
+    
+    .page-title h1 {
+        font-size: 1.5rem;
+    }
+    
+    .page-subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .card-header {
+        padding: 0.75rem;
+    }
+    
+    .card-content {
+        padding: 0.75rem;
+    }
+    
+    .card-header h3 {
+        font-size: 0.9rem;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .charts-container {
+        height: 180px;
+    }
+    
+    .activity-item {
+        padding: 0.5rem 0;
+        gap: 0.5rem;
+    }
+    
+    .activity-avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+    
+    .activity-content p {
+        font-size: 0.8rem;
+    }
+    
+    .activity-time {
+        font-size: 0.7rem;
+    }
+}
     
     .action-btn i {
         font-size: 1.25rem;
