@@ -147,15 +147,45 @@
 
         <!-- Right Column -->
         <div class="dashboard-right">
-            <!-- Charts Section -->
+            <!-- Advanced Analytics Section -->
             <div class="dashboard-card">
                 <div class="card-header">
-                    <h3><i class="fas fa-chart-line"></i> Biểu đồ thống kê</h3>
+                    <h3><i class="fas fa-chart-line"></i> Phân tích nâng cao</h3>
+                    <div class="chart-controls">
+                        <select id="chartType" class="chart-select">
+                            <option value="attendance">Check-in theo ngày</option>
+                            <option value="department">Hiệu suất phòng ban</option>
+                            <option value="time">Phân tích thời gian</option>
+                        </select>
+                        <select id="dateRange" class="chart-select">
+                            <option value="7">7 ngày qua</option>
+                            <option value="30">30 ngày qua</option>
+                            <option value="90">3 tháng qua</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="card-content">
                     <div class="charts-container">
                         <div class="chart-wrapper">
-                            <canvas id="attendanceChart" width="400" height="200"></canvas>
+                            <canvas id="mainChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-legend" id="chartLegend"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Charts Section -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie"></i> Thống kê bổ sung</h3>
+                </div>
+                <div class="card-content">
+                    <div class="charts-grid">
+                        <div class="chart-item">
+                            <canvas id="departmentChart" width="200" height="150"></canvas>
+                        </div>
+                        <div class="chart-item">
+                            <canvas id="timeChart" width="200" height="150"></canvas>
                         </div>
                     </div>
                 </div>
@@ -211,6 +241,29 @@
                 </div>
             </div>
             {% endif %}
+
+            <!-- Export & Actions -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-download"></i> Xuất báo cáo</h3>
+                </div>
+                <div class="card-content">
+                    <div class="export-actions">
+                        <button class="export-btn" id="exportPDF">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>Xuất PDF</span>
+                        </button>
+                        <button class="export-btn" id="exportExcel">
+                            <i class="fas fa-file-excel"></i>
+                            <span>Xuất Excel</span>
+                        </button>
+                        <button class="export-btn" id="exportImage">
+                            <i class="fas fa-image"></i>
+                            <span>Xuất ảnh</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <!-- Quick Actions -->
             <div class="dashboard-card">

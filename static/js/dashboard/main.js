@@ -1,7 +1,12 @@
 // Dashboard Main JavaScript
 let attendanceChart = null;
+let departmentChart = null;
+let timeChart = null;
+let mainChart = null;
 let isMobile = window.innerWidth <= 768;
 let updateInterval = null;
+let currentChartType = 'attendance';
+let currentDateRange = '7';
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard Main loaded');
@@ -191,26 +196,79 @@ function setupInteractiveElements() {
 }
 
 function initializeCharts() {
-    // Initialize attendance chart
-    createAttendanceChart();
+    // Initialize main chart
+    createMainChart();
+    
+    // Initialize additional charts
+    createDepartmentChart();
+    createTimeChart();
     
     // Add color coding to stat cards
     addColorCodingToStats();
+    
+    // Setup chart controls
+    setupChartControls();
+    
+    // Setup export functionality
+    setupExportFunctionality();
     
     // Setup swipe gestures for mobile
     setupSwipeGestures();
 }
 
-function createAttendanceChart() {
-    const ctx = document.getElementById('attendanceChart');
+function createMainChart() {
+    const ctx = document.getElementById('mainChart');
     if (!ctx) return;
     
-    // Sample data - in real implementation, this would come from API
-    const chartData = {
-        labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+    // Create main chart based on current type
+    updateMainChart();
+}
+
+function updateMainChart() {
+    const ctx = document.getElementById('mainChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart
+    if (mainChart) {
+        mainChart.destroy();
+    }
+    
+    let chartData, chartConfig;
+    
+    switch (currentChartType) {
+        case 'attendance':
+            chartData = getAttendanceData();
+            chartConfig = getAttendanceConfig();
+            break;
+        case 'department':
+            chartData = getDepartmentData();
+            chartConfig = getDepartmentConfig();
+            break;
+        case 'time':
+            chartData = getTimeData();
+            chartConfig = getTimeConfig();
+            break;
+        default:
+            chartData = getAttendanceData();
+            chartConfig = getAttendanceConfig();
+    }
+    
+    const config = {
+        ...chartConfig,
+        data: chartData
+    };
+    
+    mainChart = new Chart(ctx, config);
+    updateChartLegend(chartData);
+}
+
+function getAttendanceData() {
+    const days = getDateRangeLabels();
+    return {
+        labels: days,
         datasets: [{
-            label: 'Check-in tuần này',
-            data: [12, 19, 15, 25, 22, 8, 3],
+            label: 'Check-in',
+            data: generateAttendanceData(days.length),
             borderColor: 'rgb(102, 126, 234)',
             backgroundColor: 'rgba(102, 126, 234, 0.1)',
             borderWidth: 3,
@@ -223,10 +281,56 @@ function createAttendanceChart() {
             pointHoverRadius: 8
         }]
     };
-    
-    const config = {
+}
+
+function getDepartmentData() {
+    return {
+        labels: ['Kỹ thuật', 'Kinh doanh', 'Nhân sự', 'Kế toán', 'Marketing'],
+        datasets: [{
+            label: 'Số lượng check-in',
+            data: [45, 38, 42, 35, 28],
+            backgroundColor: [
+                'rgba(102, 126, 234, 0.8)',
+                'rgba(240, 147, 251, 0.8)',
+                'rgba(79, 172, 254, 0.8)',
+                'rgba(67, 233, 123, 0.8)',
+                'rgba(255, 159, 64, 0.8)'
+            ],
+            borderColor: [
+                'rgb(102, 126, 234)',
+                'rgb(240, 147, 251)',
+                'rgb(79, 172, 254)',
+                'rgb(67, 233, 123)',
+                'rgb(255, 159, 64)'
+            ],
+            borderWidth: 2
+        }]
+    };
+}
+
+function getTimeData() {
+    return {
+        labels: ['6h-8h', '8h-10h', '10h-12h', '12h-14h', '14h-16h', '16h-18h', '18h-20h'],
+        datasets: [{
+            label: 'Check-in theo giờ',
+            data: [5, 25, 15, 8, 20, 18, 3],
+            borderColor: 'rgb(67, 233, 123)',
+            backgroundColor: 'rgba(67, 233, 123, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: 'rgb(67, 233, 123)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+        }]
+    };
+}
+
+function getAttendanceConfig() {
+    return {
         type: 'line',
-        data: chartData,
         options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -283,8 +387,119 @@ function createAttendanceChart() {
             }
         }
     };
-    
-    attendanceChart = new Chart(ctx, config);
+}
+
+function getDepartmentConfig() {
+    return {
+        type: 'bar',
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgb(102, 126, 234)',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: false
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#718096',
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        }
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(113, 128, 150, 0.1)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#718096',
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        }
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+}
+
+function getTimeConfig() {
+    return {
+        type: 'line',
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgb(67, 233, 123)',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: false
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#718096',
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        }
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(113, 128, 150, 0.1)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#718096',
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        }
+                    },
+                    beginAtZero: true
+                }
+            },
+            elements: {
+                point: {
+                    hoverBackgroundColor: 'rgb(67, 233, 123)'
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    };
 }
 
 function addColorCodingToStats() {
@@ -307,6 +522,412 @@ function addColorCodingToStats() {
             }
         }
     });
+}
+
+function setupChartControls() {
+    const chartTypeSelect = document.getElementById('chartType');
+    const dateRangeSelect = document.getElementById('dateRange');
+    
+    if (chartTypeSelect) {
+        chartTypeSelect.addEventListener('change', function() {
+            currentChartType = this.value;
+            updateMainChart();
+        });
+    }
+    
+    if (dateRangeSelect) {
+        dateRangeSelect.addEventListener('change', function() {
+            currentDateRange = this.value;
+            updateMainChart();
+        });
+    }
+}
+
+function getDateRangeLabels() {
+    const days = parseInt(currentDateRange);
+    const labels = [];
+    const today = new Date();
+    
+    for (let i = days - 1; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        labels.push(date.toLocaleDateString('vi-VN', { weekday: 'short', month: 'short', day: 'numeric' }));
+    }
+    
+    return labels;
+}
+
+function generateAttendanceData(length) {
+    const data = [];
+    for (let i = 0; i < length; i++) {
+        data.push(Math.floor(Math.random() * 30) + 10);
+    }
+    return data;
+}
+
+function updateChartLegend(chartData) {
+    const legendContainer = document.getElementById('chartLegend');
+    if (!legendContainer) return;
+    
+    legendContainer.innerHTML = '';
+    
+    if (chartData.datasets) {
+        chartData.datasets.forEach((dataset, index) => {
+            const legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+            
+            const color = dataset.borderColor || dataset.backgroundColor;
+            legendItem.innerHTML = `
+                <div class="legend-color" style="background-color: ${color}"></div>
+                <span>${dataset.label}</span>
+            `;
+            
+            legendContainer.appendChild(legendItem);
+        });
+    }
+}
+
+function createDepartmentChart() {
+    const ctx = document.getElementById('departmentChart');
+    if (!ctx) return;
+    
+    const data = {
+        labels: ['Kỹ thuật', 'Kinh doanh', 'Nhân sự', 'Kế toán'],
+        datasets: [{
+            data: [35, 28, 22, 15],
+            backgroundColor: [
+                'rgba(102, 126, 234, 0.8)',
+                'rgba(240, 147, 251, 0.8)',
+                'rgba(79, 172, 254, 0.8)',
+                'rgba(67, 233, 123, 0.8)'
+            ],
+            borderColor: [
+                'rgb(102, 126, 234)',
+                'rgb(240, 147, 251)',
+                'rgb(79, 172, 254)',
+                'rgb(67, 233, 123)'
+            ],
+            borderWidth: 2
+        }]
+    };
+    
+    const config = {
+        type: 'doughnut',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgb(102, 126, 234)',
+                    borderWidth: 1,
+                    cornerRadius: 8
+                }
+            }
+        }
+    };
+    
+    departmentChart = new Chart(ctx, config);
+}
+
+function createTimeChart() {
+    const ctx = document.getElementById('timeChart');
+    if (!ctx) return;
+    
+    const data = {
+        labels: ['Sáng', 'Chiều', 'Tối'],
+        datasets: [{
+            data: [45, 35, 20],
+            backgroundColor: [
+                'rgba(67, 233, 123, 0.8)',
+                'rgba(79, 172, 254, 0.8)',
+                'rgba(240, 147, 251, 0.8)'
+            ],
+            borderColor: [
+                'rgb(67, 233, 123)',
+                'rgb(79, 172, 254)',
+                'rgb(240, 147, 251)'
+            ],
+            borderWidth: 2
+        }]
+    };
+    
+    const config = {
+        type: 'pie',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgb(67, 233, 123)',
+                    borderWidth: 1,
+                    cornerRadius: 8
+                }
+            }
+        }
+    };
+    
+    timeChart = new Chart(ctx, config);
+}
+
+function setupExportFunctionality() {
+    // PDF Export
+    const exportPDFBtn = document.getElementById('exportPDF');
+    if (exportPDFBtn) {
+        exportPDFBtn.addEventListener('click', function() {
+            exportToPDF();
+        });
+    }
+    
+    // Excel Export
+    const exportExcelBtn = document.getElementById('exportExcel');
+    if (exportExcelBtn) {
+        exportExcelBtn.addEventListener('click', function() {
+            exportToExcel();
+        });
+    }
+    
+    // Image Export
+    const exportImageBtn = document.getElementById('exportImage');
+    if (exportImageBtn) {
+        exportImageBtn.addEventListener('click', function() {
+            exportToImage();
+        });
+    }
+}
+
+function exportToPDF() {
+    // Show loading state
+    showExportLoading('PDF');
+    
+    // Simulate PDF generation (in real implementation, this would call an API)
+    setTimeout(() => {
+        // Create a simple PDF content
+        const content = generatePDFContent();
+        
+        // Create and download PDF
+        const element = document.createElement('a');
+        const file = new Blob([content], { type: 'application/pdf' });
+        element.href = URL.createObjectURL(file);
+        element.download = `dashboard-report-${new Date().toISOString().split('T')[0]}.pdf`;
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+        
+        hideExportLoading();
+        showExportSuccess('PDF');
+    }, 2000);
+}
+
+function exportToExcel() {
+    // Show loading state
+    showExportLoading('Excel');
+    
+    // Simulate Excel generation
+    setTimeout(() => {
+        // Create CSV content (simplified Excel export)
+        const csvContent = generateCSVContent();
+        
+        // Create and download CSV
+        const element = document.createElement('a');
+        const file = new Blob([csvContent], { type: 'text/csv' });
+        element.href = URL.createObjectURL(file);
+        element.download = `dashboard-report-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+        
+        hideExportLoading();
+        showExportSuccess('Excel');
+    }, 1500);
+}
+
+function exportToImage() {
+    // Show loading state
+    showExportLoading('Image');
+    
+    // Export charts as images
+    setTimeout(() => {
+        const charts = [mainChart, departmentChart, timeChart];
+        const images = [];
+        
+        charts.forEach((chart, index) => {
+            if (chart) {
+                const canvas = chart.canvas;
+                const imageData = canvas.toDataURL('image/png');
+                images.push(imageData);
+            }
+        });
+        
+        // Create a combined image (simplified)
+        if (images.length > 0) {
+            const element = document.createElement('a');
+            element.href = images[0]; // Use first chart as main image
+            element.download = `dashboard-chart-${new Date().toISOString().split('T')[0]}.png`;
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+        
+        hideExportLoading();
+        showExportSuccess('Image');
+    }, 1000);
+}
+
+function generatePDFContent() {
+    // This is a simplified PDF content generation
+    // In real implementation, you would use a library like jsPDF
+    return `%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+>>
+endobj
+
+4 0 obj
+<<
+/Length 44
+>>
+stream
+BT
+/F1 12 Tf
+100 700 Td
+(Dashboard Report) Tj
+ET
+endstream
+endobj
+
+xref
+0 5
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000204 00000 n 
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+startxref
+297
+%%EOF`;
+}
+
+function generateCSVContent() {
+    const headers = ['Date', 'Check-ins', 'Department', 'Time'];
+    const data = [
+        ['2024-01-01', '25', 'Kỹ thuật', '08:00'],
+        ['2024-01-02', '30', 'Kinh doanh', '08:15'],
+        ['2024-01-03', '22', 'Nhân sự', '08:30'],
+        ['2024-01-04', '28', 'Kế toán', '08:45'],
+        ['2024-01-05', '35', 'Marketing', '09:00']
+    ];
+    
+    const csvContent = [headers, ...data]
+        .map(row => row.map(cell => `"${cell}"`).join(','))
+        .join('\n');
+    
+    return csvContent;
+}
+
+function showExportLoading(format) {
+    const btn = document.getElementById(`export${format}`);
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i><span>Đang xuất ${format}...</span>`;
+    }
+}
+
+function hideExportLoading() {
+    const exportBtns = document.querySelectorAll('.export-btn');
+    exportBtns.forEach(btn => {
+        btn.disabled = false;
+        const icon = btn.querySelector('i');
+        const span = btn.querySelector('span');
+        
+        if (icon && span) {
+            if (btn.id === 'exportPDF') {
+                icon.className = 'fas fa-file-pdf';
+                span.textContent = 'Xuất PDF';
+            } else if (btn.id === 'exportExcel') {
+                icon.className = 'fas fa-file-excel';
+                span.textContent = 'Xuất Excel';
+            } else if (btn.id === 'exportImage') {
+                icon.className = 'fas fa-image';
+                span.textContent = 'Xuất ảnh';
+            }
+        }
+    });
+}
+
+function showExportSuccess(format) {
+    // Show success notification
+    const notification = document.createElement('div');
+    notification.className = 'export-success';
+    notification.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>Xuất ${format} thành công!</span>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #48bb78;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        animation: slideInRight 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
 }
 
 function setupSwipeGestures() {
