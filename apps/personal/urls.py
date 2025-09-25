@@ -6,8 +6,13 @@ from .views import (
     personal_avatar_upload_view,
     personal_checkin_history_view,
 )
+from django.shortcuts import render
 
 app_name = "personal"
+
+def avatar_test_view(request):
+    """Test avatar upload functionality"""
+    return render(request, 'personal/avatar_test.html')
 
 urlpatterns = [
     # Personal profile management
@@ -15,5 +20,6 @@ urlpatterns = [
     path("edit/", personal_profile_edit_view, name="edit"),
     path("change-password/", personal_password_change_view, name="change_password"),
     path("avatar-upload/", personal_avatar_upload_view, name="avatar_upload"),
+    path("avatar-test/", avatar_test_view, name="avatar_test"),
     path("checkin-history/", personal_checkin_history_view, name="checkin_history"),
 ]
