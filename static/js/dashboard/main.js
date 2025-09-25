@@ -655,15 +655,20 @@ function setupInteractiveElements() {
 function initializeCharts() {
     console.log('Initializing charts...');
     
-    // Initialize main chart
-    createMainChart();
-    
-    // Initialize additional charts
-    console.log('Creating department chart...');
-    createDepartmentChart();
-    
-    console.log('Creating time chart...');
-    createTimeChart();
+    // Wait a bit for Chart.js to be fully loaded
+    setTimeout(() => {
+        // Initialize main chart
+        createMainChart();
+        
+        // Initialize additional charts
+        console.log('Creating department chart...');
+        createDepartmentChart();
+        
+        console.log('Creating time chart...');
+        createTimeChart();
+        
+        console.log('Charts initialization completed');
+    }, 100);
     
     // Add color coding to stat cards
     addColorCodingToStats();
@@ -676,8 +681,6 @@ function initializeCharts() {
     
     // Setup customization system
     setupCustomizationSystem();
-    
-    console.log('Charts initialization completed');
     
     // Setup module integration
     setupModuleIntegration();
