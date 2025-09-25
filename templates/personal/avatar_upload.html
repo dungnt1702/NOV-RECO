@@ -145,6 +145,47 @@
     border: 1px solid #bee5eb;
     color: #0c5460;
 }
+
+/* Pulse animation for upload button */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+/* Upload area when file is selected */
+.upload-area.has-file {
+    border-color: #28a745;
+    background-color: #d4edda;
+}
+
+.upload-area.has-file .upload-icon {
+    color: #28a745;
+}
+
+.upload-area.has-file .upload-text {
+    color: #155724;
+}
+
+/* Success button styling */
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
 </style>
 {% endblock %}
 
@@ -201,6 +242,9 @@
                         <button type="submit" id="upload-btn" class="btn btn-upload" disabled>
                             <i class="fas fa-upload"></i> Tải lên
                         </button>
+                        <button type="button" id="reset-btn" class="btn btn-outline-warning" style="display: none;">
+                            <i class="fas fa-redo"></i> Chọn lại
+                        </button>
                         <a href="{% url 'personal:profile' %}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </a>
@@ -219,6 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('avatar-input');
     const uploadForm = document.getElementById('avatar-upload-form');
     const uploadBtn = document.getElementById('upload-btn');
+    const resetBtn = document.getElementById('reset-btn');
     const uploadProgress = document.getElementById('upload-progress');
     const progressBar = uploadProgress.querySelector('.progress-bar');
     const avatarPreview = document.getElementById('avatar-preview');
@@ -286,33 +331,58 @@ document.addEventListener('DOMContentLoaded', function() {
         const reader = new FileReader();
         reader.onload = function(e) {
             console.log('FileReader onload triggered');
-            if (avatarPreview) {
-                console.log('Updating existing avatar preview');
-                avatarPreview.src = e.target.result;
-            } else {
-                console.log('Creating new avatar preview');
-                // Create new preview if doesn't exist
-                const preview = document.createElement('img');
-                preview.id = 'avatar-preview';
-                preview.src = e.target.result;
-                preview.alt = 'Avatar preview';
-                preview.style.cssText = 'width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 4px solid #e9ecef; box-shadow: 0 4px 8px rgba(0,0,0,0.1);';
+            
+            // Update or create preview
+            let previewElement = document.getElementById('avatar-preview');
+            if (!previewElement) {
+                // Create new preview element
+                previewElement = document.createElement('img');
+                previewElement.id = 'avatar-preview';
+                previewElement.alt = 'Avatar preview';
+                previewElement.style.cssText = 'width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 4px solid #e9ecef; box-shadow: 0 4px 8px rgba(0,0,0,0.1);';
                 
-                const placeholder = uploadArea.parentElement.querySelector('.avatar-placeholder');
+                // Replace placeholder with preview
+                const placeholder = document.querySelector('.avatar-placeholder');
                 if (placeholder) {
-                    placeholder.replaceWith(preview);
+                    placeholder.replaceWith(previewElement);
+                } else {
+                    // Insert into avatar preview container
+                    const previewContainer = document.querySelector('.avatar-preview');
+                    if (previewContainer) {
+                        previewContainer.appendChild(previewElement);
+                    }
                 }
             }
+            
+            // Set preview image
+            previewElement.src = e.target.result;
+            console.log('Avatar preview updated');
+            
+            // Update upload area visual state
+            uploadArea.classList.add('has-file');
+            uploadArea.querySelector('.upload-text').innerHTML = '<strong>✅ Ảnh đã được chọn!</strong><br><span class="text-success">Bấm "Tải lên ngay" để cập nhật avatar</span>';
+            
+            // Show success message
+            showAlert('✅ Ảnh đã được chọn! Bấm "Tải lên ngay" để cập nhật avatar.', 'success');
         };
         reader.onerror = function(e) {
             console.error('FileReader error:', e);
+            showAlert('❌ Lỗi khi đọc file ảnh!', 'danger');
         };
         console.log('Reading file as data URL...');
         reader.readAsDataURL(file);
 
-        // Enable upload button
+        // Enable upload button with visual feedback
         console.log('Enabling upload button');
         uploadBtn.disabled = false;
+        uploadBtn.classList.add('btn-success');
+        uploadBtn.classList.remove('btn-primary');
+        uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Tải lên ngay';
+        uploadBtn.style.animation = 'pulse 2s infinite';
+        
+        // Show reset button
+        resetBtn.style.display = 'inline-block';
+        
         console.log('Upload button enabled:', !uploadBtn.disabled);
     }
 
@@ -372,6 +442,49 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadBtn.disabled = false;
             uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Tải lên';
         });
+    });
+
+    // Reset button functionality
+    resetBtn.addEventListener('click', function() {
+        console.log('Reset button clicked');
+        
+        // Reset file input
+        fileInput.value = '';
+        
+        // Reset upload area
+        uploadArea.classList.remove('has-file');
+        uploadArea.querySelector('.upload-text').innerHTML = '<strong>Kéo thả ảnh vào đây</strong><br>hoặc <span class="text-primary">bấm để chọn file</span>';
+        
+        // Reset upload button
+        uploadBtn.disabled = true;
+        uploadBtn.classList.remove('btn-success');
+        uploadBtn.classList.add('btn-primary');
+        uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Tải lên';
+        uploadBtn.style.animation = '';
+        
+        // Hide reset button
+        resetBtn.style.display = 'none';
+        
+        // Remove preview if exists
+        const previewElement = document.getElementById('avatar-preview');
+        if (previewElement) {
+            previewElement.remove();
+        }
+        
+        // Show original placeholder
+        const previewContainer = document.querySelector('.avatar-preview');
+        if (previewContainer && !previewContainer.querySelector('.avatar-placeholder')) {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'avatar-placeholder';
+            placeholder.innerHTML = '<i class="fas fa-user"></i>';
+            previewContainer.appendChild(placeholder);
+        }
+        
+        // Clear any alerts
+        const existingAlerts = document.querySelectorAll('.alert');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        console.log('Reset completed');
     });
 
     // Show alert
