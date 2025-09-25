@@ -1172,140 +1172,452 @@ function setupExportFunctionality() {
     }
 }
 
-function exportToPDF() {
+async function exportToPDF() {
     // Show loading state
     showExportLoading('PDF');
     
-    // Simulate PDF generation (in real implementation, this would call an API)
-    setTimeout(() => {
-        // Create a simple PDF content
-        const content = generatePDFContent();
+    try {
+        // Create new PDF document
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
         
-        // Create and download PDF
-        const element = document.createElement('a');
-        const file = new Blob([content], { type: 'application/pdf' });
-        element.href = URL.createObjectURL(file);
-        element.download = `dashboard-report-${new Date().toISOString().split('T')[0]}.pdf`;
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
+        // Add company header
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.text('NOV-RECO Dashboard Report', 20, 20);
+        
+        // Add report info
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Generated on: ${new Date().toLocaleDateString('vi-VN')}`, 20, 30);
+        doc.text(`User: ${document.querySelector('.page-title h1')?.textContent || 'Dashboard User'}`, 20, 35);
+        
+        // Add stats summary
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Dashboard Summary', 20, 50);
+        
+        // Get stats data
+        const stats = getDashboardStats();
+        let yPos = 60;
+        
+        stats.forEach((stat, index) => {
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`${stat.label}: ${stat.value}`, 20, yPos);
+            yPos += 6;
+        });
+        
+        // Add charts
+        yPos += 10;
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Charts & Analytics', 20, yPos);
+        
+        // Capture and add charts
+        const charts = [mainChart, departmentChart, timeChart];
+        for (let i = 0; i < charts.length; i++) {
+            if (charts[i] && charts[i].canvas) {
+                yPos += 10;
+                if (yPos > 250) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                
+                const chartDataURL = charts[i].canvas.toDataURL('image/png');
+                doc.addImage(chartDataURL, 'PNG', 20, yPos, 160, 80);
+                yPos += 90;
+            }
+        }
+        
+        // Add detailed data table
+        yPos += 10;
+        if (yPos > 200) {
+            doc.addPage();
+            yPos = 20;
+        }
+        
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Detailed Data', 20, yPos);
+        
+        // Add check-in data table
+        const checkinData = getCheckinData();
+        yPos += 10;
+        
+        // Table headers
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Date', 20, yPos);
+        doc.text('Check-ins', 60, yPos);
+        doc.text('Department', 100, yPos);
+        doc.text('Time', 150, yPos);
+        yPos += 5;
+        
+        // Table data
+        doc.setFont('helvetica', 'normal');
+        checkinData.slice(0, 20).forEach(row => {
+            if (yPos > 280) {
+                doc.addPage();
+                yPos = 20;
+            }
+            doc.text(row.date, 20, yPos);
+            doc.text(row.checkins.toString(), 60, yPos);
+            doc.text(row.department, 100, yPos);
+            doc.text(row.time, 150, yPos);
+            yPos += 5;
+        });
+        
+        // Save PDF
+        doc.save(`dashboard-report-${new Date().toISOString().split('T')[0]}.pdf`);
         
         hideExportLoading();
         showExportSuccess('PDF');
-    }, 2000);
+    } catch (error) {
+        console.error('PDF export error:', error);
+        hideExportLoading();
+        showExportError('PDF');
+    }
 }
 
-function exportToExcel() {
+async function exportToExcel() {
     // Show loading state
     showExportLoading('Excel');
     
-    // Simulate Excel generation
-    setTimeout(() => {
-        // Create CSV content (simplified Excel export)
-        const csvContent = generateCSVContent();
+    try {
+        // Create new workbook
+        const wb = XLSX.utils.book_new();
         
-        // Create and download CSV
-        const element = document.createElement('a');
-        const file = new Blob([csvContent], { type: 'text/csv' });
-        element.href = URL.createObjectURL(file);
-        element.download = `dashboard-report-${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(element);
-        element.click();
-        document.body.removeChild(element);
+        // Sheet 1: Dashboard Summary
+        const summaryData = [
+            ['NOV-RECO Dashboard Report'],
+            [`Generated on: ${new Date().toLocaleDateString('vi-VN')}`],
+            [`User: ${document.querySelector('.page-title h1')?.textContent || 'Dashboard User'}`],
+            [''],
+            ['Dashboard Summary'],
+            ['Metric', 'Value', 'Description'],
+            ...getDashboardStats().map(stat => [stat.label, stat.value, stat.description || ''])
+        ];
+        
+        const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
+        ws1['!cols'] = [{ width: 20 }, { width: 15 }, { width: 30 }];
+        XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
+        
+        // Sheet 2: Check-in Data
+        const checkinData = getCheckinData();
+        const checkinHeaders = ['Date', 'Check-ins', 'Department', 'Time', 'Area', 'User Count'];
+        const checkinSheetData = [checkinHeaders, ...checkinData];
+        
+        const ws2 = XLSX.utils.aoa_to_sheet(checkinSheetData);
+        ws2['!cols'] = [
+            { width: 12 }, { width: 12 }, { width: 15 }, 
+            { width: 10 }, { width: 15 }, { width: 12 }
+        ];
+        XLSX.utils.book_append_sheet(wb, ws2, 'Check-in Data');
+        
+        // Sheet 3: Department Statistics
+        const deptData = getDepartmentData();
+        const deptHeaders = ['Department', 'Employee Count', 'Office', 'Manager', 'Check-ins Today', 'Check-ins This Week'];
+        const deptSheetData = [deptHeaders, ...deptData];
+        
+        const ws3 = XLSX.utils.aoa_to_sheet(deptSheetData);
+        ws3['!cols'] = [
+            { width: 20 }, { width: 15 }, { width: 15 }, 
+            { width: 20 }, { width: 15 }, { width: 15 }
+        ];
+        XLSX.utils.book_append_sheet(wb, ws3, 'Department Stats');
+        
+        // Sheet 4: Time Analytics
+        const timeData = getTimeAnalytics();
+        const timeHeaders = ['Time Period', 'Check-ins', 'Percentage', 'Trend'];
+        const timeSheetData = [timeHeaders, ...timeData];
+        
+        const ws4 = XLSX.utils.aoa_to_sheet(timeSheetData);
+        ws4['!cols'] = [
+            { width: 20 }, { width: 15 }, { width: 15 }, { width: 10 }
+        ];
+        XLSX.utils.book_append_sheet(wb, ws4, 'Time Analytics');
+        
+        // Sheet 5: Recent Activity
+        const activityData = getActivityData();
+        const activityHeaders = ['Time', 'User', 'Action', 'Location', 'Type'];
+        const activitySheetData = [activityHeaders, ...activityData];
+        
+        const ws5 = XLSX.utils.aoa_to_sheet(activitySheetData);
+        ws5['!cols'] = [
+            { width: 20 }, { width: 20 }, { width: 15 }, { width: 20 }, { width: 10 }
+        ];
+        XLSX.utils.book_append_sheet(wb, ws5, 'Recent Activity');
+        
+        // Add charts as images (if possible)
+        try {
+            const chartImages = await captureChartsAsImages();
+            if (chartImages.length > 0) {
+                // Create a sheet for chart images
+                const chartSheetData = [
+                    ['Dashboard Charts'],
+                    ['Chart Type', 'Description', 'Image Reference'],
+                    ['Attendance Trend', 'Daily check-in trends over time', 'Chart1'],
+                    ['Department Distribution', 'Employee distribution by department', 'Chart2'],
+                    ['Time Analysis', 'Check-in patterns by time of day', 'Chart3']
+                ];
+                
+                const ws6 = XLSX.utils.aoa_to_sheet(chartSheetData);
+                ws6['!cols'] = [{ width: 25 }, { width: 40 }, { width: 20 }];
+                XLSX.utils.book_append_sheet(wb, ws6, 'Charts');
+            }
+        } catch (error) {
+            console.log('Chart capture not available:', error);
+        }
+        
+        // Save Excel file
+        XLSX.writeFile(wb, `dashboard-report-${new Date().toISOString().split('T')[0]}.xlsx`);
         
         hideExportLoading();
         showExportSuccess('Excel');
-    }, 1500);
+    } catch (error) {
+        console.error('Excel export error:', error);
+        hideExportLoading();
+        showExportError('Excel');
+    }
 }
 
-function exportToImage() {
+async function exportToImage() {
     // Show loading state
     showExportLoading('Image');
     
-    // Export charts as images
-    setTimeout(() => {
+    try {
+        // Capture all charts as high-resolution images
         const charts = [mainChart, departmentChart, timeChart];
+        const chartNames = ['Attendance Trend', 'Department Distribution', 'Time Analysis'];
         const images = [];
         
-        charts.forEach((chart, index) => {
-            if (chart) {
-                const canvas = chart.canvas;
-                const imageData = canvas.toDataURL('image/png');
-                images.push(imageData);
+        for (let i = 0; i < charts.length; i++) {
+            if (charts[i] && charts[i].canvas) {
+                // Set high DPI for better quality
+                const canvas = charts[i].canvas;
+                const originalWidth = canvas.width;
+                const originalHeight = canvas.height;
+                
+                // Create high-resolution canvas
+                const highResCanvas = document.createElement('canvas');
+                const ctx = highResCanvas.getContext('2d');
+                const scale = 2; // 2x resolution
+                
+                highResCanvas.width = originalWidth * scale;
+                highResCanvas.height = originalHeight * scale;
+                
+                // Scale the context
+                ctx.scale(scale, scale);
+                
+                // Draw the chart with high resolution
+                ctx.drawImage(canvas, 0, 0);
+                
+                // Convert to image
+                const imageData = highResCanvas.toDataURL('image/png', 1.0);
+                images.push({
+                    data: imageData,
+                    name: chartNames[i],
+                    filename: `dashboard-${chartNames[i].toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.png`
+                });
             }
-        });
+        }
         
-        // Create a combined image (simplified)
-        if (images.length > 0) {
+        // Download each chart as separate image
+        images.forEach((image, index) => {
             const element = document.createElement('a');
-            element.href = images[0]; // Use first chart as main image
-            element.download = `dashboard-chart-${new Date().toISOString().split('T')[0]}.png`;
+            element.href = image.data;
+            element.download = image.filename;
             document.body.appendChild(element);
             element.click();
             document.body.removeChild(element);
+        });
+        
+        // Also create a combined dashboard screenshot
+        try {
+            const dashboardElement = document.querySelector('.dashboard-main');
+            if (dashboardElement) {
+                const canvas = await html2canvas(dashboardElement, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    width: dashboardElement.scrollWidth,
+                    height: dashboardElement.scrollHeight
+                });
+                
+                const combinedImage = canvas.toDataURL('image/png', 1.0);
+                const element = document.createElement('a');
+                element.href = combinedImage;
+                element.download = `dashboard-complete-${new Date().toISOString().split('T')[0]}.png`;
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            }
+        } catch (error) {
+            console.log('Combined screenshot not available:', error);
         }
         
         hideExportLoading();
         showExportSuccess('Image');
-    }, 1000);
+    } catch (error) {
+        console.error('Image export error:', error);
+        hideExportLoading();
+        showExportError('Image');
+    }
 }
 
-function generatePDFContent() {
-    // This is a simplified PDF content generation
-    // In real implementation, you would use a library like jsPDF
-    return `%PDF-1.4
-1 0 obj
-<<
-/Type /Catalog
-/Pages 2 0 R
->>
-endobj
+// Helper functions for data extraction
+function getDashboardStats() {
+    const stats = [];
+    
+    // Get stats from DOM elements
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(card => {
+        const value = card.querySelector('.stat-content h3')?.textContent || '0';
+        const label = card.querySelector('.stat-content p')?.textContent || 'Unknown';
+        stats.push({
+            label: label,
+            value: value,
+            description: `Current ${label.toLowerCase()} value`
+        });
+    });
+    
+    return stats;
+}
 
-2 0 obj
-<<
-/Type /Pages
-/Kids [3 0 R]
-/Count 1
->>
-endobj
+function getCheckinData() {
+    // Get data from test data or generate sample data
+    if (window.DashboardTestData && window.DashboardTestData.exportAllData) {
+        const data = window.DashboardTestData.exportAllData();
+        return data.checkins.map(checkin => [
+            new Date(checkin.created_at).toLocaleDateString('vi-VN'),
+            Math.floor(Math.random() * 50) + 10, // Simulated check-in count
+            checkin.area_name || 'Unknown Area',
+            new Date(checkin.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+            checkin.area_name || 'Unknown Area',
+            Math.floor(Math.random() * 20) + 5 // Simulated user count
+        ]);
+    }
+    
+    // Fallback sample data
+    const sampleData = [];
+    for (let i = 0; i < 30; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        sampleData.push([
+            date.toLocaleDateString('vi-VN'),
+            Math.floor(Math.random() * 50) + 10,
+            ['Kỹ thuật', 'Kinh doanh', 'Nhân sự', 'Kế toán'][Math.floor(Math.random() * 4)],
+            `${String(Math.floor(Math.random() * 3) + 8).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+            ['Main Office', 'Branch A', 'Warehouse'][Math.floor(Math.random() * 3)],
+            Math.floor(Math.random() * 20) + 5
+        ]);
+    }
+    return sampleData;
+}
 
-3 0 obj
-<<
-/Type /Page
-/Parent 2 0 R
-/MediaBox [0 0 612 792]
-/Contents 4 0 R
->>
-endobj
+function getDepartmentData() {
+    if (window.DashboardTestData && window.DashboardTestData.exportAllData) {
+        const data = window.DashboardTestData.exportAllData();
+        return data.departments.map(dept => [
+            dept.name,
+            dept.employee_count,
+            dept.office,
+            dept.manager,
+            Math.floor(Math.random() * 20) + 5, // Today's check-ins
+            Math.floor(Math.random() * 100) + 20 // This week's check-ins
+        ]);
+    }
+    
+    // Fallback sample data
+    return [
+        ['Kỹ thuật', 25, 'Main Office', 'Nguyễn Văn A', 18, 85],
+        ['Kinh doanh', 20, 'Main Office', 'Trần Thị B', 15, 70],
+        ['Nhân sự', 12, 'Branch A', 'Lê Văn C', 10, 45],
+        ['Kế toán', 15, 'Main Office', 'Phạm Thị D', 12, 55],
+        ['Marketing', 18, 'Branch A', 'Hoàng Văn E', 14, 65]
+    ];
+}
 
-4 0 obj
-<<
-/Length 44
->>
-stream
-BT
-/F1 12 Tf
-100 700 Td
-(Dashboard Report) Tj
-ET
-endstream
-endobj
+function getTimeAnalytics() {
+    const timePeriods = [
+        'Sáng sớm (6-9h)',
+        'Buổi sáng (9-12h)', 
+        'Buổi chiều (12-17h)',
+        'Buổi tối (17-22h)',
+        'Đêm (22-6h)'
+    ];
+    
+    const totalCheckins = 1000; // Simulated total
+    
+    return timePeriods.map(period => {
+        const checkins = Math.floor(Math.random() * 200) + 50;
+        const percentage = ((checkins / totalCheckins) * 100).toFixed(1);
+        const trend = Math.random() > 0.5 ? '↗' : '↘';
+        
+        return [period, checkins, `${percentage}%`, trend];
+    });
+}
 
-xref
-0 5
-0000000000 65535 f 
-0000000009 00000 n 
-0000000058 00000 n 
-0000000115 00000 n 
-0000000204 00000 n 
-trailer
-<<
-/Size 5
-/Root 1 0 R
->>
-startxref
-297
-%%EOF`;
+function getActivityData() {
+    if (window.DashboardTestData && window.DashboardTestData.exportAllData) {
+        const data = window.DashboardTestData.exportAllData();
+        return data.checkins.slice(0, 50).map(checkin => [
+            new Date(checkin.created_at).toLocaleString('vi-VN'),
+            checkin.user_name,
+            checkin.checkin_type === 'check-in' ? 'Check-in' : 'Check-out',
+            checkin.area_name,
+            checkin.checkin_type
+        ]);
+    }
+    
+    // Fallback sample data
+    const activities = [];
+    for (let i = 0; i < 30; i++) {
+        const time = new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000);
+        activities.push([
+            time.toLocaleString('vi-VN'),
+            `User ${Math.floor(Math.random() * 20) + 1}`,
+            Math.random() > 0.5 ? 'Check-in' : 'Check-out',
+            ['Main Office', 'Branch A', 'Warehouse'][Math.floor(Math.random() * 3)],
+            Math.random() > 0.5 ? 'check-in' : 'check-out'
+        ]);
+    }
+    return activities;
+}
+
+async function captureChartsAsImages() {
+    const charts = [mainChart, departmentChart, timeChart];
+    const images = [];
+    
+    for (let i = 0; i < charts.length; i++) {
+        if (charts[i] && charts[i].canvas) {
+            const canvas = charts[i].canvas;
+            const imageData = canvas.toDataURL('image/png', 1.0);
+            images.push({
+                name: `Chart${i + 1}`,
+                data: imageData
+            });
+        }
+    }
+    
+    return images;
+}
+
+function showExportError(type) {
+    const notification = document.createElement('div');
+    notification.className = 'export-notification error';
+    notification.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Lỗi khi xuất ${type}. Vui lòng thử lại.</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
 }
 
 function generateCSVContent() {
@@ -1329,6 +1641,7 @@ function showExportLoading(format) {
     const btn = document.getElementById(`export${format}`);
     if (btn) {
         btn.disabled = true;
+        btn.classList.add('loading');
         btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i><span>Đang xuất ${format}...</span>`;
     }
 }
@@ -1337,6 +1650,7 @@ function hideExportLoading() {
     const exportBtns = document.querySelectorAll('.export-btn');
     exportBtns.forEach(btn => {
         btn.disabled = false;
+        btn.classList.remove('loading');
         const icon = btn.querySelector('i');
         const span = btn.querySelector('span');
         
@@ -1356,41 +1670,18 @@ function hideExportLoading() {
 }
 
 function showExportSuccess(format) {
-    // Show success notification
     const notification = document.createElement('div');
-    notification.className = 'export-success';
+    notification.className = 'export-notification';
     notification.innerHTML = `
         <i class="fas fa-check-circle"></i>
-        <span>Xuất ${format} thành công!</span>
-    `;
-    
-    // Add styles
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #48bb78;
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 600;
-        animation: slideInRight 0.3s ease;
+        <span>Xuất ${format} thành công! File đã được tải xuống.</span>
     `;
     
     document.body.appendChild(notification);
     
-    // Remove after 3 seconds
     setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease';
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
+        notification.remove();
+    }, 5000);
 }
 
 function setupCustomizationSystem() {
