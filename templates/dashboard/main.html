@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_permissions %}
+
+{% block title %}Dashboard Tổng quan - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/main.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-main">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-title">
+            <i class="fas fa-chart-pie"></i>
+            <h1>Dashboard Tổng quan</h1>
+        </div>
+        <div class="page-subtitle">
+            {% if user_role == 'admin' %}
+                <p>Quản trị viên - Tổng quan hệ thống</p>
+            {% elif user_role == 'manager' %}
+                <p>Quản lý - Tổng quan phòng ban</p>
+            {% elif user_role == 'hcns' %}
+                <p>Nhân sự - Tổng quan nhân viên</p>
+            {% else %}
+                <p>Nhân viên - Tổng quan cá nhân</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-day"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ today_checkins }}</h3>
+                <p>Check-in hôm nay</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-week"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ week_checkins }}</h3>
+                <p>Check-in tuần này</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ month_checkins }}</h3>
+                <p>Check-in tháng này</p>
+            </div>
+        </div>
+
+        {% if user_role in 'admin,manager,hcns' %}
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_employees }}</h3>
+                <p>Tổng nhân viên</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ user_today_checkins }}</h3>
+                <p>Check-in của tôi hôm nay</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="dashboard-grid">
+        <!-- Left Column -->
+        <div class="dashboard-left">
+            <!-- Recent Activity -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-clock"></i> Hoạt động gần đây</h3>
+                </div>
+                <div class="card-content">
+                    {% if user_role in 'admin,manager,hcns' %}
+                        {% if recent_checkins %}
+                            <div class="activity-list">
+                                {% for checkin in recent_checkins %}
+                                <div class="activity-item">
+                                    <div class="activity-avatar">
+                                        {% if checkin.user.avatar %}
+                                            <img src="{{ checkin.user.avatar.url }}" alt="{{ checkin.user.get_full_name }}">
+                                        {% else %}
+                                            {{ checkin.user.first_name|first|upper }}{{ checkin.user.last_name|first|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="activity-content">
+                                        <p><strong>{{ checkin.user.get_full_name }}</strong> đã check-in tại <strong>{{ checkin.area.name }}</strong></p>
+                                        <span class="activity-time">{{ checkin.created_at|timesince }} trước</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>Chưa có hoạt động nào</p>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        {% if user_recent_checkins %}
+                            <div class="activity-list">
+                                {% for checkin in user_recent_checkins %}
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <p>Check-in tại <strong>{{ checkin.area.name }}</strong></p>
+                                        <span class="activity-time">{{ checkin.created_at|timesince }} trước</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>Chưa có hoạt động nào</p>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="dashboard-right">
+            {% if user_role in 'admin,manager,hcns' %}
+            <!-- Department Stats -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-sitemap"></i> Thống kê phòng ban</h3>
+                </div>
+                <div class="card-content">
+                    {% if department_stats %}
+                        <div class="department-list">
+                            {% for dept in department_stats %}
+                            <div class="department-item">
+                                <div class="department-info">
+                                    <h4>{{ dept.name }}</h4>
+                                    <p>{{ dept.office.name }}</p>
+                                </div>
+                                <div class="department-count">
+                                    <span class="count">{{ dept.employee_count }}</span>
+                                    <span class="label">nhân viên</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-sitemap"></i>
+                            <p>Chưa có phòng ban nào</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <!-- Personal Stats -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Thống kê cá nhân</h3>
+                </div>
+                <div class="card-content">
+                    <div class="personal-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">{{ user_week_checkins }}</div>
+                            <div class="stat-label">Tuần này</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ user_month_checkins }}</div>
+                            <div class="stat-label">Tháng này</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Actions -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-bolt"></i> Thao tác nhanh</h3>
+                </div>
+                <div class="card-content">
+                    <div class="quick-actions">
+                        <a href="{% url 'checkin:action' %}" class="action-btn">
+                            <i class="fas fa-plus"></i>
+                            <span>Check-in</span>
+                        </a>
+                        <a href="{% url 'checkin:history' %}" class="action-btn">
+                            <i class="fas fa-history"></i>
+                            <span>Lịch sử</span>
+                        </a>
+                        <a href="{% url 'absence:request' %}" class="action-btn">
+                            <i class="fas fa-calendar-times"></i>
+                            <span>Vắng mặt</span>
+                        </a>
+                        {% if user_role in 'admin,manager,hcns' %}
+                        <a href="{% url 'checkin:list' %}" class="action-btn">
+                            <i class="fas fa-list"></i>
+                            <span>Danh sách</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard/main.js' %}"></script>
+{% endblock %}

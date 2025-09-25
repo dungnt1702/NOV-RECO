@@ -12,18 +12,80 @@ from apps.users.permissions import group_required
 
 @login_required
 def dashboard_main_view(request):
-    """Router chính cho dashboard"""
+    """Dashboard tổng quan cho tất cả vai trò"""
     user = request.user
+    today = timezone.now().date()
+    week_start = today - timedelta(days=today.weekday())
+    month_start = today.replace(day=1)
     
-    # Redirect based on user role
-    if user.role == UserRole.ADMIN:
-        return redirect('dashboard:manager')
-    elif user.role == UserRole.MANAGER:
-        return redirect('dashboard:manager')
-    elif user.role == UserRole.HCNS:
-        return redirect('dashboard:hr')
+    # Thống kê cơ bản cho tất cả vai trò
+    context = {
+        'user': user,
+        'user_role': user.role,
+        'today': today,
+    }
+    
+    # Thống kê check-in hôm nay
+    today_checkins = Checkin.objects.filter(created_at__date=today).count()
+    context['today_checkins'] = today_checkins
+    
+    # Thống kê check-in tuần này
+    week_checkins = Checkin.objects.filter(created_at__date__gte=week_start).count()
+    context['week_checkins'] = week_checkins
+    
+    # Thống kê check-in tháng này
+    month_checkins = Checkin.objects.filter(created_at__date__gte=month_start).count()
+    context['month_checkins'] = month_checkins
+    
+    # Thống kê theo vai trò
+    if user.role in [UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS]:
+        # Thống kê tổng quan cho quản lý
+        total_employees = User.objects.filter(role=UserRole.EMPLOYEE, is_active=True).count()
+        total_areas = Area.objects.filter(is_active=True).count()
+        
+        # Thống kê theo phòng ban
+        from apps.users.models import Department
+        department_stats = Department.objects.annotate(
+            employee_count=Count('employees')
+        ).order_by('-employee_count')[:5]
+        
+        # Check-ins gần đây
+        recent_checkins = Checkin.objects.select_related('user', 'area').order_by('-created_at')[:10]
+        
+        context.update({
+            'total_employees': total_employees,
+            'total_areas': total_areas,
+            'department_stats': department_stats,
+            'recent_checkins': recent_checkins,
+        })
     else:
-        return redirect('dashboard:personal')
+        # Thống kê cá nhân cho nhân viên
+        user_today_checkins = Checkin.objects.filter(
+            user=user,
+            created_at__date=today
+        ).count()
+        
+        user_week_checkins = Checkin.objects.filter(
+            user=user,
+            created_at__date__gte=week_start
+        ).count()
+        
+        user_month_checkins = Checkin.objects.filter(
+            user=user,
+            created_at__date__gte=month_start
+        ).count()
+        
+        # Check-ins gần đây của user
+        user_recent_checkins = Checkin.objects.filter(user=user).select_related('area').order_by('-created_at')[:5]
+        
+        context.update({
+            'user_today_checkins': user_today_checkins,
+            'user_week_checkins': user_week_checkins,
+            'user_month_checkins': user_month_checkins,
+            'user_recent_checkins': user_recent_checkins,
+        })
+    
+    return render(request, 'dashboard/main.html', context)
 
 
 @login_required

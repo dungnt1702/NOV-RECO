@@ -11,7 +11,7 @@
             </button>
             {% endif %}
             
-            <a href="/" class="nav-logo">
+            <a href="{% if user.is_authenticated %}{% url 'dashboard:main' %}{% else %}/{% endif %}" class="nav-logo">
                 <img src="{% static 'logo.svg' %}" alt="NOV-RECO Logo">
                 <span>NOV-RECO</span>
             </a>
@@ -138,6 +138,46 @@
                     </li>
                 {% endif %}
                 
+                <!-- Dashboard -->
+                {% if user.is_authenticated %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">
+                            <i class="fas fa-chart-pie"></i>
+                            Dashboard
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="{% url 'dashboard:main' %}">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    Tổng quan
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'dashboard:personal' %}">
+                                    <i class="fas fa-user"></i>
+                                    Cá nhân
+                                </a>
+                            </li>
+                            {% if user|has_permission:'dashboard.can_view_manager' or user.role == 'admin' or user.role == 'manager' %}
+                            <li>
+                                <a href="{% url 'dashboard:manager' %}">
+                                    <i class="fas fa-users-cog"></i>
+                                    Quản lý
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% if user|has_permission:'dashboard.can_view_hr' or user.role == 'admin' or user.role == 'hcns' %}
+                            <li>
+                                <a href="{% url 'dashboard:hr' %}">
+                                    <i class="fas fa-user-tie"></i>
+                                    Nhân sự
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                {% endif %}
+                
                 <!-- Admin Panel -->
                 {% if user|in_group:'Super Admin' or user|in_group:'Admin' or user|in_group:'Manager' %}
                     <li>
@@ -207,11 +247,11 @@
 <!-- Mobile Bottom Navigation -->
 {% if user.is_authenticated %}
 <nav class="mobile-bottom-nav">
-    <a href="/" class="nav-item {% if request.resolver_match and request.resolver_match.url_name|default:'' == 'home' %}active{% endif %}">
+    <a href="{% url 'dashboard:main' %}" class="nav-item {% if request.resolver_match and request.resolver_match.namespace == 'dashboard' %}active{% endif %}">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
         </svg>
-        <span class="nav-label">Trang chủ</span>
+        <span class="nav-label">Dashboard</span>
     </a>
     
     <a href="{% url 'checkin:action' %}" class="nav-item {% if request.resolver_match and request.resolver_match.url_name|default:'' == 'action' %}active{% endif %}">
