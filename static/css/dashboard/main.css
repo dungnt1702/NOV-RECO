@@ -1592,12 +1592,20 @@
 /* Charts Grid */
 .charts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
     margin-top: 1rem;
     padding: 0;
     width: 100%;
     box-sizing: border-box;
+}
+
+/* Ensure PC layout is maintained for charts */
+@media (min-width: 769px) {
+    .charts-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 1.5rem !important;
+    }
 }
 
 .chart-item {
