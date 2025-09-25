@@ -5,6 +5,31 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/personal/profile.css' %}">
+<style>
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.3s ease;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -14,7 +39,7 @@
         <div class="profile-header">
             <div class="profile-avatar">
                 {% if user.avatar %}
-                    <img src="{{ user.avatar.url }}" alt="Avatar" class="avatar-image">
+                    <img src="{{ user.avatar.url }}" alt="Avatar" class="avatar-image" id="profile-avatar-img">
                 {% else %}
                     <div class="avatar-placeholder">
                         <i class="fas fa-user"></i>
@@ -170,4 +195,105 @@
 
 {% block extra_js %}
 <script src="{% static 'js/personal/profile.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if coming from avatar upload page
+    const isFromUpload = sessionStorage.getItem('avatar_uploaded') === 'true';
+    
+    // Force reload avatar with cache busting when page loads
+    const profileAvatar = document.getElementById('profile-avatar-img');
+    if (profileAvatar) {
+        const originalSrc = profileAvatar.src;
+        const timestamp = new Date().getTime();
+        const random = Math.random().toString(36).substring(7);
+        const newSrc = originalSrc.split('?')[0] + '?v=' + timestamp + '&r=' + random;
+        
+        // Force reload avatar
+        profileAvatar.style.display = 'none';
+        profileAvatar.src = '';
+        setTimeout(() => {
+            profileAvatar.src = newSrc;
+            profileAvatar.style.display = 'block';
+            console.log('Profile avatar force reloaded:', newSrc);
+        }, 100);
+        
+        // Fallback with fetch if needed
+        setTimeout(() => {
+            fetch(newSrc, {cache: 'no-cache'})
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    profileAvatar.src = url;
+                    console.log('Profile avatar force reloaded with blob URL');
+                })
+                .catch(error => {
+                    console.error('Profile avatar force reload failed:', error);
+                });
+        }, 500);
+        
+        // If coming from upload, show success message
+        if (isFromUpload) {
+            showSuccessMessage('✅ Avatar đã được cập nhật thành công!');
+            sessionStorage.removeItem('avatar_uploaded');
+        }
+    }
+    
+    // Update avatar in header if exists
+    const headerAvatar = document.querySelector('.user-avatar img');
+    if (headerAvatar) {
+        const originalSrc = headerAvatar.src;
+        const timestamp = new Date().getTime();
+        const random = Math.random().toString(36).substring(7);
+        const newSrc = originalSrc.split('?')[0] + '?v=' + timestamp + '&r=' + random;
+        
+        headerAvatar.style.display = 'none';
+        headerAvatar.src = '';
+        setTimeout(() => {
+            headerAvatar.src = newSrc;
+            headerAvatar.style.display = 'block';
+            console.log('Header avatar force reloaded:', newSrc);
+        }, 200);
+    }
+    
+    // Clear browser cache for avatar images
+    if ('caches' in window) {
+        caches.keys().then(cacheNames => {
+            cacheNames.forEach(cacheName => {
+                caches.open(cacheName).then(cache => {
+                    // Clear any avatar-related cache entries
+                    cache.keys().then(requests => {
+                        requests.forEach(request => {
+                            if (request.url.includes('avatar') || request.url.includes('media')) {
+                                cache.delete(request);
+                                console.log('Cleared avatar cache:', request.url);
+                            }
+                        });
+                    });
+                });
+            });
+        });
+    }
+    
+    // Show success message function
+    function showSuccessMessage(message) {
+        // Remove existing alerts
+        const existingAlerts = document.querySelectorAll('.alert');
+        existingAlerts.forEach(alert => alert.remove());
+        
+        // Create success alert
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success';
+        alert.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000; max-width: 300px;';
+        alert.innerHTML = message;
+        
+        // Add to page
+        document.body.appendChild(alert);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            alert.remove();
+        }, 3000);
+    }
+});
+</script>
 {% endblock %}

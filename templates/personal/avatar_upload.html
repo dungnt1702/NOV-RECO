@@ -547,6 +547,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Hide reset button
                 resetBtn.style.display = 'none';
                 
+                // Set session storage to indicate avatar was uploaded
+                sessionStorage.setItem('avatar_uploaded', 'true');
+                
                 // Show redirect message
                 setTimeout(() => {
                     showAlert('🔄 Đang chuyển về trang profile...', 'info');
