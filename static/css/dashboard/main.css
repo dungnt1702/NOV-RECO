@@ -438,21 +438,29 @@
 @media (max-width: 1024px) {
     .dashboard-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
     
     .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    .charts-container {
+        height: 250px;
     }
 }
 
 @media (max-width: 768px) {
     .dashboard-main {
         padding: 1rem 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
     
     .page-header {
         padding: 1.5rem;
         margin-bottom: 1.5rem;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
     }
     
     .page-title {
@@ -464,27 +472,46 @@
         font-size: 2rem;
     }
     
+    .page-subtitle {
+        font-size: 1rem;
+    }
+    
     .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
+        margin-bottom: 1.5rem;
     }
     
     .stat-card {
         padding: 1rem;
+        border-radius: 15px;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
     }
     
     .stat-icon {
         width: 50px;
         height: 50px;
         font-size: 1.25rem;
+        border-radius: 12px;
     }
     
     .stat-content h3 {
         font-size: 1.5rem;
     }
     
+    .stat-content p {
+        font-size: 0.8rem;
+    }
+    
     .card-header {
         padding: 1rem;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .card-header h3 {
+        font-size: 1.1rem;
     }
     
     .card-content {
@@ -492,17 +519,61 @@
     }
     
     .quick-actions {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .action-btn {
+        padding: 1rem 0.75rem;
+        border-radius: 12px;
+    }
+    
+    .action-btn i {
+        font-size: 1.25rem;
+    }
+    
+    .action-btn span {
+        font-size: 0.8rem;
     }
     
     .personal-stats {
         grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .charts-container {
+        height: 200px;
+    }
+    
+    .activity-item {
+        padding: 0.75rem 0;
+    }
+    
+    .activity-avatar,
+    .activity-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 0.8rem;
+    }
+    
+    .activity-content p {
+        font-size: 0.85rem;
+    }
+    
+    .activity-time {
+        font-size: 0.75rem;
     }
 }
 
 @media (max-width: 576px) {
+    .dashboard-main {
+        padding: 0.75rem 0;
+    }
+    
     .page-header {
         padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 12px;
     }
     
     .page-title h1 {
@@ -510,23 +581,164 @@
     }
     
     .page-subtitle {
-        font-size: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
     }
     
     .stat-card {
-        flex-direction: column;
-        text-align: center;
+        padding: 0.75rem;
+        border-radius: 12px;
+    }
+    
+    .stat-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+    
+    .stat-content h3 {
+        font-size: 1.25rem;
+    }
+    
+    .stat-content p {
+        font-size: 0.75rem;
+    }
+    
+    .card-header {
+        padding: 0.75rem;
+    }
+    
+    .card-header h3 {
+        font-size: 1rem;
+    }
+    
+    .card-content {
+        padding: 0.75rem;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .action-btn {
+        padding: 0.75rem;
+        border-radius: 10px;
+    }
+    
+    .charts-container {
+        height: 180px;
     }
     
     .activity-item {
         flex-direction: column;
         text-align: center;
         gap: 0.5rem;
+        padding: 0.5rem 0;
     }
     
     .department-item {
         flex-direction: column;
         text-align: center;
         gap: 0.5rem;
+        padding: 0.75rem 0;
+    }
+    
+    .department-info h4 {
+        font-size: 0.9rem;
+    }
+    
+    .department-info p {
+        font-size: 0.75rem;
+    }
+    
+    .department-count .count {
+        font-size: 1.25rem;
+    }
+    
+    .department-count .label {
+        font-size: 0.7rem;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+    .stat-card:hover {
+        transform: none;
+    }
+    
+    .dashboard-card:hover {
+        transform: none;
+    }
+    
+    .action-btn:hover {
+        transform: none;
+    }
+    
+    .stat-card:active {
+        transform: scale(0.98);
+    }
+    
+    .action-btn:active {
+        transform: scale(0.95);
+    }
+}
+
+/* Performance optimizations */
+.low-performance * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+}
+
+.low-performance .stat-card:hover {
+    transform: none !important;
+}
+
+.low-performance .dashboard-card:hover {
+    transform: none !important;
+}
+
+.low-performance .action-btn:hover {
+    transform: none !important;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+    .dashboard-main {
+        will-change: auto;
+    }
+    
+    .stat-card {
+        will-change: transform;
+    }
+    
+    .dashboard-card {
+        will-change: transform;
+    }
+    
+    .action-btn {
+        will-change: transform;
+    }
+    
+    /* Reduce motion for better performance */
+    .stat-card,
+    .dashboard-card,
+    .action-btn {
+        transition: transform 0.1s ease;
+    }
+    
+    /* Optimize chart container */
+    .charts-container {
+        contain: layout style paint;
+    }
+    
+    /* Optimize activity list */
+    .activity-list {
+        contain: layout style;
     }
 }

@@ -1,5 +1,7 @@
 // Dashboard Main JavaScript
 let attendanceChart = null;
+let isMobile = window.innerWidth <= 768;
+let updateInterval = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard Main loaded');
@@ -7,14 +9,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize dashboard
     initializeDashboard();
     
-    // Setup real-time updates
-    setupRealTimeUpdates();
+    // Setup real-time updates (only on desktop)
+    if (!isMobile) {
+        setupRealTimeUpdates();
+    }
     
     // Setup interactive elements
     setupInteractiveElements();
     
     // Initialize charts
     initializeCharts();
+    
+    // Setup mobile-specific optimizations
+    if (isMobile) {
+        setupMobileOptimizations();
+    }
 });
 
 function initializeDashboard() {
@@ -33,23 +42,110 @@ function initializeDashboard() {
 }
 
 function setupRealTimeUpdates() {
-    // Update stats every 30 seconds
-    setInterval(updateStats, 30000);
+    // Update stats every 30 seconds (desktop only)
+    updateInterval = setInterval(updateStats, 30000);
     
-    // Update activity every 60 seconds
+    // Update activity every 60 seconds (desktop only)
     setInterval(updateActivity, 60000);
 }
 
+function setupMobileOptimizations() {
+    // Disable real-time updates on mobile to save battery
+    console.log('Mobile optimizations enabled');
+    
+    // Add intersection observer for lazy loading
+    setupLazyLoading();
+    
+    // Optimize chart rendering for mobile
+    optimizeChartsForMobile();
+    
+    // Add performance monitoring
+    monitorPerformance();
+}
+
+function setupLazyLoading() {
+    // Only load charts when they come into view
+    const chartContainer = document.querySelector('.charts-container');
+    if (chartContainer) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Chart is visible, ensure it's rendered
+                    if (attendanceChart) {
+                        attendanceChart.resize();
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        observer.observe(chartContainer);
+    }
+}
+
+function optimizeChartsForMobile() {
+    // Reduce chart complexity on mobile
+    if (attendanceChart && isMobile) {
+        attendanceChart.options.animation.duration = 0; // Disable animations
+        attendanceChart.options.responsive = true;
+        attendanceChart.options.maintainAspectRatio = false;
+        attendanceChart.update();
+    }
+}
+
+function monitorPerformance() {
+    // Monitor performance and adjust accordingly
+    let frameCount = 0;
+    let lastTime = performance.now();
+    
+    function measureFPS() {
+        frameCount++;
+        const currentTime = performance.now();
+        
+        if (currentTime - lastTime >= 1000) {
+            const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+            
+            if (fps < 30) {
+                // Low FPS detected, reduce animations
+                document.body.classList.add('low-performance');
+            } else {
+                document.body.classList.remove('low-performance');
+            }
+            
+            frameCount = 0;
+            lastTime = currentTime;
+        }
+        
+        requestAnimationFrame(measureFPS);
+    }
+    
+    requestAnimationFrame(measureFPS);
+}
+
 function setupInteractiveElements() {
-    // Add hover effects to stat cards
+    // Add hover effects to stat cards (desktop only)
     const statCards = document.querySelectorAll('.stat-card');
     statCards.forEach(card => {
         card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
+            if (window.innerWidth > 768) {
+                this.style.transform = 'translateY(-5px)';
+            }
         });
         
         card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
+            if (window.innerWidth > 768) {
+                this.style.transform = 'translateY(0)';
+            }
+        });
+        
+        // Touch interactions for mobile
+        card.addEventListener('touchstart', function(e) {
+            this.style.transform = 'scale(0.98)';
+            this.style.transition = 'transform 0.1s ease';
+        });
+        
+        card.addEventListener('touchend', function(e) {
+            this.style.transform = 'scale(1)';
+            this.style.transition = 'transform 0.2s ease';
         });
     });
     
@@ -66,6 +162,31 @@ function setupInteractiveElements() {
                 ripple.remove();
             }, 600);
         });
+        
+        // Touch interactions for mobile
+        btn.addEventListener('touchstart', function(e) {
+            this.style.transform = 'scale(0.95)';
+            this.style.transition = 'transform 0.1s ease';
+        });
+        
+        btn.addEventListener('touchend', function(e) {
+            this.style.transform = 'scale(1)';
+            this.style.transition = 'transform 0.2s ease';
+        });
+    });
+    
+    // Add touch interactions to dashboard cards
+    const dashboardCards = document.querySelectorAll('.dashboard-card');
+    dashboardCards.forEach(card => {
+        card.addEventListener('touchstart', function(e) {
+            this.style.transform = 'scale(0.99)';
+            this.style.transition = 'transform 0.1s ease';
+        });
+        
+        card.addEventListener('touchend', function(e) {
+            this.style.transform = 'scale(1)';
+            this.style.transition = 'transform 0.2s ease';
+        });
     });
 }
 
@@ -75,6 +196,9 @@ function initializeCharts() {
     
     // Add color coding to stat cards
     addColorCodingToStats();
+    
+    // Setup swipe gestures for mobile
+    setupSwipeGestures();
 }
 
 function createAttendanceChart() {
@@ -183,6 +307,151 @@ function addColorCodingToStats() {
             }
         }
     });
+}
+
+function setupSwipeGestures() {
+    // Only setup swipe gestures on mobile devices
+    if (window.innerWidth > 768) return;
+    
+    let startX = 0;
+    let startY = 0;
+    let endX = 0;
+    let endY = 0;
+    
+    // Add swipe gesture to stats grid
+    const statsGrid = document.querySelector('.stats-grid');
+    if (statsGrid) {
+        statsGrid.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+        
+        statsGrid.addEventListener('touchend', function(e) {
+            endX = e.changedTouches[0].clientX;
+            endY = e.changedTouches[0].clientY;
+            
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+            
+            // Check if it's a horizontal swipe
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    // Swipe left - could be used for next stats view
+                    console.log('Swipe left detected');
+                } else {
+                    // Swipe right - could be used for previous stats view
+                    console.log('Swipe right detected');
+                }
+            }
+        });
+    }
+    
+    // Add swipe gesture to activity list
+    const activityList = document.querySelector('.activity-list');
+    if (activityList) {
+        activityList.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+        
+        activityList.addEventListener('touchend', function(e) {
+            endX = e.changedTouches[0].clientX;
+            endY = e.changedTouches[0].clientY;
+            
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+            
+            // Check if it's a vertical swipe
+            if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 50) {
+                if (diffY > 0) {
+                    // Swipe up - refresh activity
+                    refreshActivity();
+                } else {
+                    // Swipe down - could be used for pull to refresh
+                    console.log('Swipe down detected - pull to refresh');
+                }
+            }
+        });
+    }
+    
+    // Add swipe gesture to charts
+    const chartContainer = document.querySelector('.charts-container');
+    if (chartContainer) {
+        chartContainer.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+        
+        chartContainer.addEventListener('touchend', function(e) {
+            endX = e.changedTouches[0].clientX;
+            endY = e.changedTouches[0].clientY;
+            
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+            
+            // Check if it's a horizontal swipe
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    // Swipe left - next chart
+                    switchToNextChart();
+                } else {
+                    // Swipe right - previous chart
+                    switchToPreviousChart();
+                }
+            }
+        });
+    }
+}
+
+function refreshActivity() {
+    // Add visual feedback
+    const activityList = document.querySelector('.activity-list');
+    if (activityList) {
+        activityList.style.transform = 'translateY(10px)';
+        activityList.style.opacity = '0.7';
+        
+        setTimeout(() => {
+            activityList.style.transform = 'translateY(0)';
+            activityList.style.opacity = '1';
+        }, 300);
+    }
+    
+    // Refresh activity data
+    updateActivity();
+}
+
+function switchToNextChart() {
+    // Add visual feedback
+    const chartContainer = document.querySelector('.charts-container');
+    if (chartContainer) {
+        chartContainer.style.transform = 'translateX(-10px)';
+        chartContainer.style.opacity = '0.7';
+        
+        setTimeout(() => {
+            chartContainer.style.transform = 'translateX(0)';
+            chartContainer.style.opacity = '1';
+        }, 300);
+    }
+    
+    // Switch to next chart (placeholder for future implementation)
+    console.log('Switching to next chart');
+}
+
+function switchToPreviousChart() {
+    // Add visual feedback
+    const chartContainer = document.querySelector('.charts-container');
+    if (chartContainer) {
+        chartContainer.style.transform = 'translateX(10px)';
+        chartContainer.style.opacity = '0.7';
+        
+        setTimeout(() => {
+            chartContainer.style.transform = 'translateX(0)';
+            chartContainer.style.opacity = '1';
+        }, 300);
+    }
+    
+    // Switch to previous chart (placeholder for future implementation)
+    console.log('Switching to previous chart');
 }
 
 function updateStats() {
