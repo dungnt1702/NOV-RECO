@@ -252,31 +252,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // File input change
     fileInput.addEventListener('change', function(e) {
+        console.log('File input changed:', e.target.files);
         if (e.target.files.length > 0) {
+            console.log('File selected:', e.target.files[0]);
             handleFileSelect(e.target.files[0]);
         }
     });
 
     // Handle file selection
     function handleFileSelect(file) {
+        console.log('Handling file select:', file);
+        console.log('File type:', file.type);
+        console.log('File size:', file.size);
+        
         // Validate file type
         if (!file.type.startsWith('image/')) {
+            console.log('Invalid file type');
             showAlert('Vui lòng chọn file hình ảnh!', 'danger');
             return;
         }
 
         // Validate file size (5MB)
         if (file.size > 5 * 1024 * 1024) {
+            console.log('File too large');
             showAlert('File quá lớn! Vui lòng chọn file nhỏ hơn 5MB.', 'danger');
             return;
         }
+        
+        console.log('File validation passed');
 
         // Preview image
+        console.log('Creating FileReader...');
         const reader = new FileReader();
         reader.onload = function(e) {
+            console.log('FileReader onload triggered');
             if (avatarPreview) {
+                console.log('Updating existing avatar preview');
                 avatarPreview.src = e.target.result;
             } else {
+                console.log('Creating new avatar preview');
                 // Create new preview if doesn't exist
                 const preview = document.createElement('img');
                 preview.id = 'avatar-preview';
@@ -290,17 +304,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         };
+        reader.onerror = function(e) {
+            console.error('FileReader error:', e);
+        };
+        console.log('Reading file as data URL...');
         reader.readAsDataURL(file);
 
         // Enable upload button
+        console.log('Enabling upload button');
         uploadBtn.disabled = false;
+        console.log('Upload button enabled:', !uploadBtn.disabled);
     }
 
     // Form submission
     uploadForm.addEventListener('submit', function(e) {
+        console.log('Form submission triggered');
         e.preventDefault();
         
         const formData = new FormData(uploadForm);
+        console.log('FormData created:', formData);
         
         // Show progress
         uploadProgress.style.display = 'block';
@@ -308,15 +330,23 @@ document.addEventListener('DOMContentLoaded', function() {
         uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải lên...';
 
         // Upload file
-        fetch('{% url "personal:avatar_upload" %}', {
+        console.log('Starting fetch request...');
+        const uploadUrl = '{% url "personal:avatar_upload" %}';
+        console.log('Upload URL:', uploadUrl);
+        
+        fetch(uploadUrl, {
             method: 'POST',
             body: formData,
             headers: {
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response received:', response);
+            return response.json();
+        })
         .then(data => {
+            console.log('Response data:', data);
             uploadProgress.style.display = 'none';
             
             if (data.success) {
@@ -336,6 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
+            console.error('Upload error:', error);
             uploadProgress.style.display = 'none';
             showAlert('Có lỗi xảy ra khi tải lên. Vui lòng thử lại!', 'danger');
             uploadBtn.disabled = false;
