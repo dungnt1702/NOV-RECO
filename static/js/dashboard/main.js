@@ -2,6 +2,8 @@
 let attendanceChart = null;
 let departmentChart = null;
 let timeChart = null;
+let areaChart = null;
+let weeklyChart = null;
 let mainChart = null;
 let isMobile = window.innerWidth <= 768;
 
@@ -674,6 +676,12 @@ function initializeCharts() {
         
         console.log('Creating time chart...');
         createTimeChart();
+        
+        console.log('Creating area chart...');
+        createAreaChart();
+        
+        console.log('Creating weekly chart...');
+        createWeeklyChart();
         
         console.log('Charts initialization completed');
         
@@ -2749,3 +2757,186 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Create Area Chart
+function createAreaChart() {
+    const ctx = document.getElementById('areaChart');
+    if (!ctx) {
+        console.log('areaChart canvas not found');
+        return;
+    }
+    
+    console.log('Creating area chart...');
+    
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded');
+        return;
+    }
+    
+    const canvasContext = ctx.getContext('2d');
+    if (!canvasContext) {
+        console.error('Cannot get 2D context from canvas');
+        return;
+    }
+    
+    // Sample data for area chart
+    const areaData = [
+        { label: 'Văn phòng chính', value: 35 },
+        { label: 'Khu sản xuất', value: 25 },
+        { label: 'Khu kho', value: 20 },
+        { label: 'Khu văn phòng', value: 15 },
+        { label: 'Khu khác', value: 5 }
+    ];
+    
+    const data = {
+        labels: areaData.map(item => item.label),
+        datasets: [{
+            data: areaData.map(item => item.value),
+            backgroundColor: [
+                '#667eea',
+                '#764ba2',
+                '#f093fb',
+                '#f5576c',
+                '#4facfe'
+            ],
+            borderColor: [
+                '#667eea',
+                '#764ba2',
+                '#f093fb',
+                '#f5576c',
+                '#4facfe'
+            ],
+            borderWidth: 2
+        }]
+    };
+    
+    const config = {
+        type: 'doughnut',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 1,
+            layout: {
+                padding: {
+                    top: 20, bottom: 20, left: 20, right: 20
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        },
+                        boxWidth: 14,
+                        boxHeight: 14
+                    }
+                }
+            }
+        }
+    };
+    
+    try {
+        areaChart = new Chart(ctx, config);
+        console.log('Area chart created successfully');
+    } catch (error) {
+        console.error('Error creating area chart:', error);
+    }
+}
+
+// Create Weekly Chart
+function createWeeklyChart() {
+    const ctx = document.getElementById('weeklyChart');
+    if (!ctx) {
+        console.log('weeklyChart canvas not found');
+        return;
+    }
+    
+    console.log('Creating weekly chart...');
+    
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded');
+        return;
+    }
+    
+    const canvasContext = ctx.getContext('2d');
+    if (!canvasContext) {
+        console.error('Cannot get 2D context from canvas');
+        return;
+    }
+    
+    // Sample data for weekly chart
+    const weeklyData = {
+        labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+        data: [45, 52, 48, 55, 50, 35, 20]
+    };
+    
+    const data = {
+        labels: weeklyData.labels,
+        datasets: [{
+            label: 'Check-in',
+            data: weeklyData.data,
+            backgroundColor: 'rgba(102, 126, 234, 0.2)',
+            borderColor: '#667eea',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+        }]
+    };
+    
+    const config = {
+        type: 'line',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 1,
+            layout: {
+                padding: {
+                    top: 20, bottom: 20, left: 20, right: 20
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        },
+                        boxWidth: 14,
+                        boxHeight: 14
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            }
+        }
+    };
+    
+    try {
+        weeklyChart = new Chart(ctx, config);
+        console.log('Weekly chart created successfully');
+    } catch (error) {
+        console.error('Error creating weekly chart:', error);
+    }
+}

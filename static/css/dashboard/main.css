@@ -1600,10 +1600,11 @@
     box-sizing: border-box;
 }
 
-/* Ensure PC layout is maintained for charts */
+/* Ensure PC layout is maintained for charts - 2x2 grid */
 @media (min-width: 769px) {
     .charts-grid {
         grid-template-columns: 1fr 1fr !important;
+        grid-template-rows: 1fr 1fr !important;
         gap: 1.5rem !important;
     }
 }
