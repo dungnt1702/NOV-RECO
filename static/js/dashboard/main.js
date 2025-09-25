@@ -1052,7 +1052,11 @@ function updateChartLegend(chartData) {
 
 function createDepartmentChart() {
     const ctx = document.getElementById('departmentChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.log('departmentChart canvas not found');
+        return;
+    }
+    console.log('Creating department chart...');
     
     // Get real data from test data or use fallback
     let chartData;
@@ -1082,6 +1086,7 @@ function createDepartmentChart() {
     
     // Ensure chartData is valid
     if (!chartData || !Array.isArray(chartData) || chartData.length === 0) {
+        console.log('Using fallback data for department chart');
         chartData = [
             { label: 'Kỹ thuật', value: 35 },
             { label: 'Kinh doanh', value: 28 },
@@ -1090,6 +1095,7 @@ function createDepartmentChart() {
         ];
     }
     
+    console.log('Department chart data:', chartData);
     const total = chartData.reduce((sum, item) => sum + item.value, 0);
     
     const data = {
@@ -1179,18 +1185,23 @@ function createDepartmentChart() {
     };
     
     departmentChart = new Chart(ctx, config);
+    console.log('Department chart created successfully');
 }
 
 function createTimeChart() {
     const ctx = document.getElementById('timeChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.log('timeChart canvas not found');
+        return;
+    }
+    console.log('Creating time chart...');
     
     // Get real data or use fallback
     let chartData;
     if (window.DashboardTestData && window.DashboardTestData.exportAllData) {
         const data = window.DashboardTestData.exportAllData();
-        if (data.charts && data.charts.time) {
-            chartData = data.charts.time;
+        if (data.chart_data && data.chart_data.time) {
+            chartData = data.chart_data.time;
         } else {
             chartData = {
                 labels: ['Sáng sớm (6-9h)', 'Buổi sáng (9-12h)', 'Buổi chiều (12-17h)', 'Buổi tối (17-22h)', 'Đêm (22-6h)'],
@@ -1206,12 +1217,14 @@ function createTimeChart() {
     
     // Ensure chartData has the correct structure
     if (!chartData || !chartData.labels || !chartData.data) {
+        console.log('Using fallback data for time chart');
         chartData = {
             labels: ['Sáng sớm (6-9h)', 'Buổi sáng (9-12h)', 'Buổi chiều (12-17h)', 'Buổi tối (17-22h)', 'Đêm (22-6h)'],
             data: [45, 120, 85, 30, 15]
         };
     }
     
+    console.log('Time chart data:', chartData);
     const total = chartData.data.reduce((sum, value) => sum + value, 0);
     
     const data = {
@@ -1299,6 +1312,7 @@ function createTimeChart() {
     };
     
     timeChart = new Chart(ctx, config);
+    console.log('Time chart created successfully');
 }
 
 function setupExportFunctionality() {
