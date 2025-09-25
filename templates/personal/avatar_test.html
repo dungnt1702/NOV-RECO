@@ -119,10 +119,31 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Response data:', data);
             if (data.success) {
                 resultDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-                // Reload page to show new avatar
+                
+                // Update preview with new avatar URL
+                if (previewImage) {
+                    previewImage.src = data.avatar_url + '?t=' + new Date().getTime();
+                    console.log('Preview updated with new avatar URL:', data.avatar_url);
+                }
+                
+                // Update button to show success
+                uploadBtn.classList.remove('btn-success');
+                uploadBtn.classList.add('btn-success');
+                uploadBtn.innerHTML = '<i class="fas fa-check"></i> Success!';
+                uploadBtn.disabled = true;
+                
+                // Hide reset button
+                resetBtn.style.display = 'none';
+                
+                // Show success message
+                setTimeout(() => {
+                    resultDiv.innerHTML = `<div class="alert alert-info">🔄 Reloading page to show updated avatar...</div>`;
+                }, 1000);
+                
+                // Reload page after 3 seconds
                 setTimeout(() => {
                     window.location.reload();
-                }, 2000);
+                }, 3000);
             } else {
                 resultDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
             }

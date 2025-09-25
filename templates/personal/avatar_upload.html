@@ -176,6 +176,27 @@
     color: #155724;
 }
 
+/* Upload area when upload is successful */
+.upload-area.upload-success {
+    border-color: #28a745;
+    background-color: #d4edda;
+    animation: successPulse 2s ease-in-out;
+}
+
+.upload-area.upload-success .upload-icon {
+    color: #28a745;
+}
+
+.upload-area.upload-success .upload-text {
+    color: #155724;
+}
+
+@keyframes successPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
 /* Success button styling */
 .btn-success {
     background-color: #28a745;
@@ -421,14 +442,60 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (data.success) {
                 showAlert(data.message, 'success');
-                // Update avatar preview
+                
+                // Update avatar preview immediately
                 if (avatarPreview) {
                     avatarPreview.src = data.avatar_url + '?t=' + new Date().getTime();
+                    console.log('Avatar preview updated with new URL:', data.avatar_url);
                 }
-                // Redirect after 2 seconds
+                
+                // Update avatar in header if exists
+                const headerAvatar = document.querySelector('.user-avatar img');
+                if (headerAvatar) {
+                    headerAvatar.src = data.avatar_url + '?t=' + new Date().getTime();
+                    console.log('Header avatar updated');
+                }
+                
+                // Update avatar in profile page if exists
+                const profileAvatar = document.querySelector('.profile-avatar img');
+                if (profileAvatar) {
+                    profileAvatar.src = data.avatar_url + '?t=' + new Date().getTime();
+                    console.log('Profile avatar updated');
+                }
+                
+                // Update all avatar images on the page
+                const allAvatarImages = document.querySelectorAll('img[src*="avatar"]');
+                allAvatarImages.forEach(img => {
+                    if (img.src.includes('avatar')) {
+                        img.src = data.avatar_url + '?t=' + new Date().getTime();
+                    }
+                });
+                console.log('All avatar images updated');
+                
+                // Update upload area to show success state
+                uploadArea.classList.remove('has-file');
+                uploadArea.classList.add('upload-success');
+                uploadArea.querySelector('.upload-text').innerHTML = '<strong>✅ Upload thành công!</strong><br><span class="text-success">Avatar đã được cập nhật</span>';
+                
+                // Update upload button to show success
+                uploadBtn.classList.remove('btn-success');
+                uploadBtn.classList.add('btn-success');
+                uploadBtn.innerHTML = '<i class="fas fa-check"></i> Thành công!';
+                uploadBtn.style.animation = '';
+                uploadBtn.disabled = true;
+                
+                // Hide reset button
+                resetBtn.style.display = 'none';
+                
+                // Show redirect message
+                setTimeout(() => {
+                    showAlert('🔄 Đang chuyển về trang profile...', 'info');
+                }, 1000);
+                
+                // Redirect after 3 seconds
                 setTimeout(() => {
                     window.location.href = '{% url "personal:profile" %}';
-                }, 2000);
+                }, 3000);
             } else {
                 showAlert(data.message, 'danger');
                 uploadBtn.disabled = false;
