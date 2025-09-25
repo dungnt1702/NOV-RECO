@@ -588,6 +588,108 @@
     box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
 }
 
+/* Widget Data Display */
+.widget-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.9rem;
+    padding: 1rem 0;
+}
+
+.widget-loading i {
+    color: #667eea;
+}
+
+.widget-data {
+    margin-top: 1rem;
+}
+
+.widget-metrics {
+    margin-bottom: 1rem;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.metric-item {
+    background: rgba(102, 126, 234, 0.1);
+    padding: 0.75rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.metric-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.metric-value {
+    display: block;
+    font-size: 1.1rem;
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.chart-info, .table-info {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.chart-info h5, .table-info h5 {
+    margin: 0 0 0.5rem 0;
+    color: #1f2937;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.chart-info p, .table-info p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+.table-preview {
+    margin-top: 0.5rem;
+}
+
+.table-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+}
+
+.table-cell {
+    font-size: 0.8rem;
+    color: #374151;
+}
+
+.table-cell strong {
+    color: #1f2937;
+}
+
+.table-more {
+    font-style: italic;
+    color: #9ca3af;
+    font-size: 0.75rem;
+    margin: 0.5rem 0 0 0;
+}
+
 /* Customization Success Notification */
 .customization-success {
     position: fixed;

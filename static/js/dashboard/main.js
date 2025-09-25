@@ -2325,15 +2325,32 @@ function addNewModule(modal) {
         description: moduleDescription,
         api: {
             getData: function() {
-                return new Promise((resolve) => {
-                    // Simulate API call
-                    setTimeout(() => {
-                        resolve({
+                return fetch(`/dashboard/api/modules/${moduleName}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            return {
+                                success: true,
+                                data: data.data,
+                                module: data.module,
+                                title: data.title,
+                                last_updated: data.last_updated
+                            };
+                        } else {
+                            throw new Error(data.error || 'Failed to fetch module data');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching module data:', error);
+                        // Fallback to sample data
+                        return {
                             success: true,
-                            data: generateSampleData(moduleType)
-                        });
-                    }, 1000);
-                });
+                            data: generateSampleData(moduleType),
+                            module: moduleName,
+                            title: moduleTitle,
+                            last_updated: new Date().toISOString()
+                        };
+                    });
             }
         },
         permissions: ['dashboard.view']
@@ -2369,11 +2386,19 @@ function createWidgetContainer(moduleName) {
     container.id = `widget-container-${moduleName}`;
     container.className = 'widget-container';
     
-    // Add widget content
+    // Add widget content with loading state
     container.innerHTML = `
         <h4><i class="fas fa-puzzle-piece"></i> ${moduleName.charAt(0).toUpperCase() + moduleName.slice(1)} Module</h4>
         <div class="widget-content">
-            <p>Module đã được tích hợp thành công!</p>
+            <div class="widget-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Đang tải dữ liệu...</span>
+            </div>
+            <div class="widget-data" style="display: none;">
+                <div class="widget-metrics"></div>
+                <div class="widget-chart"></div>
+                <div class="widget-table"></div>
+            </div>
             <div class="widget-status">
                 <span class="status-indicator active"></span>
                 <span>Đang hoạt động</span>
@@ -2387,7 +2412,105 @@ function createWidgetContainer(moduleName) {
         moduleIntegrationCenter.appendChild(container);
     }
     
+    // Load real data
+    loadWidgetData(moduleName, container);
+    
     return container;
+}
+
+function loadWidgetData(moduleName, container) {
+    // Fetch data from API
+    fetch(`/dashboard/api/modules/${moduleName}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateWidgetContent(container, data);
+            } else {
+                showWidgetError(container, data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading widget data:', error);
+            showWidgetError(container, 'Không thể tải dữ liệu');
+        });
+}
+
+function updateWidgetContent(container, data) {
+    const loadingDiv = container.querySelector('.widget-loading');
+    const dataDiv = container.querySelector('.widget-data');
+    const metricsDiv = container.querySelector('.widget-metrics');
+    const chartDiv = container.querySelector('.widget-chart');
+    const tableDiv = container.querySelector('.widget-table');
+    
+    // Hide loading, show data
+    loadingDiv.style.display = 'none';
+    dataDiv.style.display = 'block';
+    
+    // Update metrics
+    if (data.data.metrics) {
+        metricsDiv.innerHTML = `
+            <div class="metrics-grid">
+                ${Object.entries(data.data.metrics).map(([key, value]) => `
+                    <div class="metric-item">
+                        <span class="metric-label">${key.replace(/_/g, ' ').toUpperCase()}</span>
+                        <span class="metric-value">${formatValue(value)}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    // Update chart info
+    if (data.data.chart) {
+        chartDiv.innerHTML = `
+            <div class="chart-info">
+                <h5>Biểu đồ ${data.title}</h5>
+                <p>Dữ liệu được cập nhật: ${new Date(data.last_updated).toLocaleString('vi-VN')}</p>
+            </div>
+        `;
+    }
+    
+    // Update table
+    if (data.data.table) {
+        tableDiv.innerHTML = `
+            <div class="table-info">
+                <h5>Bảng dữ liệu</h5>
+                <div class="table-preview">
+                    ${data.data.table.slice(0, 3).map(item => `
+                        <div class="table-row">
+                            ${Object.entries(item).map(([key, value]) => `
+                                <span class="table-cell">
+                                    <strong>${key}:</strong> ${formatValue(value)}
+                                </span>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                    ${data.data.table.length > 3 ? `<p class="table-more">... và ${data.data.table.length - 3} mục khác</p>` : ''}
+                </div>
+            </div>
+        `;
+    }
+}
+
+function showWidgetError(container, error) {
+    const loadingDiv = container.querySelector('.widget-loading');
+    loadingDiv.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Lỗi: ${error}</span>
+    `;
+    loadingDiv.style.color = '#ef4444';
+}
+
+function formatValue(value) {
+    if (typeof value === 'number') {
+        if (value >= 1000000) {
+            return (value / 1000000).toFixed(1) + 'M';
+        } else if (value >= 1000) {
+            return (value / 1000).toFixed(1) + 'K';
+        }
+        return value.toLocaleString('vi-VN');
+    }
+    return value;
 }
 
 function generateSampleData(type) {
