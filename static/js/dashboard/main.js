@@ -86,8 +86,8 @@ function initializeDashboard() {
         card.classList.add('loading');
     });
     
-    // Load real data
-    loadDashboardData();
+    // Don't override server data - keep original values
+    console.log('Dashboard initialized - preserving server data');
     
     // Remove loading states after a short delay
     setTimeout(() => {
@@ -100,14 +100,18 @@ function initializeDashboard() {
 function loadDashboardData() {
     if (!testData) return;
     
-    // Update stat cards with real data
-    updateStatCards(testData.dashboard_stats);
+    // Don't override server data - only use test data for charts
+    console.log('Test data available but not overriding server stats');
     
-    // Update activity list
-    updateActivityList(testData.checkins.slice(0, 5));
+    // Update activity list with test data (if no server data)
+    const activityList = document.querySelector('.activity-list');
+    if (activityList && activityList.children.length === 0) {
+        updateActivityList(testData.checkins.slice(0, 5));
+    }
     
-    // Update department stats if available
-    if (testData.departments) {
+    // Update department stats if available (if no server data)
+    const departmentList = document.querySelector('.department-list');
+    if (departmentList && departmentList.children.length === 0 && testData.departments) {
         updateDepartmentStats(testData.departments);
     }
 }
@@ -329,8 +333,8 @@ function handleWebSocketMessage(data) {
 }
 
 function updateStatsFromWebSocket(stats) {
-    // Update stat cards with new data
-    updateStatCards(stats);
+    // Don't override server data - only update charts
+    console.log('WebSocket stats received but not overriding server data');
     
     // Update charts if needed
     if (mainChart) {
@@ -610,7 +614,7 @@ function refreshDashboard() {
     
     // Refresh data
     setTimeout(() => {
-        // Re-initialize charts with fresh data
+        // Re-initialize charts with fresh data (but don't override server stats)
         initializeCharts();
         
         // Reset button state
@@ -620,7 +624,7 @@ function refreshDashboard() {
             refreshText.textContent = 'Làm mới';
         }
         
-        console.log('Dashboard refreshed successfully');
+        console.log('Dashboard refreshed successfully - server data preserved');
     }, 1000);
 }
 
@@ -2623,17 +2627,8 @@ function switchToPreviousChart() {
 }
 
 function updateStats() {
-    // Fetch updated stats from API
-    fetch('/dashboard/api/stats/')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                updateStatCards(data.stats);
-            }
-        })
-        .catch(error => {
-            console.error('Error updating stats:', error);
-        });
+    // Don't fetch stats from API - preserve server data
+    console.log('Skipping API stats fetch to preserve server data');
 }
 
 function updateStatCards(stats) {
