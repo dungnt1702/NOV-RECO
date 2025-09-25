@@ -1,4 +1,6 @@
 // Dashboard Main JavaScript
+let attendanceChart = null;
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard Main loaded');
     
@@ -10,6 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup interactive elements
     setupInteractiveElements();
+    
+    // Initialize charts
+    initializeCharts();
 });
 
 function initializeDashboard() {
@@ -61,6 +66,122 @@ function setupInteractiveElements() {
                 ripple.remove();
             }, 600);
         });
+    });
+}
+
+function initializeCharts() {
+    // Initialize attendance chart
+    createAttendanceChart();
+    
+    // Add color coding to stat cards
+    addColorCodingToStats();
+}
+
+function createAttendanceChart() {
+    const ctx = document.getElementById('attendanceChart');
+    if (!ctx) return;
+    
+    // Sample data - in real implementation, this would come from API
+    const chartData = {
+        labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+        datasets: [{
+            label: 'Check-in tuần này',
+            data: [12, 19, 15, 25, 22, 8, 3],
+            borderColor: 'rgb(102, 126, 234)',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: 'rgb(102, 126, 234)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+        }]
+    };
+    
+    const config = {
+        type: 'line',
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgb(102, 126, 234)',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: false
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#718096',
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        }
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(113, 128, 150, 0.1)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#718096',
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        }
+                    },
+                    beginAtZero: true
+                }
+            },
+            elements: {
+                point: {
+                    hoverBackgroundColor: 'rgb(102, 126, 234)'
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    };
+    
+    attendanceChart = new Chart(ctx, config);
+}
+
+function addColorCodingToStats() {
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(card => {
+        const valueElement = card.querySelector('h3');
+        if (valueElement) {
+            const value = parseInt(valueElement.textContent);
+            
+            // Remove existing classes
+            card.classList.remove('high-value', 'medium-value', 'low-value');
+            
+            // Add appropriate class based on value
+            if (value >= 20) {
+                card.classList.add('high-value');
+            } else if (value >= 10) {
+                card.classList.add('medium-value');
+            } else {
+                card.classList.add('low-value');
+            }
+        }
     });
 }
 
