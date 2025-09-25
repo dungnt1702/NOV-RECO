@@ -55,6 +55,7 @@ def dashboard_main_view(request):
         context.update({
             'total_employees': total_employees,
             'total_areas': total_areas,
+            'total_departments': department_stats.count(),
             'department_stats': department_stats,
             'recent_checkins': recent_checkins,
         })
@@ -83,6 +84,10 @@ def dashboard_main_view(request):
             'user_week_checkins': user_week_checkins,
             'user_month_checkins': user_month_checkins,
             'user_recent_checkins': user_recent_checkins,
+            'total_employees': 0,
+            'total_areas': 0,
+            'total_departments': 0,
+            'department_stats': [],
         })
     
     return render(request, 'dashboard/main.html', context)
