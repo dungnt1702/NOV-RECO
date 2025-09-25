@@ -1054,21 +1054,44 @@ function createDepartmentChart() {
     const ctx = document.getElementById('departmentChart');
     if (!ctx) return;
     
+    // Get real data from test data or use fallback
+    let chartData;
+    if (window.DashboardTestData && window.DashboardTestData.exportAllData) {
+        const data = window.DashboardTestData.exportAllData();
+        chartData = data.departments.map(dept => ({
+            label: dept.name,
+            value: dept.employee_count
+        }));
+    } else {
+        chartData = [
+            { label: 'Kỹ thuật', value: 35 },
+            { label: 'Kinh doanh', value: 28 },
+            { label: 'Nhân sự', value: 22 },
+            { label: 'Kế toán', value: 15 }
+        ];
+    }
+    
+    const total = chartData.reduce((sum, item) => sum + item.value, 0);
+    
     const data = {
-        labels: ['Kỹ thuật', 'Kinh doanh', 'Nhân sự', 'Kế toán'],
+        labels: chartData.map(item => item.label),
         datasets: [{
-            data: [35, 28, 22, 15],
+            data: chartData.map(item => item.value),
             backgroundColor: [
                 'rgba(102, 126, 234, 0.8)',
                 'rgba(240, 147, 251, 0.8)',
                 'rgba(79, 172, 254, 0.8)',
-                'rgba(67, 233, 123, 0.8)'
+                'rgba(67, 233, 123, 0.8)',
+                'rgba(255, 193, 7, 0.8)',
+                'rgba(220, 53, 69, 0.8)'
             ],
             borderColor: [
                 'rgb(102, 126, 234)',
                 'rgb(240, 147, 251)',
                 'rgb(79, 172, 254)',
-                'rgb(67, 233, 123)'
+                'rgb(67, 233, 123)',
+                'rgb(255, 193, 7)',
+                'rgb(220, 53, 69)'
             ],
             borderWidth: 2
         }]
@@ -1082,7 +1105,35 @@ function createDepartmentChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    display: false
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        },
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return {
+                                        text: `${label}: ${value} (${percentage}%)`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        strokeStyle: data.datasets[0].borderColor[i],
+                                        lineWidth: 2,
+                                        pointStyle: 'circle',
+                                        hidden: false,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
                 },
                 tooltip: {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -1090,7 +1141,19 @@ function createDepartmentChart() {
                     bodyColor: '#fff',
                     borderColor: 'rgb(102, 126, 234)',
                     borderWidth: 1,
-                    cornerRadius: 8
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed;
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${context.label}: ${value} nhân viên (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            elements: {
+                arc: {
+                    borderWidth: 2
                 }
             }
         }
@@ -1103,19 +1166,39 @@ function createTimeChart() {
     const ctx = document.getElementById('timeChart');
     if (!ctx) return;
     
+    // Get real data or use fallback
+    let chartData;
+    if (window.DashboardTestData && window.DashboardTestData.exportAllData) {
+        const data = window.DashboardTestData.exportAllData();
+        chartData = data.charts.time;
+    } else {
+        chartData = {
+            labels: ['Sáng sớm (6-9h)', 'Buổi sáng (9-12h)', 'Buổi chiều (12-17h)', 'Buổi tối (17-22h)', 'Đêm (22-6h)'],
+            datasets: [{
+                data: [45, 120, 85, 30, 15]
+            }]
+        };
+    }
+    
+    const total = chartData.datasets[0].data.reduce((sum, value) => sum + value, 0);
+    
     const data = {
-        labels: ['Sáng', 'Chiều', 'Tối'],
+        labels: chartData.labels,
         datasets: [{
-            data: [45, 35, 20],
+            data: chartData.datasets[0].data,
             backgroundColor: [
                 'rgba(67, 233, 123, 0.8)',
                 'rgba(79, 172, 254, 0.8)',
-                'rgba(240, 147, 251, 0.8)'
+                'rgba(240, 147, 251, 0.8)',
+                'rgba(255, 193, 7, 0.8)',
+                'rgba(220, 53, 69, 0.8)'
             ],
             borderColor: [
                 'rgb(67, 233, 123)',
                 'rgb(79, 172, 254)',
-                'rgb(240, 147, 251)'
+                'rgb(240, 147, 251)',
+                'rgb(255, 193, 7)',
+                'rgb(220, 53, 69)'
             ],
             borderWidth: 2
         }]
@@ -1129,7 +1212,35 @@ function createTimeChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    display: false
+                    display: true,
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        },
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return {
+                                        text: `${label}: ${value} (${percentage}%)`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        strokeStyle: data.datasets[0].borderColor[i],
+                                        lineWidth: 2,
+                                        pointStyle: 'circle',
+                                        hidden: false,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
                 },
                 tooltip: {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -1137,7 +1248,19 @@ function createTimeChart() {
                     bodyColor: '#fff',
                     borderColor: 'rgb(67, 233, 123)',
                     borderWidth: 1,
-                    cornerRadius: 8
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed;
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${context.label}: ${value} lượt (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            elements: {
+                arc: {
+                    borderWidth: 2
                 }
             }
         }
