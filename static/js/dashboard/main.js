@@ -833,10 +833,10 @@ function getAttendanceConfig() {
             aspectRatio: 1,
             layout: {
                 padding: {
-                    top: 10,
-                    bottom: 10,
-                    left: 10,
-                    right: 10
+                    top: 20,
+                    bottom: 20,
+                    left: 20,
+                    right: 20
                 }
             },
             plugins: {
@@ -903,10 +903,10 @@ function getDepartmentConfig() {
             aspectRatio: 1,
             layout: {
                 padding: {
-                    top: 10,
-                    bottom: 10,
-                    left: 10,
-                    right: 10
+                    top: 20,
+                    bottom: 20,
+                    left: 20,
+                    right: 20
                 }
             },
             plugins: {
@@ -964,10 +964,10 @@ function getTimeConfig() {
             aspectRatio: 1,
             layout: {
                 padding: {
-                    top: 10,
-                    bottom: 10,
-                    left: 10,
-                    right: 10
+                    top: 20,
+                    bottom: 20,
+                    left: 20,
+                    right: 20
                 }
             },
             plugins: {
@@ -1211,10 +1211,10 @@ function createDepartmentChart() {
             aspectRatio: 1,
             layout: {
                 padding: {
-                    top: 10,
-                    bottom: 10,
-                    left: 10,
-                    right: 10
+                    top: 20,
+                    bottom: 20,
+                    left: 20,
+                    right: 20
                 }
             },
             plugins: {
@@ -1223,13 +1223,13 @@ function createDepartmentChart() {
                     position: 'bottom',
                     labels: {
                         usePointStyle: true,
-                        padding: 15,
+                        padding: 20,
                         font: {
-                            size: 11,
+                            size: 12,
                             weight: '500'
                         },
-                        boxWidth: 12,
-                        boxHeight: 12,
+                        boxWidth: 14,
+                        boxHeight: 14,
                         generateLabels: function(chart) {
                             const data = chart.data;
                             if (data.labels.length && data.datasets.length) {
@@ -1375,10 +1375,10 @@ function createTimeChart() {
             aspectRatio: 1,
             layout: {
                 padding: {
-                    top: 10,
-                    bottom: 10,
-                    left: 10,
-                    right: 10
+                    top: 20,
+                    bottom: 20,
+                    left: 20,
+                    right: 20
                 }
             },
             plugins: {
