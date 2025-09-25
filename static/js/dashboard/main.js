@@ -4,6 +4,11 @@ let departmentChart = null;
 let timeChart = null;
 let mainChart = null;
 let isMobile = window.innerWidth <= 768;
+
+// Update mobile detection on resize
+window.addEventListener('resize', function() {
+    isMobile = window.innerWidth <= 768;
+});
 let updateInterval = null;
 let currentChartType = 'attendance';
 let currentDateRange = '7';
@@ -2403,7 +2408,7 @@ function setupExampleModules() {
 
 function setupSwipeGestures() {
     // Only setup swipe gestures on mobile devices
-    if (window.innerWidth > 768) return;
+    if (!isMobile) return;
     
     let startX = 0;
     let startY = 0;
