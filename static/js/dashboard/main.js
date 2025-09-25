@@ -1065,6 +1065,12 @@ function createDepartmentChart() {
     }
     console.log('Creating department chart...');
     
+    // Check if Chart.js is available
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded');
+        return;
+    }
+    
     // Get real data from test data or use fallback
     let chartData;
     if (window.DashboardTestData && window.DashboardTestData.exportAllData) {
@@ -1191,8 +1197,12 @@ function createDepartmentChart() {
         }
     };
     
-    departmentChart = new Chart(ctx, config);
-    console.log('Department chart created successfully');
+    try {
+        departmentChart = new Chart(ctx, config);
+        console.log('Department chart created successfully');
+    } catch (error) {
+        console.error('Error creating department chart:', error);
+    }
 }
 
 function createTimeChart() {
@@ -1202,6 +1212,12 @@ function createTimeChart() {
         return;
     }
     console.log('Creating time chart...');
+    
+    // Check if Chart.js is available
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded');
+        return;
+    }
     
     // Get real data or use fallback
     let chartData;
@@ -1318,8 +1334,12 @@ function createTimeChart() {
         }
     };
     
-    timeChart = new Chart(ctx, config);
-    console.log('Time chart created successfully');
+    try {
+        timeChart = new Chart(ctx, config);
+        console.log('Time chart created successfully');
+    } catch (error) {
+        console.error('Error creating time chart:', error);
+    }
 }
 
 function setupExportFunctionality() {
