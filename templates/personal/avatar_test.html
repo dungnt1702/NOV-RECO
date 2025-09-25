@@ -120,10 +120,35 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 resultDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
                 
-                // Update preview with new avatar URL
+                // Update preview with new avatar URL and force reload
                 if (previewImage) {
-                    previewImage.src = data.avatar_url + '?t=' + new Date().getTime();
-                    console.log('Preview updated with new avatar URL:', data.avatar_url);
+                    const timestamp = new Date().getTime();
+                    const random = Math.random().toString(36).substring(7);
+                    const newAvatarUrl = data.avatar_url + '?v=' + timestamp + '&r=' + random;
+                    
+                    // Method 1: Clear cache and force reload
+                    previewImage.style.display = 'none';
+                    previewImage.src = '';
+                    setTimeout(() => {
+                        previewImage.src = newAvatarUrl;
+                        previewImage.style.display = 'block';
+                    }, 100);
+                    
+                    // Method 2: Force reload with fetch
+                    setTimeout(() => {
+                        fetch(newAvatarUrl, {cache: 'no-cache'})
+                            .then(response => response.blob())
+                            .then(blob => {
+                                const url = URL.createObjectURL(blob);
+                                previewImage.src = url;
+                                console.log('Preview force reloaded with blob URL');
+                            })
+                            .catch(error => {
+                                console.error('Force reload failed:', error);
+                            });
+                    }, 500);
+                    
+                    console.log('Preview updated with new avatar URL:', newAvatarUrl);
                 }
                 
                 // Update button to show success

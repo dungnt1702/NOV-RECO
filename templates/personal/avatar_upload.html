@@ -443,34 +443,94 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 showAlert(data.message, 'success');
                 
-                // Update avatar preview immediately
+                // Force reload avatar with cache busting
+                const timestamp = new Date().getTime();
+                const random = Math.random().toString(36).substring(7);
+                const newAvatarUrl = data.avatar_url + '?v=' + timestamp + '&r=' + random;
+                
+                // Clear browser cache for avatar images
+                if ('caches' in window) {
+                    caches.keys().then(cacheNames => {
+                        cacheNames.forEach(cacheName => {
+                            caches.open(cacheName).then(cache => {
+                                cache.delete(data.avatar_url);
+                                console.log('Cleared avatar from cache:', cacheName);
+                            });
+                        });
+                    });
+                }
+                
+                // Update avatar preview immediately with force reload
                 if (avatarPreview) {
-                    avatarPreview.src = data.avatar_url + '?t=' + new Date().getTime();
-                    console.log('Avatar preview updated with new URL:', data.avatar_url);
+                    // Method 1: Clear cache and force reload
+                    avatarPreview.style.display = 'none';
+                    avatarPreview.src = '';
+                    setTimeout(() => {
+                        avatarPreview.src = newAvatarUrl;
+                        avatarPreview.style.display = 'block';
+                        avatarPreview.onload = function() {
+                            console.log('Avatar preview loaded successfully');
+                        };
+                        avatarPreview.onerror = function() {
+                            console.error('Failed to load avatar preview');
+                            avatarPreview.style.display = 'block';
+                        };
+                    }, 100);
+                    
+                    // Method 2: Force reload with fetch
+                    setTimeout(() => {
+                        fetch(newAvatarUrl, {cache: 'no-cache'})
+                            .then(response => response.blob())
+                            .then(blob => {
+                                const url = URL.createObjectURL(blob);
+                                avatarPreview.src = url;
+                                console.log('Avatar preview force reloaded with blob URL');
+                            })
+                            .catch(error => {
+                                console.error('Force reload failed:', error);
+                            });
+                    }, 500);
+                    
+                    console.log('Avatar preview updated with new URL:', newAvatarUrl);
                 }
                 
                 // Update avatar in header if exists
                 const headerAvatar = document.querySelector('.user-avatar img');
                 if (headerAvatar) {
-                    headerAvatar.src = data.avatar_url + '?t=' + new Date().getTime();
+                    headerAvatar.style.display = 'none';
+                    headerAvatar.src = '';
+                    setTimeout(() => {
+                        headerAvatar.src = newAvatarUrl;
+                        headerAvatar.style.display = 'block';
+                    }, 150);
                     console.log('Header avatar updated');
                 }
                 
                 // Update avatar in profile page if exists
                 const profileAvatar = document.querySelector('.profile-avatar img');
                 if (profileAvatar) {
-                    profileAvatar.src = data.avatar_url + '?t=' + new Date().getTime();
+                    profileAvatar.style.display = 'none';
+                    profileAvatar.src = '';
+                    setTimeout(() => {
+                        profileAvatar.src = newAvatarUrl;
+                        profileAvatar.style.display = 'block';
+                    }, 200);
                     console.log('Profile avatar updated');
                 }
                 
-                // Update all avatar images on the page
+                // Update all avatar images on the page with force reload
                 const allAvatarImages = document.querySelectorAll('img[src*="avatar"]');
-                allAvatarImages.forEach(img => {
+                allAvatarImages.forEach((img, index) => {
                     if (img.src.includes('avatar')) {
-                        img.src = data.avatar_url + '?t=' + new Date().getTime();
+                        img.style.display = 'none';
+                        img.src = '';
+                        setTimeout(() => {
+                            img.src = newAvatarUrl;
+                            img.style.display = 'block';
+                        }, 250 + (index * 50));
                     }
                 });
-                console.log('All avatar images updated');
+                console.log('All avatar images updated with force reload');
                 
                 // Update upload area to show success state
                 uploadArea.classList.remove('has-file');
