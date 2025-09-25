@@ -6,6 +6,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard/main.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard/module-framework.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -242,6 +243,47 @@
             </div>
             {% endif %}
 
+            <!-- Dashboard Customization -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-cog"></i> Tùy chỉnh Dashboard</h3>
+                </div>
+                <div class="card-content">
+                    <div class="customization-controls">
+                        <div class="control-group">
+                            <label for="themeSelect">Giao diện:</label>
+                            <select id="themeSelect" class="custom-select">
+                                <option value="default">Mặc định</option>
+                                <option value="dark">Tối</option>
+                                <option value="light">Sáng</option>
+                                <option value="colorful">Màu sắc</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="layoutSelect">Bố cục:</label>
+                            <select id="layoutSelect" class="custom-select">
+                                <option value="grid">Lưới</option>
+                                <option value="list">Danh sách</option>
+                                <option value="compact">Gọn</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="refreshRate">Tần suất cập nhật:</label>
+                            <select id="refreshRate" class="custom-select">
+                                <option value="30">30 giây</option>
+                                <option value="60">1 phút</option>
+                                <option value="300">5 phút</option>
+                                <option value="0">Tắt</option>
+                            </select>
+                        </div>
+                        <button class="customize-btn" id="resetSettings">
+                            <i class="fas fa-undo"></i>
+                            <span>Đặt lại</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Export & Actions -->
             <div class="dashboard-card">
                 <div class="card-header">
@@ -263,6 +305,16 @@
                         </button>
                     </div>
                 </div>
+            </div>
+
+            <!-- Module Integration Area -->
+            <div class="module-integration-area">
+                <h3><i class="fas fa-puzzle-piece"></i> Tích hợp Module</h3>
+                <p>Thêm các module tùy chỉnh để mở rộng chức năng dashboard</p>
+                <button class="integration-btn" id="addModuleBtn">
+                    <i class="fas fa-plus"></i>
+                    Thêm Module
+                </button>
             </div>
 
             <!-- Quick Actions -->
@@ -300,5 +352,6 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/dashboard/module-framework.js' %}"></script>
 <script src="{% static 'js/dashboard/main.js' %}"></script>
 {% endblock %}

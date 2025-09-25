@@ -486,6 +486,12 @@ function initializeCharts() {
     // Setup export functionality
     setupExportFunctionality();
     
+    // Setup customization system
+    setupCustomizationSystem();
+    
+    // Setup module integration
+    setupModuleIntegration();
+    
     // Setup swipe gestures for mobile
     setupSwipeGestures();
 }
@@ -1202,6 +1208,422 @@ function showExportSuccess(format) {
             document.body.removeChild(notification);
         }, 300);
     }, 3000);
+}
+
+function setupCustomizationSystem() {
+    // Load saved preferences
+    loadUserPreferences();
+    
+    // Setup theme switching
+    setupThemeSwitching();
+    
+    // Setup layout switching
+    setupLayoutSwitching();
+    
+    // Setup refresh rate control
+    setupRefreshRateControl();
+    
+    // Setup reset functionality
+    setupResetFunctionality();
+}
+
+function loadUserPreferences() {
+    const preferences = JSON.parse(localStorage.getItem('dashboardPreferences') || '{}');
+    
+    // Apply theme
+    if (preferences.theme) {
+        applyTheme(preferences.theme);
+        document.getElementById('themeSelect').value = preferences.theme;
+    }
+    
+    // Apply layout
+    if (preferences.layout) {
+        applyLayout(preferences.layout);
+        document.getElementById('layoutSelect').value = preferences.layout;
+    }
+    
+    // Apply refresh rate
+    if (preferences.refreshRate !== undefined) {
+        updateRefreshRate(preferences.refreshRate);
+        document.getElementById('refreshRate').value = preferences.refreshRate;
+    }
+}
+
+function setupThemeSwitching() {
+    const themeSelect = document.getElementById('themeSelect');
+    if (themeSelect) {
+        themeSelect.addEventListener('change', function() {
+            const theme = this.value;
+            applyTheme(theme);
+            saveUserPreferences({ theme });
+        });
+    }
+}
+
+function setupLayoutSwitching() {
+    const layoutSelect = document.getElementById('layoutSelect');
+    if (layoutSelect) {
+        layoutSelect.addEventListener('change', function() {
+            const layout = this.value;
+            applyLayout(layout);
+            saveUserPreferences({ layout });
+        });
+    }
+}
+
+function setupRefreshRateControl() {
+    const refreshRateSelect = document.getElementById('refreshRate');
+    if (refreshRateSelect) {
+        refreshRateSelect.addEventListener('change', function() {
+            const refreshRate = parseInt(this.value);
+            updateRefreshRate(refreshRate);
+            saveUserPreferences({ refreshRate });
+        });
+    }
+}
+
+function setupResetFunctionality() {
+    const resetBtn = document.getElementById('resetSettings');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            resetToDefaults();
+        });
+    }
+}
+
+function applyTheme(theme) {
+    const dashboard = document.querySelector('.dashboard-main');
+    if (!dashboard) return;
+    
+    // Remove existing theme classes
+    dashboard.classList.remove('theme-dark', 'theme-light', 'theme-colorful');
+    
+    // Add new theme class
+    if (theme !== 'default') {
+        dashboard.classList.add(`theme-${theme}`);
+    }
+}
+
+function applyLayout(layout) {
+    const dashboard = document.querySelector('.dashboard-main');
+    if (!dashboard) return;
+    
+    // Remove existing layout classes
+    dashboard.classList.remove('layout-list', 'layout-compact');
+    
+    // Add new layout class
+    if (layout !== 'grid') {
+        dashboard.classList.add(`layout-${layout}`);
+    }
+}
+
+function updateRefreshRate(seconds) {
+    // Clear existing interval
+    if (updateInterval) {
+        clearInterval(updateInterval);
+        updateInterval = null;
+    }
+    
+    // Set new interval if not disabled
+    if (seconds > 0) {
+        updateInterval = setInterval(updateStats, seconds * 1000);
+        console.log(`Refresh rate set to ${seconds} seconds`);
+    } else {
+        console.log('Auto-refresh disabled');
+    }
+}
+
+function saveUserPreferences(preferences) {
+    const currentPreferences = JSON.parse(localStorage.getItem('dashboardPreferences') || '{}');
+    const newPreferences = { ...currentPreferences, ...preferences };
+    localStorage.setItem('dashboardPreferences', JSON.stringify(newPreferences));
+}
+
+function resetToDefaults() {
+    // Clear saved preferences
+    localStorage.removeItem('dashboardPreferences');
+    
+    // Reset form values
+    document.getElementById('themeSelect').value = 'default';
+    document.getElementById('layoutSelect').value = 'grid';
+    document.getElementById('refreshRate').value = '30';
+    
+    // Apply default theme and layout
+    applyTheme('default');
+    applyLayout('grid');
+    updateRefreshRate(30);
+    
+    // Show success message
+    showCustomizationSuccess('Đã đặt lại về mặc định');
+}
+
+function showCustomizationSuccess(message) {
+    const notification = document.createElement('div');
+    notification.className = 'customization-success';
+    notification.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>${message}</span>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #48bb78;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        animation: slideInRight 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentElement) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+function setupModuleIntegration() {
+    // Setup add module button
+    const addModuleBtn = document.getElementById('addModuleBtn');
+    if (addModuleBtn) {
+        addModuleBtn.addEventListener('click', function() {
+            showModuleIntegrationModal();
+        });
+    }
+    
+    // Setup example modules
+    setupExampleModules();
+}
+
+function showModuleIntegrationModal() {
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = 'module-modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-puzzle-piece"></i> Tích hợp Module</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="module-form">
+                    <div class="form-group">
+                        <label for="moduleName">Tên Module:</label>
+                        <input type="text" id="moduleName" placeholder="Ví dụ: sales, marketing, hr">
+                    </div>
+                    <div class="form-group">
+                        <label for="moduleTitle">Tiêu đề hiển thị:</label>
+                        <input type="text" id="moduleTitle" placeholder="Ví dụ: Bán hàng, Marketing, Nhân sự">
+                    </div>
+                    <div class="form-group">
+                        <label for="moduleType">Loại Module:</label>
+                        <select id="moduleType">
+                            <option value="chart">Biểu đồ</option>
+                            <option value="table">Bảng dữ liệu</option>
+                            <option value="metric">Số liệu</option>
+                            <option value="custom">Tùy chỉnh</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="moduleDescription">Mô tả:</label>
+                        <textarea id="moduleDescription" placeholder="Mô tả chức năng của module"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelModule">Hủy</button>
+                <button class="btn btn-primary" id="addModule">Thêm Module</button>
+            </div>
+        </div>
+    `;
+    
+    // Add styles
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Setup event listeners
+    const closeBtn = modal.querySelector('.modal-close');
+    const cancelBtn = modal.querySelector('#cancelModule');
+    const addBtn = modal.querySelector('#addModule');
+    
+    closeBtn.addEventListener('click', () => modal.remove());
+    cancelBtn.addEventListener('click', () => modal.remove());
+    addBtn.addEventListener('click', () => addNewModule(modal));
+    
+    // Close on backdrop click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+}
+
+function addNewModule(modal) {
+    const moduleName = modal.querySelector('#moduleName').value;
+    const moduleTitle = modal.querySelector('#moduleTitle').value;
+    const moduleType = modal.querySelector('#moduleType').value;
+    const moduleDescription = modal.querySelector('#moduleDescription').value;
+    
+    if (!moduleName || !moduleTitle) {
+        alert('Vui lòng điền đầy đủ thông tin');
+        return;
+    }
+    
+    // Create module configuration
+    const moduleConfig = {
+        title: moduleTitle,
+        type: moduleType,
+        description: moduleDescription,
+        api: {
+            getData: function() {
+                return new Promise((resolve) => {
+                    // Simulate API call
+                    setTimeout(() => {
+                        resolve({
+                            success: true,
+                            data: generateSampleData(moduleType)
+                        });
+                    }, 1000);
+                });
+            }
+        },
+        permissions: ['dashboard.view']
+    };
+    
+    // Register module
+    const module = window.DashboardModuleFramework.registerModule(moduleName, moduleConfig);
+    
+    // Activate module
+    window.DashboardModuleFramework.activateModule(moduleName);
+    
+    // Register widget
+    const widget = window.DashboardModuleFramework.registerWidget(moduleName, `${moduleName}_widget`, {
+        title: moduleTitle,
+        type: moduleType,
+        description: moduleDescription
+    });
+    
+    // Render widget
+    const container = createWidgetContainer(moduleName);
+    window.DashboardModuleFramework.renderWidget(moduleName, `${moduleName}_widget`, container.id);
+    
+    // Close modal
+    modal.remove();
+    
+    // Show success message
+    showCustomizationSuccess(`Module "${moduleTitle}" đã được thêm thành công`);
+}
+
+function createWidgetContainer(moduleName) {
+    // Create container for the widget
+    const container = document.createElement('div');
+    container.id = `widget-container-${moduleName}`;
+    container.className = 'widget-container';
+    
+    // Add to dashboard
+    const dashboardRight = document.querySelector('.dashboard-right');
+    if (dashboardRight) {
+        dashboardRight.appendChild(container);
+    }
+    
+    return container;
+}
+
+function generateSampleData(type) {
+    switch (type) {
+        case 'chart':
+            return {
+                labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                datasets: [{
+                    label: 'Dữ liệu mẫu',
+                    data: [12, 19, 15, 25, 22, 8, 3],
+                    borderColor: 'rgb(102, 126, 234)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)'
+                }]
+            };
+        case 'table':
+            return [
+                { name: 'Item 1', value: 100, status: 'Active' },
+                { name: 'Item 2', value: 200, status: 'Inactive' },
+                { name: 'Item 3', value: 150, status: 'Active' }
+            ];
+        case 'metric':
+            return {
+                value: Math.floor(Math.random() * 1000),
+                label: 'Tổng số',
+                change: '+12%'
+            };
+        default:
+            return { message: 'Dữ liệu mẫu' };
+    }
+}
+
+function setupExampleModules() {
+    // Register example modules
+    const exampleModules = [
+        {
+            name: 'sales',
+            config: {
+                title: 'Bán hàng',
+                type: 'chart',
+                description: 'Thống kê doanh số bán hàng',
+                api: {
+                    getData: function() {
+                        return Promise.resolve({
+                            success: true,
+                            data: generateSampleData('chart')
+                        });
+                    }
+                }
+            }
+        },
+        {
+            name: 'hr',
+            config: {
+                title: 'Nhân sự',
+                type: 'table',
+                description: 'Quản lý nhân viên',
+                api: {
+                    getData: function() {
+                        return Promise.resolve({
+                            success: true,
+                            data: generateSampleData('table')
+                        });
+                    }
+                }
+            }
+        }
+    ];
+    
+    // Register example modules
+    exampleModules.forEach(module => {
+        window.DashboardModuleFramework.registerModule(module.name, module.config);
+    });
 }
 
 function setupSwipeGestures() {
