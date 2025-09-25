@@ -79,6 +79,14 @@
     padding: 0;
 }
 
+/* Ensure PC layout is maintained */
+@media (min-width: 769px) {
+    .stats-grid {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 1rem !important;
+    }
+}
+
 .stat-card {
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(20px);
@@ -203,6 +211,14 @@
     margin: 0 auto;
     padding: 0 2rem;
     min-height: calc(100vh - 200px);
+}
+
+/* Ensure PC layout is maintained */
+@media (min-width: 769px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 2rem !important;
+    }
 }
 
 /* Dashboard Cards */
