@@ -807,6 +807,7 @@ function getAttendanceConfig() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            aspectRatio: 1,
             plugins: {
                 legend: {
                     display: false
@@ -868,6 +869,7 @@ function getDepartmentConfig() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            aspectRatio: 1,
             plugins: {
                 legend: {
                     display: false
@@ -920,6 +922,7 @@ function getTimeConfig() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            aspectRatio: 1,
             plugins: {
                 legend: {
                     display: false
@@ -1067,10 +1070,24 @@ function createDepartmentChart() {
         return;
     }
     console.log('Creating department chart...');
+    console.log('Canvas element:', ctx);
+    console.log('Canvas dimensions:', ctx.width, 'x', ctx.height);
     
     // Check if Chart.js is available
     if (typeof Chart === 'undefined') {
         console.error('Chart.js is not loaded');
+        return;
+    }
+    
+    // Check if canvas is ready
+    if (!ctx.getContext) {
+        console.error('Canvas getContext not available');
+        return;
+    }
+    
+    const canvasContext = ctx.getContext('2d');
+    if (!canvasContext) {
+        console.error('Cannot get 2D context from canvas');
         return;
     }
     
@@ -1144,6 +1161,7 @@ function createDepartmentChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            aspectRatio: 1,
             plugins: {
                 legend: {
                     display: true,
@@ -1203,8 +1221,10 @@ function createDepartmentChart() {
     try {
         departmentChart = new Chart(ctx, config);
         console.log('Department chart created successfully');
+        console.log('Department chart instance:', departmentChart);
     } catch (error) {
         console.error('Error creating department chart:', error);
+        console.error('Chart config:', config);
     }
 }
 
@@ -1215,10 +1235,24 @@ function createTimeChart() {
         return;
     }
     console.log('Creating time chart...');
+    console.log('Canvas element:', ctx);
+    console.log('Canvas dimensions:', ctx.width, 'x', ctx.height);
     
     // Check if Chart.js is available
     if (typeof Chart === 'undefined') {
         console.error('Chart.js is not loaded');
+        return;
+    }
+    
+    // Check if canvas is ready
+    if (!ctx.getContext) {
+        console.error('Canvas getContext not available');
+        return;
+    }
+    
+    const canvasContext = ctx.getContext('2d');
+    if (!canvasContext) {
+        console.error('Cannot get 2D context from canvas');
         return;
     }
     
@@ -1281,6 +1315,7 @@ function createTimeChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            aspectRatio: 1,
             plugins: {
                 legend: {
                     display: true,
@@ -1340,8 +1375,10 @@ function createTimeChart() {
     try {
         timeChart = new Chart(ctx, config);
         console.log('Time chart created successfully');
+        console.log('Time chart instance:', timeChart);
     } catch (error) {
         console.error('Error creating time chart:', error);
+        console.error('Chart config:', config);
     }
 }
 
