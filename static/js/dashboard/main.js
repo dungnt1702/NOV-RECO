@@ -2220,32 +2220,16 @@ function showCustomizationSuccess(message) {
         <span>${message}</span>
     `;
     
-    // Add styles
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #48bb78;
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-weight: 600;
-        animation: slideInRight 0.3s ease;
-    `;
+    // Styles are now in CSS
     
     document.body.appendChild(notification);
     
     // Remove after 3 seconds
     setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease';
+        notification.classList.add('fade-out');
         setTimeout(() => {
             if (notification.parentElement) {
-                document.body.removeChild(notification);
+                notification.remove();
             }
         }, 300);
     }, 3000);
@@ -2304,21 +2288,6 @@ function showModuleIntegrationModal() {
                 <button class="btn btn-primary" id="addModule">Thêm Module</button>
             </div>
         </div>
-    `;
-    
-    // Add styles
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        animation: fadeIn 0.3s ease;
     `;
     
     document.body.appendChild(modal);
@@ -2400,10 +2369,22 @@ function createWidgetContainer(moduleName) {
     container.id = `widget-container-${moduleName}`;
     container.className = 'widget-container';
     
+    // Add widget content
+    container.innerHTML = `
+        <h4><i class="fas fa-puzzle-piece"></i> ${moduleName.charAt(0).toUpperCase() + moduleName.slice(1)} Module</h4>
+        <div class="widget-content">
+            <p>Module đã được tích hợp thành công!</p>
+            <div class="widget-status">
+                <span class="status-indicator active"></span>
+                <span>Đang hoạt động</span>
+            </div>
+        </div>
+    `;
+    
     // Add to dashboard
-    const dashboardRight = document.querySelector('.dashboard-right');
-    if (dashboardRight) {
-        dashboardRight.appendChild(container);
+    const moduleIntegrationCenter = document.querySelector('.module-integration-center');
+    if (moduleIntegrationCenter) {
+        moduleIntegrationCenter.appendChild(container);
     }
     
     return container;
