@@ -653,11 +653,16 @@ function setupInteractiveElements() {
 }
 
 function initializeCharts() {
+    console.log('Initializing charts...');
+    
     // Initialize main chart
     createMainChart();
     
     // Initialize additional charts
+    console.log('Creating department chart...');
     createDepartmentChart();
+    
+    console.log('Creating time chart...');
     createTimeChart();
     
     // Add color coding to stat cards
@@ -671,6 +676,8 @@ function initializeCharts() {
     
     // Setup customization system
     setupCustomizationSystem();
+    
+    console.log('Charts initialization completed');
     
     // Setup module integration
     setupModuleIntegration();
