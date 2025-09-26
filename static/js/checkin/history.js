@@ -117,9 +117,9 @@ function setupEventListeners() {
     }
     
     // Location filter
-    const areaFilter = document.getElementById('areaFilter');
-    if (areaFilter) {
-        areaFilter.addEventListener('change', applyFilters);
+    const locationFilter = document.getElementById('locationFilter');
+    if (locationFilter) {
+        locationFilter.addEventListener('change', applyFilters);
     }
 
     const checkinTypeFilter = document.getElementById('checkinTypeFilter');
@@ -238,16 +238,16 @@ async function loadAreas() {
             const data = await response.json();
             const areas = Array.isArray(data) ? data : (data.areas || data.results || []);
             
-            const areaSelect = document.getElementById('areaFilter');
-            if (areaSelect) {
+            const locationSelect = document.getElementById('locationFilter');
+            if (locationSelect) {
                 // Clear existing options except first one
-                areaSelect.innerHTML = '<option value="">Tất cả địa điểm</option>';
+                locationSelect.innerHTML = '<option value="">Tất cả địa điểm</option>';
                 
                 areas.forEach(area => {
                     const option = document.createElement('option');
                     option.value = area.id;
                     option.textContent = area.name;
-                    areaSelect.appendChild(option);
+                    locationSelect.appendChild(option);
                 });
             }
         }
@@ -316,7 +316,7 @@ function applyFilters() {
     const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
     const dateFrom = document.getElementById('dateFrom')?.value || '';
     const dateTo = document.getElementById('dateTo')?.value || '';
-    const area = document.getElementById('areaFilter')?.value || '';
+    const location = document.getElementById('locationFilter')?.value || '';
     const checkinType = document.getElementById('checkinTypeFilter')?.value || '';
     
     filteredCheckins = allCheckins.filter(checkin => {
@@ -340,8 +340,8 @@ function applyFilters() {
             if (checkinDate > toDate) return false;
         }
         
-        // Area filter
-        if (area && checkin.area && checkin.area.toString() !== area) {
+        // Location filter
+        if (location && checkin.location && checkin.location.toString() !== location) {
             return false;
         }
         
@@ -362,7 +362,7 @@ function clearFilters() {
     document.getElementById('search-input').value = '';
     document.getElementById('date-from').value = '';
     document.getElementById('date-to').value = '';
-    document.getElementById('area-filter').value = '';
+    document.getElementById('locationFilter').value = '';
     document.getElementById('checkinTypeFilter').value = '';
     
     // Reset to all check-ins
@@ -379,14 +379,14 @@ function updateFilterCount() {
     const searchTerm = document.getElementById('search-input')?.value.trim() || '';
     const dateFrom = document.getElementById('date-from')?.value || '';
     const dateTo = document.getElementById('date-to')?.value || '';
-    const area = document.getElementById('area-filter')?.value || '';
+    const location = document.getElementById('locationFilter')?.value || '';
     
     let activeFilters = 0;
     
     if (searchTerm) activeFilters++;
     if (dateFrom) activeFilters++;
     if (dateTo) activeFilters++;
-    if (area) activeFilters++;
+    if (location) activeFilters++;
     
     const filterCountText = document.getElementById('filter-count-text');
     const filterCount = document.getElementById('filter-count');

@@ -527,7 +527,7 @@ async function loadAreas() {
     if (response.ok) {
       const data = await response.json();
       const areas = data.results || data; // Handle both paginated and direct array responses
-      populateAreaFilter(areas);
+      populateLocationFilter(areas);
     }
   } catch (error) {
     console.error('Error loading areas:', error);
@@ -582,10 +582,10 @@ function populateUserFilter(users) {
   }
 }
 
-function populateAreaFilter(areas) {
-  const areaFilter = document.getElementById('areaFilter');
-  if (areaFilter) {
-    areaFilter.innerHTML = '<option value="">Tất cả địa điểm</option>' +
+function populateLocationFilter(areas) {
+  const locationFilter = document.getElementById('locationFilter');
+  if (locationFilter) {
+    locationFilter.innerHTML = '<option value="">Tất cả địa điểm</option>' +
       areas.map(area => `<option value="${area.id}">${area.name}</option>`).join('');
   }
 }
@@ -595,7 +595,7 @@ function applyFilters() {
   const dateTo = document.getElementById('dateTo')?.value || '';
   const departmentId = document.getElementById('departmentFilter')?.value || '';
   const userId = document.getElementById('userFilter')?.value || '';
-  const areaId = document.getElementById('areaFilter')?.value || '';
+  const locationId = document.getElementById('locationFilter')?.value || '';
   const checkinType = document.getElementById('checkinTypeFilter')?.value || '';
   const employeeIdSearch = (document.getElementById('employeeIdSearch')?.value || '').trim().toLowerCase();
 
@@ -613,8 +613,8 @@ function applyFilters() {
     // User filter
     if (userId && checkin.user_id !== parseInt(userId)) return false;
 
-    // Area filter
-    if (areaId && checkin.area_id !== parseInt(areaId)) return false;
+    // Location filter
+    if (locationId && checkin.location_id !== parseInt(locationId)) return false;
 
     // Checkin type filter
     if (checkinType && checkin.checkin_type !== checkinType) return false;
@@ -853,8 +853,8 @@ document.addEventListener('DOMContentLoaded', function() {
       if (departmentFilter) departmentFilter.value = '';
       const userFilterSel = document.getElementById('userFilter');
       if (userFilterSel) userFilterSel.value = '';
-      const areaFilterSel = document.getElementById('areaFilter');
-      if (areaFilterSel) areaFilterSel.value = '';
+      const locationFilterSel = document.getElementById('locationFilter');
+      if (locationFilterSel) locationFilterSel.value = '';
       const dateFromSel = document.getElementById('dateFrom');
       if (dateFromSel) dateFromSel.value = '';
       const dateToSel = document.getElementById('dateTo');
@@ -878,10 +878,10 @@ document.addEventListener('DOMContentLoaded', function() {
     userFilter.addEventListener('change', applyFilters);
   }
 
-  // Area filter change
-  const areaFilter = document.getElementById('areaFilter');
-  if (areaFilter) {
-    areaFilter.addEventListener('change', applyFilters);
+  // Location filter change
+  const locationFilter = document.getElementById('locationFilter');
+  if (locationFilter) {
+    locationFilter.addEventListener('change', applyFilters);
   }
 
   // Date filters
