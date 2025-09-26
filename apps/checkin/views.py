@@ -18,9 +18,9 @@ from .utils import haversine_m, find_nearest_location
 @login_required
 def checkin_action_view(request):
     """Trang check-in chính"""
-    areas = Location.objects.filter(is_active=True)
+    locations = Location.objects.filter(is_active=True)
     context = {
-        'areas': areas,
+        'locations': locations,
     }
     return render(request, 'checkin/action.html', context)
 
@@ -34,7 +34,7 @@ def checkin_submit_view(request):
         lat = float(request.POST.get('lat', 0))
         lng = float(request.POST.get('lng', 0))
         note = request.POST.get('note', '')
-        area_id = request.POST.get('area_id')
+        location_id = request.POST.get('location_id')
         checkin_type = request.POST.get('checkin_type', '1')  # Default to '1' (Chấm công)
         address = request.POST.get('address', '')  # Địa chỉ từ reverse geocoding
         # Lấy ảnh
@@ -44,12 +44,12 @@ def checkin_submit_view(request):
                 {'success': False, 'error': 'Vui lòng chụp ảnh'}, status=400
             )
         # Tự động tìm địa điểm gần nhất dựa trên tọa độ
-        area, distance = find_nearest_location(lat, lng, area_id)
+        location, distance = find_nearest_location(lat, lng, location_id)
 
         # Tạo check-in
         checkin = Checkin.objects.create(
             user=request.user,
-            location=area,
+            location=location,
             lat=lat,
             lng=lng,
             address=address,
@@ -61,8 +61,8 @@ def checkin_submit_view(request):
         )
 
         # Tính khoảng cách
-        if area:
-            checkin.distance_m = haversine_m(area.lat, area.lng, lat, lng)
+        if location:
+            checkin.distance_m = haversine_m(location.lat, location.lng, lat, lng)
             checkin.save()
 
         # New pretty URL: /checkin/success/checkin_id/<id>/
@@ -74,10 +74,10 @@ def checkin_submit_view(request):
             'success': True,
             'checkin_id': checkin.id,
             'location_name': (
-                area.name
-                if area else 'Không xác định'
+                location.name
+                if location else 'Không xác định'
             ),
-            'area_id': area.id if area else None,
+            'location_id': location.id if location else None,
             'distance': distance if distance else checkin.distance_m,
             'redirect_url': redirect_url,
         })
@@ -172,7 +172,7 @@ def checkin_list_view(request):
 
     # Filtering
     search = request.GET.get('search', '')
-    area_id = request.GET.get('area_id', '')
+    location_id = request.GET.get('location_id', '')
     user_id = request.GET.get('user_id', '')
     date_from = request.GET.get('date_from', '')
     date_to = request.GET.get('date_to', '')
@@ -185,8 +185,8 @@ def checkin_list_view(request):
             Q(note__icontains=search)
         )
 
-    if area_id:
-        checkins = checkins.filter(location_id=area_id)
+    if location_id:
+        checkins = checkins.filter(location_id=location_id)
 
     if user_id:
         checkins = checkins.filter(user_id=user_id)
@@ -211,17 +211,17 @@ def checkin_list_view(request):
     page_obj = paginator.get_page(page_number)
 
     # Get filter options
-    areas = Location.objects.filter(is_active=True)
+    locations = Location.objects.filter(is_active=True)
     users = (User.objects.filter(is_active=True)
              .order_by('first_name', 'last_name'))
 
     context = {
         'page_obj': page_obj,
         'checkins': page_obj,
-        'areas': areas,
+        'locations': locations,
         'users': users,
         'search': search,
-        'area_id': area_id,
+        'location_id': location_id,
         'user_id': user_id,
         'date_from': date_from,
         'date_to': date_to,
@@ -238,7 +238,7 @@ def checkin_list_api(request):
 
     # Filtering
     search = request.GET.get('search', '')
-    area_id = request.GET.get('area_id', '')
+    location_id = request.GET.get('location_id', '')
     user_id = request.GET.get('user_id', '')
 
     if search:
@@ -249,8 +249,8 @@ def checkin_list_api(request):
             Q(note__icontains=search)
         )
 
-    if area_id:
-        checkins = checkins.filter(location_id=area_id)
+    if location_id:
+        checkins = checkins.filter(location_id=location_id)
 
     if user_id:
         checkins = checkins.filter(user_id=user_id)
@@ -284,7 +284,7 @@ def checkin_history_api(request):
 
     # Filtering
     search = request.GET.get('search', '')
-    area_id = request.GET.get('area_id', '')
+    location_id = request.GET.get('location_id', '')
 
     if search:
         checkins = checkins.filter(
@@ -292,8 +292,8 @@ def checkin_history_api(request):
             Q(location__name__icontains=search)
         )
 
-    if area_id:
-        checkins = checkins.filter(location_id=area_id)
+    if location_id:
+        checkins = checkins.filter(location_id=location_id)
 
     # Pagination
     page = int(request.GET.get('page', 1))
