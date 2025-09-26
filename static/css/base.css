@@ -950,6 +950,13 @@ svg {
     transform: scale(1.05);
 }
 
+/* Hide user menu toggle on mobile */
+@media (max-width: 768px) {
+    .user-menu-dropdown {
+        display: none;
+    }
+}
+
 .user-menu-content {
     position: absolute;
     top: 100%;
