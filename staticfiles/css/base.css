@@ -973,6 +973,21 @@ svg {
     transform: translateY(0);
 }
 
+/* Mobile responsive adjustments for user menu */
+@media (max-width: 768px) {
+    .user-menu-content {
+        right: -10px;
+        min-width: 200px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .user-menu-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+}
+
 .user-menu-header {
     padding: 1rem;
     border-bottom: 1px solid #e5e7eb;
