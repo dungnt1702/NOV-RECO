@@ -25,7 +25,7 @@ function exportCurrentToCSV() {
     rows.push([
       String(index + 1),
       c.user_name || '',
-      c.area_name || '',
+      c.location_name || '',
       c.lat != null ? (Number(c.lat).toFixed(6)) : '',
       c.lng != null ? (Number(c.lng).toFixed(6)) : '',
       c.distance_m != null ? (Number(c.distance_m).toFixed(2)) : '',
@@ -76,7 +76,7 @@ function exportCurrentToXLSX() {
     idx + 1,
     c.employee_id || '',
     c.user_name || '',
-    c.area_name || '',
+    c.location_name || '',
     c.lat != null ? Number(c.lat).toFixed(6) : '',
     c.lng != null ? Number(c.lng).toFixed(6) : '',
     c.distance_m != null ? Number(c.distance_m).toFixed(2) : '',
@@ -120,7 +120,7 @@ const sampleCheckins = [
   {
     id: 1,
     user_name: 'Nguyễn Văn A',
-    area_name: 'Văn phòng chính',
+    location_name: 'Văn phòng chính',
     lat: 10.7769,
     lng: 106.7009,
     distance_m: 15,
@@ -131,7 +131,7 @@ const sampleCheckins = [
   {
     id: 2,
     user_name: 'Trần Thị B',
-    area_name: 'Chi nhánh Quận 1',
+    location_name: 'Chi nhánh Quận 1',
     lat: 10.7831,
     lng: 106.6957,
     distance_m: 8,
@@ -295,7 +295,7 @@ function renderCheckinsTable(items = null) {
           <td>${checkin.employee_id || ''}</td>
           <td>${checkin.user_name || 'N/A'}</td>
           <td class="area-cell">
-            <i class="fas fa-map-marker-alt"></i>${checkin.area_name || 'N/A'}
+            <i class="fas fa-map-marker-alt"></i>${checkin.location_name || 'N/A'}
           </td>
           <td class="location-cell">
             ${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}
@@ -373,7 +373,7 @@ function renderMobileCards(items = null) {
         <div class="mobile-card-details">
           <div class="mobile-card-row">
             <span class="mobile-card-label">📍 Địa điểm:</span>
-            <span class="mobile-card-value">${checkin.area_name}</span>
+            <span class="mobile-card-value">${checkin.location_name}</span>
           </div>
           
           <div class="mobile-card-row">

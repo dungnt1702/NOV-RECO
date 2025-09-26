@@ -66,8 +66,8 @@ function generateFallbackData() {
             { id: 3, full_name: 'Employee User', role: 'employee', department: 'Tech' }
         ],
         checkins: [
-            { id: 1, user_name: 'Admin User', area_name: 'Văn phòng chính', checkin_type: 'check-in', created_at: new Date().toISOString() },
-            { id: 2, user_name: 'Manager User', area_name: 'Địa điểm A', checkin_type: 'check-out', created_at: new Date().toISOString() }
+            { id: 1, user_name: 'Admin User', location_name: 'Văn phòng chính', checkin_type: 'check-in', created_at: new Date().toISOString() },
+            { id: 2, user_name: 'Manager User', location_name: 'Địa điểm A', checkin_type: 'check-out', created_at: new Date().toISOString() }
         ],
         dashboard_stats: {
             today_checkins: 15,
@@ -162,7 +162,7 @@ function updateActivityList(activities) {
                 <i class="fas fa-user"></i>
             </div>
             <div class="activity-content">
-                <p><strong>${activity.user_name}</strong> đã ${activity.checkin_type} tại <strong>${activity.area_name}</strong></p>
+                <p><strong>${activity.user_name}</strong> đã ${activity.checkin_type} tại <strong>${activity.location_name}</strong></p>
                 <span class="activity-time">${formatDateTime(activity.created_at)}</span>
             </div>
             <div class="activity-icon">
@@ -357,7 +357,7 @@ function showCheckinAlert(checkinData) {
                 <i class="fas fa-map-marker-alt"></i>
             </div>
             <div class="alert-text">
-                <strong>${checkinData.user_name}</strong> vừa check-in tại <strong>${checkinData.area_name}</strong>
+                <strong>${checkinData.user_name}</strong> vừa check-in tại <strong>${checkinData.location_name}</strong>
             </div>
             <button class="alert-close" onclick="this.parentElement.parentElement.remove()">
                 <i class="fas fa-times"></i>
@@ -1936,9 +1936,9 @@ function getCheckinData() {
         return data.checkins.map(checkin => [
             new Date(checkin.created_at).toLocaleDateString('vi-VN'),
             Math.floor(Math.random() * 50) + 10, // Simulated check-in count
-            checkin.area_name || 'Unknown Area',
+            checkin.location_name || 'Unknown Area',
             new Date(checkin.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-            checkin.area_name || 'Unknown Area',
+            checkin.location_name || 'Unknown Area',
             Math.floor(Math.random() * 20) + 5 // Simulated user count
         ]);
     }
@@ -2010,7 +2010,7 @@ function getActivityData() {
             new Date(checkin.created_at).toLocaleString('vi-VN'),
             checkin.user_name,
             checkin.checkin_type === 'check-in' ? 'Check-in' : 'Check-out',
-            checkin.area_name,
+            checkin.location_name,
             checkin.checkin_type
         ]);
     }
@@ -2871,7 +2871,7 @@ function createActivityItem(activity) {
     
     // Handle different data structures
     const userName = activity.user_name || (activity.user && activity.user.name) || 'Unknown User';
-    const areaName = activity.area_name || (activity.area && activity.area.name) || 'Unknown Area';
+    const areaName = activity.location_name || (activity.location && activity.location.name) || 'Unknown Area';
     const timeAgo = activity.time_ago || formatDateTime(activity.created_at);
     const checkinType = activity.checkin_type || 'check-in';
     

@@ -321,7 +321,7 @@ function applyFilters() {
     
     filteredCheckins = allCheckins.filter(checkin => {
         // Search filter
-        if (searchTerm && !checkin.area_name.toLowerCase().includes(searchTerm) &&
+        if (searchTerm && !checkin.location_name.toLowerCase().includes(searchTerm) &&
             !(checkin.note && checkin.note.toLowerCase().includes(searchTerm))) {
             return false;
         }
@@ -456,7 +456,7 @@ function renderCheckins(checkins = null) {
                     <div class="mobile-card-details">
                         <div class="mobile-card-row">
                             <span class="mobile-card-label">📍 Địa điểm:</span>
-                            <span class="mobile-card-value">${checkin.area_name || 'N/A'}</span>
+                            <span class="mobile-card-value">${checkin.location_name || 'N/A'}</span>
                         </div>
                         
                         <div class="mobile-card-row">
@@ -516,7 +516,7 @@ function renderCheckins(checkins = null) {
                 <td>
                     <div class="area-cell">
                         <i class="fas fa-map-marker-alt"></i>
-                        ${checkin.area_name || 'N/A'}
+                        ${checkin.location_name || 'N/A'}
                     </div>
                 </td>
                 <td>

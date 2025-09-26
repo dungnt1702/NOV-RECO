@@ -173,7 +173,7 @@ class DashboardTestData {
                 id: i + 1,
                 user_id: Math.floor(Math.random() * 5) + 1,
                 user_name: this.users[Math.floor(Math.random() * this.users.length)].full_name,
-                area_name: areas[Math.floor(Math.random() * areas.length)],
+                location_name: areas[Math.floor(Math.random() * areas.length)],
                 checkin_type: types[Math.floor(Math.random() * types.length)],
                 created_at: date.toISOString(),
                 latitude: 21.0285 + (Math.random() - 0.5) * 0.01,
@@ -377,7 +377,7 @@ class DashboardTestData {
                 type: 'checkin_alert',
                 data: {
                     user_name: this.users[Math.floor(Math.random() * this.users.length)].full_name,
-                    area_name: this.areas[Math.floor(Math.random() * this.areas.length)].name,
+                    location_name: this.areas[Math.floor(Math.random() * this.areas.length)].name,
                     timestamp: new Date().toISOString()
                 }
             },
