@@ -16,6 +16,7 @@ class Checkin(models.Model):
     )
     lat = models.FloatField()
     lng = models.FloatField()
+    address = models.TextField(blank=True, help_text="Địa chỉ được lấy từ reverse geocoding")
     photo = models.ImageField(upload_to="checkins/%Y/%m/%d/")
     note = models.CharField(max_length=255, blank=True)
     checkin_type = models.CharField(

@@ -36,6 +36,7 @@ def checkin_submit_view(request):
         note = request.POST.get('note', '')
         area_id = request.POST.get('area_id')
         checkin_type = request.POST.get('checkin_type', '1')  # Default to '1' (Chấm công)
+        address = request.POST.get('address', '')  # Địa chỉ từ reverse geocoding
         # Lấy ảnh
         photo = request.FILES.get('photo')
         if not photo:
@@ -51,6 +52,7 @@ def checkin_submit_view(request):
             area=area,
             lat=lat,
             lng=lng,
+            address=address,
             photo=photo,
             note=note,
             checkin_type=checkin_type,
@@ -103,6 +105,7 @@ def checkin_success_view(request, checkin_id=None):
                 'coordinates': (
                     f"{checkin.lat:.6f}, {checkin.lng:.6f}"
                 ),
+                'address': checkin.address or 'Không xác định',
                 'checkin_time': checkin.created_at.strftime(
                     '%d/%m/%Y %H:%M:%S'
                 ),

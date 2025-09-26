@@ -5,6 +5,7 @@ let map;
 let marker;
 let currentPosition = null;
 let currentPhoto = null;
+let currentAddress = null;
 let stream = null;
 let currentFacingMode = 'environment'; // 'environment' for back camera, 'user' for front camera
 
@@ -288,6 +289,9 @@ async function getCurrentLocation() {
                 coordsElement.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
             }
             
+            // Reverse geocoding to get address
+            reverseGeocode(lat, lng);
+            
             updateSubmitButtonState();
             showAlert('✅ Đã lấy vị trí thành công!', 'success');
             setLoading(btn, false);
@@ -325,6 +329,61 @@ async function getCurrentLocation() {
             maximumAge: 30000
         }
     );
+}
+
+// Reverse geocoding to get address from coordinates
+async function reverseGeocode(lat, lng) {
+    try {
+        // Show loading state for address
+        const addressElement = document.getElementById('currentAddress');
+        const addressDisplay = document.getElementById('addressDisplay');
+        
+        if (addressElement) {
+            addressElement.textContent = 'Đang tải địa chỉ...';
+        }
+        if (addressDisplay) {
+            addressDisplay.style.display = 'block';
+        }
+        
+        // Using OpenStreetMap Nominatim API
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=vi`
+        );
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data && data.display_name) {
+            currentAddress = data.display_name;
+            
+            // Update address display
+            if (addressElement) {
+                addressElement.textContent = currentAddress;
+            }
+            
+            console.log('Address found:', currentAddress);
+        } else {
+            throw new Error('No address data received');
+        }
+        
+    } catch (error) {
+        console.error('Reverse geocoding error:', error);
+        currentAddress = 'Không thể xác định địa chỉ';
+        
+        // Update address display with error message
+        const addressElement = document.getElementById('currentAddress');
+        if (addressElement) {
+            addressElement.textContent = currentAddress;
+        }
+        
+        const addressDisplay = document.getElementById('addressDisplay');
+        if (addressDisplay) {
+            addressDisplay.style.display = 'block';
+        }
+    }
 }
 
 // Open camera handler
@@ -661,6 +720,7 @@ async function handleSubmit(e) {
         const formData = new FormData();
         formData.append('lat', currentPosition.lat);
         formData.append('lng', currentPosition.lng);
+        formData.append('address', currentAddress || '');
         formData.append('photo', currentPhoto);
         
         const note = document.getElementById('note').value;
