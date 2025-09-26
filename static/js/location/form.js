@@ -4,6 +4,7 @@ let currentLocation = null;
 let isEditing = false;
 let editingMarker = null;
 let editingCircle = null;
+let currentAddress = null;
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function () {
@@ -41,6 +42,9 @@ function initializeMap() {
 
         // Update map marker
         updateMapMarker(lat, lng);
+        
+        // Get address from coordinates
+        reverseGeocode(lat, lng);
     });
 }
 
@@ -56,6 +60,11 @@ function setupEventListeners() {
     document.getElementById('lat').addEventListener('input', updateMapFromInputs);
     document.getElementById('lng').addEventListener('input', updateMapFromInputs);
     document.getElementById('radius_m').addEventListener('input', updateMapFromInputs);
+    
+    // Address field manual edit tracking
+    document.getElementById('address').addEventListener('input', function() {
+        this.dataset.autoFilled = 'false';
+    });
 }
 
 // Load location data for editing
@@ -69,6 +78,7 @@ async function loadLocation(locationId) {
         // Fill form
         document.getElementById('name').value = location.name;
         document.getElementById('description').value = location.description || '';
+        document.getElementById('address').value = location.address || '';
         document.getElementById('lat').value = location.lat;
         document.getElementById('lng').value = location.lng;
         document.getElementById('radius_m').value = location.radius_m;
@@ -135,6 +145,11 @@ function updateMapFromInputs() {
         if (editingCircle) {
             editingCircle.setRadius(radius);
         }
+        
+        // Get address from coordinates (only if both lat and lng are valid)
+        if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+            reverseGeocode(lat, lng);
+        }
     }
 }
 
@@ -164,6 +179,9 @@ function getCurrentLocation() {
             // Update map marker
             updateMapMarker(lat, lng);
             map.setView([lat, lng], 15);
+            
+            // Get address from coordinates
+            reverseGeocode(lat, lng);
             
             // Show success message
             showAlert('Đã lấy vị trí hiện tại thành công!', 'success');
@@ -213,6 +231,7 @@ async function handleFormSubmit() {
     const formData = {
         name: document.getElementById('name').value,
         description: document.getElementById('description').value,
+        address: document.getElementById('address').value,
         lat: parseFloat(document.getElementById('lat').value),
         lng: parseFloat(document.getElementById('lng').value),
         radius_m: parseInt(document.getElementById('radius_m').value),
@@ -341,6 +360,34 @@ function showAlert(message, type) {
             alertDiv.parentNode.removeChild(alertDiv);
         }
     }, 5000);
+}
+
+// Reverse geocoding function
+async function reverseGeocode(lat, lng) {
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+        const data = await response.json();
+        
+        if (data && data.display_name) {
+            currentAddress = data.display_name;
+            
+            // Update address field if it's empty or if user hasn't manually edited it
+            const addressField = document.getElementById('address');
+            if (!addressField.value.trim() || addressField.dataset.autoFilled === 'true') {
+                addressField.value = currentAddress;
+                addressField.dataset.autoFilled = 'true';
+                
+                // Add visual indicator that address was auto-filled
+                addressField.style.backgroundColor = '#e8f5e8';
+                setTimeout(() => {
+                    addressField.style.backgroundColor = '';
+                }, 2000);
+            }
+        }
+    } catch (error) {
+        console.error('Reverse geocoding error:', error);
+        // Don't show error to user as this is a background operation
+    }
 }
 
 // Get CSRF token
