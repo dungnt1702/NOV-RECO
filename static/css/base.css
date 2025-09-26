@@ -316,3 +316,39 @@ body {
     100% { transform: rotate(360deg); }
 }
 
+/* Global Page Title Styles */
+.page-title {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.page-title h1,
+.page-title h2,
+.page-title h3 {
+    text-align: center !important;
+    margin: 0;
+}
+
+.page-title i {
+    text-align: center !important;
+}
+
+/* Ensure page titles are centered on all screen sizes */
+@media (max-width: 768px) {
+    .page-title {
+        text-align: center !important;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .page-title h1,
+    .page-title h2,
+    .page-title h3 {
+        text-align: center !important;
+    }
+}
+
