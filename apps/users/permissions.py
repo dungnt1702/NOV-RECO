@@ -111,14 +111,14 @@ def can_view_all_checkins(view_func):
     return permission_required('checkin.can_view_all_checkins')(view_func)
 
 
-def can_manage_areas(view_func):
-    """Có quyền quản lý areas"""
-    return permission_required('area.can_manage_areas')(view_func)
+def can_manage_locations(view_func):
+    """Có quyền quản lý locations"""
+    return permission_required('location.can_manage_locations')(view_func)
 
 
-def can_view_areas(view_func):
-    """Có quyền xem areas"""
-    return permission_required('area.can_view_areas')(view_func)
+def can_view_locations(view_func):
+    """Có quyền xem locations"""
+    return permission_required('location.can_view_locations')(view_func)
 
 
 def can_manage_departments(view_func):

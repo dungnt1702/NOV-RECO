@@ -278,13 +278,13 @@ class User(AbstractUser):
         """Kiểm tra có thể xem tất cả checkins không (mới)"""
         return self.has_perm('checkin.can_view_all_checkins')
     
-    def can_manage_areas_new(self):
-        """Kiểm tra có thể quản lý areas không (mới)"""
-        return self.has_perm('area.can_manage_areas')
-    
-    def can_view_areas_new(self):
-        """Kiểm tra có thể xem areas không (mới)"""
-        return self.has_perm('area.can_view_areas')
+    def can_manage_locations_new(self):
+        """Kiểm tra có thể quản lý locations không (mới)"""
+        return self.has_perm('location.can_manage_locations')
+
+    def can_view_locations_new(self):
+        """Kiểm tra có thể xem locations không (mới)"""
+        return self.has_perm('location.can_view_locations')
     
     def can_manage_departments_new(self):
         """Kiểm tra có thể quản lý departments không (mới)"""

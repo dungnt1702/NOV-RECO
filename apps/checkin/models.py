@@ -11,9 +11,9 @@ class Checkin(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
     )
-    location = models.ForeignKey(
-        'location.Location', on_delete=models.CASCADE, null=True, blank=True
-    )
+    # location = models.ForeignKey(
+    #     'location.Location', on_delete=models.CASCADE, null=True, blank=True
+    # )
     lat = models.FloatField()
     lng = models.FloatField()
     address = models.TextField(blank=True, help_text="Địa chỉ được lấy từ reverse geocoding")
