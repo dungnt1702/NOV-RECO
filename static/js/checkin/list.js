@@ -18,7 +18,7 @@ function exportCurrentToCSV() {
 
   const rows = [];
   // Header
-  rows.push(['Số thứ tự', 'Nhân viên', 'Khu vực', 'Tọa độ (lat)', 'Tọa độ (lng)', 'Khoảng cách (mét)', 'Loại checkin', 'Thời gian', 'Ghi chú']);
+  rows.push(['Số thứ tự', 'Nhân viên', 'Địa điểm', 'Tọa độ (lat)', 'Tọa độ (lng)', 'Khoảng cách (mét)', 'Loại checkin', 'Thời gian', 'Ghi chú']);
   
   // Data rows
   data.forEach((c, index) => {
@@ -71,7 +71,7 @@ function exportCurrentToXLSX() {
       ? allCheckins
       : (window.originalCheckins || allCheckins);
 
-  const header = ['Số thứ tự', 'Mã nhân viên', 'Nhân viên', 'Khu vực', 'Tọa độ (lat)', 'Tọa độ (lng)', 'Khoảng cách (mét)', 'Loại checkin', 'Thời gian', 'Ghi chú'];
+  const header = ['Số thứ tự', 'Mã nhân viên', 'Nhân viên', 'Địa điểm', 'Tọa độ (lat)', 'Tọa độ (lng)', 'Khoảng cách (mét)', 'Loại checkin', 'Thời gian', 'Ghi chú'];
   const rows = data.map((c, idx) => [
     idx + 1,
     c.employee_id || '',

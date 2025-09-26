@@ -67,7 +67,7 @@ function generateFallbackData() {
         ],
         checkins: [
             { id: 1, user_name: 'Admin User', area_name: 'Văn phòng chính', checkin_type: 'check-in', created_at: new Date().toISOString() },
-            { id: 2, user_name: 'Manager User', area_name: 'Khu vực A', checkin_type: 'check-out', created_at: new Date().toISOString() }
+            { id: 2, user_name: 'Manager User', area_name: 'Địa điểm A', checkin_type: 'check-out', created_at: new Date().toISOString() }
         ],
         dashboard_stats: {
             today_checkins: 15,

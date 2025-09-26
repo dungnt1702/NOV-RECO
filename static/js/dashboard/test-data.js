@@ -161,7 +161,7 @@ class DashboardTestData {
     generateCheckins() {
         const checkins = [];
         const today = new Date();
-        const areas = ['Văn phòng chính', 'Khu vực A', 'Khu vực B', 'Khu vực C'];
+        const areas = ['Văn phòng chính', 'Địa điểm A', 'Địa điểm B', 'Địa điểm C'];
         const types = ['check-in', 'check-out'];
         
         for (let i = 0; i < 50; i++) {
@@ -276,34 +276,34 @@ class DashboardTestData {
                 longitude: 105.8542,
                 radius: 100,
                 is_active: true,
-                description: 'Khu vực văn phòng chính tại Hà Nội'
+                description: 'Địa điểm văn phòng chính tại Hà Nội'
             },
             {
                 id: 2,
-                name: 'Khu vực A',
+                name: 'Địa điểm A',
                 latitude: 21.0300,
                 longitude: 105.8560,
                 radius: 50,
                 is_active: true,
-                description: 'Khu vực làm việc A'
+                description: 'Địa điểm làm việc A'
             },
             {
                 id: 3,
-                name: 'Khu vực B',
+                name: 'Địa điểm B',
                 latitude: 21.0270,
                 longitude: 105.8520,
                 radius: 75,
                 is_active: true,
-                description: 'Khu vực làm việc B'
+                description: 'Địa điểm làm việc B'
             },
             {
                 id: 4,
-                name: 'Khu vực C',
+                name: 'Địa điểm C',
                 latitude: 21.0290,
                 longitude: 105.8580,
                 radius: 60,
                 is_active: false,
-                description: 'Khu vực làm việc C (tạm ngưng)'
+                description: 'Địa điểm làm việc C (tạm ngưng)'
             }
         ];
     }

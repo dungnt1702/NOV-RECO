@@ -169,7 +169,7 @@ def personal_password_change_view(request):
 def personal_checkin_history_view(request):
     """Lịch sử check-in cá nhân"""
     user = request.user
-    checkins = user.checkin_set.select_related('area').order_by('-created_at')
+    checkins = user.checkin_set.select_related('location').order_by('-created_at')
     
     # Pagination
     from django.core.paginator import Paginator

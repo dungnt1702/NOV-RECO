@@ -102,8 +102,8 @@ from checkin.models import Area
 # Create sample areas if not exist
 areas_data = [
     {
-        'name': 'Khu vực tự do',
-        'description': 'Khu vực check-in tự do cho nhân viên',
+        'name': 'Địa điểm tự do',
+        'description': 'Địa điểm check-in tự do cho nhân viên',
         'lat': 20.997042,
         'lng': 105.803160,
         'radius': 100

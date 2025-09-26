@@ -51,7 +51,7 @@ Tất cả tài liệu được tổ chức trong thư mục [`docs/`](./docs/):
 
 ### 🗺️ Area Management
 - **Interactive Maps** - Sử dụng Leaflet.js
-- **Radius-based Areas** - Khu vực theo bán kính
+- **Radius-based Areas** - Địa điểm theo bán kính
 - **Drag & Drop** - Kéo thả để tạo khu vực
 - **Real-time Preview** - Xem trước khu vực
 

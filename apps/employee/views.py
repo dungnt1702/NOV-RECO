@@ -101,7 +101,7 @@ def employee_detail_view(request, employee_id):
     
     # Get employee's check-ins
     from apps.checkin.models import Checkin
-    checkins = Checkin.objects.filter(user=employee).select_related('area').order_by('-created_at')[:10]
+    checkins = Checkin.objects.filter(user=employee).select_related('location').order_by('-created_at')[:10]
     
     context = {
         'employee': employee,
@@ -148,7 +148,7 @@ def employee_checkin_history_view(request, employee_id):
     employee = get_object_or_404(User, id=employee_id, role=UserRole.EMPLOYEE)
     
     from apps.checkin.models import Checkin
-    checkins = Checkin.objects.filter(user=employee).select_related('area').order_by('-created_at')
+    checkins = Checkin.objects.filter(user=employee).select_related('location').order_by('-created_at')
     
     # Pagination
     paginator = Paginator(checkins, 20)

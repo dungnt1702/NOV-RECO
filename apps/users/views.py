@@ -260,7 +260,7 @@ def user_detail_view(request, user_id):
     
     # Get user's check-ins
     from apps.checkin.models import Checkin
-    checkins = Checkin.objects.filter(user=user).select_related('area').order_by('-created_at')[:10]
+    checkins = Checkin.objects.filter(user=user).select_related('location').order_by('-created_at')[:10]
     
     context = {
         'user': user,

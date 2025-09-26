@@ -66,7 +66,7 @@ python start_and_test.py
 - Phòng Marketing
 - Phòng Hành chính
 
-### 📍 Khu vực (5 areas)
+### 📍 Địa điểm (5 areas)
 - Văn phòng chính (19-21 Vũ Trọng Phụng)
 - Chi nhánh Cầu Giấy
 - Chi nhánh Đống Đa

@@ -91,7 +91,7 @@ def dashboard_main_view(request):
         ).count()
         
         # Check-ins gần đây của user
-        user_recent_checkins = Checkin.objects.filter(user=user).select_related('area').order_by('-created_at')[:5]
+        user_recent_checkins = Checkin.objects.filter(user=user).select_related('location').order_by('-created_at')[:5]
         
         context.update({
             'user_today_checkins': user_today_checkins,
@@ -136,7 +136,7 @@ def dashboard_personal_view(request):
     ).count()
     
     # Check-ins gần đây
-    recent_checkins = Checkin.objects.filter(user=user).select_related('area').order_by('-created_at')[:5]
+    recent_checkins = Checkin.objects.filter(user=user).select_related('location').order_by('-created_at')[:5]
     
     context = {
         'user': user,

@@ -35,7 +35,7 @@ Dự án đã được migration thành công từ hệ thống role-based sang 
 - **Mô tả**: Nhân sự
 
 ### 5. **Secretary** (0 users)
-- **Quyền**: Toàn quyền liên quan tới Checkin, Khu vực
+- **Quyền**: Toàn quyền liên quan tới Checkin, Địa điểm
 - **Permissions**:
   - Quản lý checkins, areas
   - Xem báo cáo checkin
