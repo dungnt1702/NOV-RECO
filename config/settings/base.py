@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "apps.automation_test",
     "apps.absence",
     "apps.notifications",
+    "apps.module_settings",
 ]
 
 MIDDLEWARE = [
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.module_settings.middleware.ModulePermissionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
@@ -68,6 +70,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.checkin.context_processors.current_year",
+                "apps.module_settings.decorators.module_enabled_context_processor",
             ],
         },
     },

@@ -1,0 +1,223 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Quản lý Modules - {{ block.super }}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+.module-card {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    border: 2px solid transparent;
+}
+
+.module-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.module-enabled {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #f8fff9 0%, #e8f5e8 100%);
+}
+
+.module-disabled {
+    border-color: #dc3545;
+    background: linear-gradient(135deg, #fff8f8 0%, #ffe8e8 100%);
+}
+
+.status-badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+.toggle-btn {
+    border-radius: 20px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+    transform: scale(1.05);
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-cogs me-2"></i>
+                        Quản lý Modules
+                    </h1>
+                    <p class="text-muted mb-0">Bật/tắt các chức năng của hệ thống</p>
+                </div>
+                <div>
+                    <a href="{% url 'admin:module_settings_modulesettings_changelist' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-cog me-2"></i>
+                        Cài đặt chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-number">{{ enabled_count }}</div>
+                    <div>Modules đang bật</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-number">{{ disabled_count }}</div>
+                    <div>Modules đang tắt</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-number">{{ total_count }}</div>
+                    <div>Tổng số modules</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <div class="stats-number">{{ enabled_percentage }}%</div>
+                    <div>Tỷ lệ hoạt động</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modules Grid -->
+    <div class="row">
+        {% for module in modules %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card module-card {% if module.is_enabled %}module-enabled{% else %}module-disabled{% endif %}">
+                <div class="card-body">
+                    <!-- Module Header -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-title mb-1">{{ module.display_name }}</h5>
+                            <small class="text-muted">{{ module.module_name }}</small>
+                        </div>
+                        <span class="badge status-badge {% if module.is_enabled %}bg-success{% else %}bg-danger{% endif %}">
+                            {% if module.is_enabled %}
+                                <i class="fas fa-check me-1"></i>Bật
+                            {% else %}
+                                <i class="fas fa-times me-1"></i>Tắt
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <!-- Description -->
+                    {% if module.description %}
+                    <p class="card-text text-muted small mb-3">
+                        {{ module.description|truncatechars:100 }}
+                    </p>
+                    {% endif %}
+
+                    <!-- Actions -->
+                    <div class="d-grid gap-2">
+                        <button 
+                            class="btn toggle-btn {% if module.is_enabled %}btn-danger{% else %}btn-success{% endif %}"
+                            onclick="toggleModule('{{ module.module_name }}', this)"
+                            data-module="{{ module.module_name }}"
+                            data-enabled="{{ module.is_enabled|yesno:'true,false' }}"
+                        >
+                            {% if module.is_enabled %}
+                                <i class="fas fa-power-off me-2"></i>Tắt Module
+                            {% else %}
+                                <i class="fas fa-play me-2"></i>Bật Module
+                            {% endif %}
+                        </button>
+                    </div>
+
+                    <!-- Last Updated -->
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            Cập nhật: {{ module.updated_at|date:"d/m/Y H:i" }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function toggleModule(moduleName, button) {
+    const isEnabled = button.dataset.enabled === 'true';
+    const action = isEnabled ? 'tắt' : 'bật';
+    
+    if (!confirm(`Bạn có chắc chắn muốn ${action} module "${moduleName}"?`)) {
+        return;
+    }
+    
+    // Disable button during request
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+    
+    fetch(`{% url 'module_settings:toggle' 'PLACEHOLDER' %}`.replace('PLACEHOLDER', moduleName), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload page to update all modules
+            location.reload();
+        } else {
+            alert('Lỗi: ' + data.error);
+            // Reset button
+            button.disabled = false;
+            button.innerHTML = isEnabled ? 
+                '<i class="fas fa-power-off me-2"></i>Tắt Module' : 
+                '<i class="fas fa-play me-2"></i>Bật Module';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra khi cập nhật module');
+        // Reset button
+        button.disabled = false;
+        button.innerHTML = isEnabled ? 
+            '<i class="fas fa-power-off me-2"></i>Tắt Module' : 
+            '<i class="fas fa-play me-2"></i>Bật Module';
+    });
+}
+</script>
+{% endblock %}
