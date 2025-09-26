@@ -8,7 +8,7 @@ const sampleCheckins = [
   {
     id: 1,
     user_name: 'Nguyễn Văn A',
-    area_name: 'Văn phòng chính',
+    location_name: 'Văn phòng chính',
     lat: 10.7769,
     lng: 106.7009,
     distance_m: 15,
@@ -19,7 +19,7 @@ const sampleCheckins = [
   {
     id: 2,
     user_name: 'Trần Thị B',
-    area_name: 'Chi nhánh Quận 1',
+    location_name: 'Chi nhánh Quận 1',
     lat: 10.7831,
     lng: 106.6957,
     distance_m: 8,
@@ -121,7 +121,7 @@ function renderCheckinsTable(items = null) {
       <tr>
         <td>${checkin.id}</td>
         <td>${checkin.user_name}</td>
-        <td>${checkin.area_name}</td>
+        <td>${checkin.location_name}</td>
         <td>${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}</td>
         <td>${formatDistance(checkin.distance_m || 0)}</td>
         <td>${formatDate(checkin.created_at)}</td>
@@ -176,7 +176,7 @@ function renderMobileCards(items = null) {
         <div class="mobile-card-details">
           <div class="mobile-card-row">
             <span class="mobile-card-label">📍 Địa điểm:</span>
-            <span class="mobile-card-value">${checkin.area_name}</span>
+            <span class="mobile-card-value">${checkin.location_name}</span>
           </div>
           
           <div class="mobile-card-row">
@@ -207,7 +207,7 @@ function renderMobileCards(items = null) {
       </div>
         
         <div class="mobile-card-badges">
-          <span class="mobile-card-badge location">${checkin.area_name}</span>
+          <span class="mobile-card-badge location">${checkin.location_name}</span>
           <span class="mobile-card-badge distance">${formatDistance(checkin.distance_m || 0)}</span>
         </div>
       </div>
@@ -269,7 +269,7 @@ function applyFilters() {
   const filtered = allCheckins.filter(checkin => {
     // Search filter
     if (searchTerm && !checkin.user_name.toLowerCase().includes(searchTerm) &&
-        !checkin.area_name.toLowerCase().includes(searchTerm) &&
+        !checkin.location_name.toLowerCase().includes(searchTerm) &&
         !(checkin.note && checkin.note.toLowerCase().includes(searchTerm))) {
       return false;
     }

@@ -73,7 +73,7 @@ def checkin_submit_view(request):
         return JsonResponse({
             'success': True,
             'checkin_id': checkin.id,
-            'area_name': (
+            'location_name': (
                 area.name
                 if area else 'Không xác định'
             ),
@@ -133,7 +133,7 @@ def checkin_success_view(request, checkin_id=None):
             if request.user.department else 'N/A'
         ),
         'user_employee_id': request.user.username,
-        'area_name': 'N/A',
+        'location_name': 'N/A',
         'coordinates': 'N/A',
         'checkin_time': 'N/A',
         'note': '',
