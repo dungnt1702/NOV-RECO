@@ -14,6 +14,15 @@ class Office(models.Model):
     name = models.CharField(max_length=100, unique=True, help_text="Tên văn phòng")
     description = models.TextField(blank=True, help_text="Mô tả văn phòng")
     
+    # Địa điểm
+    location = models.ForeignKey(
+        'location.Location',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="Địa điểm của văn phòng"
+    )
+    
     # Quản lý cấp cao
     director = models.ForeignKey(
         'User', 

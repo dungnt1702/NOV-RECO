@@ -4,25 +4,30 @@
 {% block title %}Tạo Địa điểm Mới{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="stylesheet" href="{% static 'css/location/create.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-8 col-xl-6">
-            <!-- Header -->
-            <div class="text-center mb-4">
-                <h1 class="h2 mb-3 d-flex align-items-center justify-content-center">
-                    <i class="fas fa-map-marked-alt text-primary me-3"></i>
-                    Tạo Địa điểm Mới
-                </h1>
-            </div>
+<div class="location-form-page">
+    <div class="location-form-container">
+        <div class="location-form-header">
+            <h1 class="location-form-title">
+                <i class="fas fa-plus"></i> Tạo Địa điểm Mới
+            </h1>
+            <p class="location-form-subtitle">
+                Tạo địa điểm check-in mới
+            </p>
+        </div>
 
-            <!-- Form Card -->
-            <div class="card shadow">
-                <div class="card-body p-4">
-                    <form method="post">
+        <div class="location-form-content">
+            <div class="location-form-grid">
+                <!-- Form Section -->
+                <div class="location-form-section">
+                    <h3>
+                        <i class="fas fa-edit"></i> Thông tin Địa điểm
+                    </h3>
+                    <form id="locationFormElement" method="post">
                         {% csrf_token %}
                         
                         {% if form.errors %}
@@ -45,129 +50,84 @@
                             </div>
                         {% endif %}
 
-                        <!-- Location Name -->
-                        <div class="mb-3">
-                            <label for="{{ form.name.id_for_label }}" class="form-label">
-                                <i class="fas fa-tag text-primary me-2"></i>
-                                Tên địa điểm <span class="text-danger">*</span>
+                        <div class="form-group">
+                            <label for="name">Tên địa điểm *</label>
+                            <input type="text" id="name" name="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Mô tả</label>
+                            <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Địa chỉ chi tiết</label>
+                            <textarea id="address" name="address" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="radius_m">Bán kính (mét) *</label>
+                            <input type="number" id="radius_m" name="radius_m" class="form-control" value="100" min="10" max="10000" required>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="is_active" name="is_active" checked> 
+                                Địa điểm hoạt động
                             </label>
-                            {{ form.name }}
-                            {% if form.name.help_text %}
-                                <div class="form-text">{{ form.name.help_text }}</div>
-                            {% endif %}
-                            {% for error in form.name.errors %}
-                                <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-
-                        <!-- Description -->
-                        <div class="mb-3">
-                            <label for="{{ form.description.id_for_label }}" class="form-label">
-                                <i class="fas fa-info-circle text-primary me-2"></i>
-                                Mô tả
-                            </label>
-                            {{ form.description }}
-                            {% if form.description.help_text %}
-                                <div class="form-text">{{ form.description.help_text }}</div>
-                            {% endif %}
-                            {% for error in form.description.errors %}
-                                <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-
-                        <!-- Address -->
-                        <div class="mb-3">
-                            <label for="{{ form.address.id_for_label }}" class="form-label">
-                                <i class="fas fa-map-marker-alt text-primary me-2"></i>
-                                Địa chỉ chi tiết
-                            </label>
-                            {{ form.address }}
-                            {% if form.address.help_text %}
-                                <div class="form-text">{{ form.address.help_text }}</div>
-                            {% endif %}
-                            {% for error in form.address.errors %}
-                                <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-
-                        <!-- Coordinates -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.lat.id_for_label }}" class="form-label">
-                                    <i class="fas fa-map-pin text-primary me-2"></i>
-                                    Vĩ độ (Latitude) <span class="text-danger">*</span>
-                                </label>
-                                {{ form.lat }}
-                                {% if form.lat.help_text %}
-                                    <div class="form-text">{{ form.lat.help_text }}</div>
-                                {% endif %}
-                                {% for error in form.lat.errors %}
-                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.lng.id_for_label }}" class="form-label">
-                                    <i class="fas fa-map-pin text-primary me-2"></i>
-                                    Kinh độ (Longitude) <span class="text-danger">*</span>
-                                </label>
-                                {{ form.lng }}
-                                {% if form.lng.help_text %}
-                                    <div class="form-text">{{ form.lng.help_text }}</div>
-                                {% endif %}
-                                {% for error in form.lng.errors %}
-                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <!-- Radius -->
-                        <div class="mb-3">
-                            <label for="{{ form.radius_m.id_for_label }}" class="form-label">
-                                <i class="fas fa-expand-arrows-alt text-primary me-2"></i>
-                                Bán kính (mét) <span class="text-danger">*</span>
-                            </label>
-                            {{ form.radius_m }}
-                            {% if form.radius_m.help_text %}
-                                <div class="form-text">{{ form.radius_m.help_text }}</div>
-                            {% endif %}
-                            {% for error in form.radius_m.errors %}
-                                <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-
-                        <!-- Is Active -->
-                        <div class="mb-4">
-                            <div class="form-check">
-                                {{ form.is_active }}
-                                <label for="{{ form.is_active.id_for_label }}" class="form-check-label">
-                                    <i class="fas fa-toggle-on text-success me-2"></i>
-                                    Địa điểm hoạt động
-                                </label>
-                            </div>
-                            {% for error in form.is_active.errors %}
-                                <div class="invalid-feedback d-block">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="{% url 'location:list' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-times me-2"></i>
-                                Hủy
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-2"></i>
-                                Tạo Địa điểm
-                            </button>
                         </div>
                     </form>
                 </div>
+
+                <!-- Map Section -->
+                <div class="location-form-section">
+                    <h3>
+                        <i class="fas fa-map"></i> Vị trí Địa điểm
+                    </h3>
+                    <div id="map" class="map-container"></div>
+                    
+                    <!-- Location Input Methods -->
+                    <div class="location-methods">
+                        <div class="location-method">
+                            <h4><i class="fas fa-mouse-pointer"></i> Chọn trên bản đồ</h4>
+                            <p>Nhấp vào bản đồ để chọn vị trí địa điểm</p>
+                        </div>
+                        
+                        <div class="location-method">
+                            <h4><i class="fas fa-location-arrow"></i> Định vị GPS</h4>
+                            <button type="button" id="getCurrentLocationBtn" class="btn btn-info">
+                                <i class="fas fa-location-arrow"></i> Lấy vị trí hiện tại
+                            </button>
+                        </div>
+                        
+                        <div class="location-method">
+                            <h4><i class="fas fa-keyboard"></i> Nhập tọa độ</h4>
+                            <div class="coordinate-inputs">
+                                <div class="form-group">
+                                    <label for="lat">Vĩ độ *</label>
+                                    <input type="number" id="lat" name="lat" class="form-control" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lng">Kinh độ *</label>
+                                    <input type="number" id="lng" name="lng" class="form-control" step="any" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="location-form-actions">
+                <button type="button" id="saveLocationBtn" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Tạo Địa điểm
+                </button>
+                <a href="{% url 'location:list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/location/create.js' %}"></script>
-{% endblock %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'js/location/form.js' %}"></script>
 {% endblock %}
