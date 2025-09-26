@@ -59,10 +59,6 @@
                             <textarea id="description" name="description" class="form-control" rows="3"></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="address">Địa chỉ chi tiết</label>
-                            <textarea id="address" name="address" class="form-control" rows="2"></textarea>
-                        </div>
-                        <div class="form-group">
                             <label for="radius_m">Bán kính (mét) *</label>
                             <input type="number" id="radius_m" name="radius_m" class="form-control" value="100" min="10" max="10000" required>
                         </div>
@@ -81,6 +77,19 @@
                         <i class="fas fa-map"></i> Vị trí Địa điểm
                     </h3>
                     <div id="map" class="map-container"></div>
+                    
+                    <!-- Address Field -->
+                    <div class="form-group address-field">
+                        <label for="address">
+                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                            Địa chỉ chi tiết
+                        </label>
+                        <textarea id="address" name="address" class="form-control" rows="2" placeholder="Địa chỉ sẽ được tự động điền khi chọn vị trí trên bản đồ"></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Địa chỉ sẽ được tự động cập nhật khi bạn chọn vị trí trên bản đồ hoặc sử dụng GPS
+                        </div>
+                    </div>
                     
                     <!-- Location Input Methods -->
                     <div class="location-methods">

@@ -110,6 +110,39 @@
     overflow: hidden;
 }
 
+/* Address Field */
+.location-form-page .address-field {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #e9ecef;
+}
+
+.location-form-page .address-field label {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.location-form-page .address-field label i {
+    color: #667eea;
+}
+
+.location-form-page .address-field .form-text {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.location-form-page .address-field .form-text i {
+    color: #17a2b8;
+}
+
 /* Location Methods */
 .location-form-page .location-methods {
     display: flex;
