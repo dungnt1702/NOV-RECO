@@ -167,7 +167,7 @@ def checkin_history_view(request):
 @permission_required('checkin.can_view_all_checkins')
 def checkin_list_view(request):
     """Danh sách check-in cho quản lý"""
-    checkins = (Checkin.objects.select_related('user', 'area')
+    checkins = (Checkin.objects.select_related('user', 'location')
                 .order_by('-created_at'))
 
     # Filtering
@@ -233,7 +233,7 @@ def checkin_list_view(request):
 @login_required
 def checkin_list_api(request):
     """API danh sách check-in"""
-    checkins = (Checkin.objects.select_related('user', 'area')
+    checkins = (Checkin.objects.select_related('user', 'location')
                 .order_by('-created_at'))
 
     # Filtering
