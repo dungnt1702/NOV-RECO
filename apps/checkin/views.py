@@ -43,7 +43,7 @@ def checkin_submit_view(request):
             return JsonResponse(
                 {'success': False, 'error': 'Vui lòng chụp ảnh'}, status=400
             )
-        # Tự động tìm khu vực gần nhất dựa trên tọa độ
+        # Tự động tìm địa điểm gần nhất dựa trên tọa độ
         area, distance = find_nearest_location(lat, lng, area_id)
 
         # Tạo check-in

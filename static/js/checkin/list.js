@@ -585,7 +585,7 @@ function populateUserFilter(users) {
 function populateAreaFilter(areas) {
   const areaFilter = document.getElementById('areaFilter');
   if (areaFilter) {
-    areaFilter.innerHTML = '<option value="">Tất cả khu vực</option>' +
+    areaFilter.innerHTML = '<option value="">Tất cả địa điểm</option>' +
       areas.map(area => `<option value="${area.id}">${area.name}</option>`).join('');
   }
 }

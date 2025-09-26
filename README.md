@@ -46,14 +46,14 @@ Tất cả tài liệu được tổ chức trong thư mục [`docs/`](./docs/):
 ### 📍 Check-in Management
 - **GPS-based Check-in** - Sử dụng vị trí thực tế
 - **Photo Capture** - Chụp ảnh khi check-in
-- **Area Detection** - Tự động phát hiện khu vực
+- **Area Detection** - Tự động phát hiện địa điểm
 - **Real-time Validation** - Kiểm tra quyền truy cập
 
 ### 🗺️ Area Management
 - **Interactive Maps** - Sử dụng Leaflet.js
 - **Radius-based Areas** - Địa điểm theo bán kính
-- **Drag & Drop** - Kéo thả để tạo khu vực
-- **Real-time Preview** - Xem trước khu vực
+- **Drag & Drop** - Kéo thả để tạo địa điểm
+- **Real-time Preview** - Xem trước địa điểm
 
 ### 👥 User Management
 - **Department Management** - Quản lý phòng ban
@@ -64,7 +64,7 @@ Tất cả tài liệu được tổ chức trong thư mục [`docs/`](./docs/):
 ### 📊 Reporting & Analytics
 - **Check-in History** - Lịch sử check-in
 - **Department Reports** - Báo cáo phòng ban
-- **Area Statistics** - Thống kê khu vực
+- **Area Statistics** - Thống kê địa điểm
 - **Export Data** - Xuất dữ liệu
 
 ### 🤖 Automation Testing

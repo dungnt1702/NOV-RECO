@@ -78,10 +78,10 @@ async function loadLocation(locationId) {
         updateMapMarker(location.lat, location.lng);
         map.setView([location.lat, location.lng], 15);
 
-        showAlert('Đang chỉnh sửa khu vực', 'info');
+        showAlert('Đang chỉnh sửa địa điểm', 'info');
     } catch (error) {
         console.error('Error loading location:', error);
-        showAlert('Lỗi khi tải thông tin khu vực', 'danger');
+        showAlert('Lỗi khi tải thông tin địa điểm', 'danger');
     }
 }
 
@@ -249,7 +249,7 @@ async function handleFormSubmit() {
         }
 
         if (response.ok) {
-            const message = currentLocation ? 'Cập nhật khu vực thành công' : 'Tạo khu vực thành công';
+            const message = currentLocation ? 'Cập nhật địa điểm thành công' : 'Tạo địa điểm thành công';
             showAlert(message, 'success');
             
             // Redirect to list after 2 seconds
@@ -262,7 +262,7 @@ async function handleFormSubmit() {
         }
     } catch (error) {
         console.error('Error saving location:', error);
-        showAlert('Lỗi khi lưu khu vực: ' + error.message, 'danger');
+        showAlert('Lỗi khi lưu địa điểm: ' + error.message, 'danger');
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -284,7 +284,7 @@ function validateForm() {
     // Validate name
     const name = document.getElementById('name').value.trim();
     if (!name) {
-        showFieldError('name', 'Tên khu vực là bắt buộc');
+        showFieldError('name', 'Tên địa điểm là bắt buộc');
         isValid = false;
     }
 

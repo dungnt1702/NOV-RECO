@@ -77,7 +77,7 @@ python start_and_test.py
 - 30 ngày dữ liệu
 - 5-15 check-in mỗi ngày
 - Ảnh mẫu tự động tạo
-- Vị trí GPS ngẫu nhiên trong khu vực
+- Vị trí GPS ngẫu nhiên trong địa điểm
 
 ## 🧪 Các Test được thực hiện
 
@@ -101,9 +101,9 @@ python start_and_test.py
 - ✅ API check-in list
 
 ### 4. Test Area Management
-- ✅ Trang danh sách khu vực
-- ✅ Trang tạo khu vực
-- ✅ API danh sách khu vực
+- ✅ Trang danh sách địa điểm
+- ✅ Trang tạo địa điểm
+- ✅ API danh sách địa điểm
 
 ### 5. Test User Management
 - ✅ Trang danh sách người dùng

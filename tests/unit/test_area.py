@@ -90,7 +90,7 @@ class AreaViewsTest(TestBase):
         self.login_as('admin')
         response = self.client.get(reverse('area:list'))
         self.assert_response_ok(response)
-        self.assert_contains(response, 'Danh sách khu vực')
+        self.assert_contains(response, 'Danh sách địa điểm')
         
     def test_area_list_view_unauthorized(self):
         """Test area list view without login"""
@@ -102,7 +102,7 @@ class AreaViewsTest(TestBase):
         self.login_as('admin')
         response = self.client.get(reverse('area:create'))
         self.assert_response_ok(response)
-        self.assert_contains(response, 'Tạo khu vực mới')
+        self.assert_contains(response, 'Tạo địa điểm mới')
         
     def test_area_create_post(self):
         """Test area create POST request"""

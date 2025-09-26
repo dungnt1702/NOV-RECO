@@ -13,7 +13,7 @@ Hướng dẫn sử dụng hệ thống NOV-RECO cho người dùng cuối.
 - Hướng dẫn đăng nhập
 - Các tính năng chính
 - Quản lý check-in
-- Quản lý khu vực
+- Quản lý địa điểm
 - Quản lý người dùng
 - Báo cáo và thống kê
 
@@ -54,7 +54,7 @@ Hướng dẫn sử dụng hệ thống NOV-RECO cho người dùng cuối.
 ### Employee
 - Check-in/check-out
 - Xem lịch sử check-in cá nhân
-- Xem thông tin khu vực
+- Xem thông tin địa điểm
 
 ## 🔗 Liên kết
 

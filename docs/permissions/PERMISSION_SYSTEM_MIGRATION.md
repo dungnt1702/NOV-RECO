@@ -28,7 +28,7 @@ Dự án đã được migration thành công từ hệ thống role-based sang 
 - **Mô tả**: Quản lý cấp trung
 
 ### 4. **HR** (2 users)
-- **Quyền**: Toàn quyền liên quan tới User, phòng ban, khu vực
+- **Quyền**: Toàn quyền liên quan tới User, phòng ban, địa điểm
 - **Permissions**:
   - Quản lý users, departments, areas
   - Không có quyền quản lý checkins

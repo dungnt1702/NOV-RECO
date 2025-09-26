@@ -218,7 +218,7 @@ def dashboard_hr_view(request):
 @group_required(['Super Admin', 'Admin', 'Manager', 'Secretary'])
 def dashboard_secretary_view(request):
     """Dashboard cho thư ký"""
-    # Thống kê khu vực
+    # Thống kê địa điểm
     total_areas = Location.objects.count()
     active_areas = Location.objects.filter(is_active=True).count()
     
@@ -226,7 +226,7 @@ def dashboard_secretary_view(request):
     today = timezone.now().date()
     today_checkins = Checkin.objects.filter(created_at__date=today).count()
     
-    # Thống kê theo khu vực
+    # Thống kê theo địa điểm
     area_stats = Location.objects.annotate(
         checkin_count=Count('checkin')
     ).order_by('-checkin_count')

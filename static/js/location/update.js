@@ -218,7 +218,7 @@
 
       if (!name) {
         e.preventDefault();
-        showNotification('Vui lòng nhập tên khu vực', 'error');
+        showNotification('Vui lòng nhập tên địa điểm', 'error');
         return;
       }
 
@@ -246,7 +246,7 @@
         return;
       }
 
-      showNotification('Đang cập nhật khu vực...', 'info');
+      showNotification('Đang cập nhật địa điểm...', 'info');
     });
   }
 

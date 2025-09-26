@@ -74,7 +74,7 @@ async function loadLocations() {
         updatePagination();
     } catch (error) {
         console.error('Error loading locations:', error);
-        showAlert('Lỗi khi tải danh sách khu vực', 'danger');
+        showAlert('Lỗi khi tải danh sách địa điểm', 'danger');
     }
 }
 
@@ -99,7 +99,7 @@ function displayLocationsTable() {
             <tr>
                 <td colspan="8" class="text-center">
                     <i class="fas fa-inbox"></i>
-                    <p class="mb-0">Không có khu vực nào</p>
+                    <p class="mb-0">Không có địa điểm nào</p>
                 </td>
             </tr>
         `;
@@ -123,7 +123,7 @@ function displayLocationsCards() {
         locationsList.innerHTML = `
             <div class="loading">
                 <i class="fas fa-inbox"></i>
-                <p>Không có khu vực nào</p>
+                <p>Không có địa điểm nào</p>
             </div>
         `;
         return;
@@ -198,7 +198,7 @@ function editLocation(locationId) {
 
 // Delete location
 async function deleteLocation(locationId) {
-    if (!confirm('Bạn có chắc chắn muốn xóa khu vực này?')) {
+    if (!confirm('Bạn có chắc chắn muốn xóa địa điểm này?')) {
         return;
     }
 
@@ -211,14 +211,14 @@ async function deleteLocation(locationId) {
         });
 
         if (response.ok) {
-            showAlert('Xóa khu vực thành công', 'success');
+            showAlert('Xóa địa điểm thành công', 'success');
             loadLocations();
         } else {
             throw new Error('Failed to delete location');
         }
     } catch (error) {
         console.error('Error deleting location:', error);
-        showAlert('Lỗi khi xóa khu vực', 'danger');
+        showAlert('Lỗi khi xóa địa điểm', 'danger');
     }
 }
 

@@ -241,7 +241,7 @@ async function loadAreas() {
             const areaSelect = document.getElementById('areaFilter');
             if (areaSelect) {
                 // Clear existing options except first one
-                areaSelect.innerHTML = '<option value="">Tất cả khu vực</option>';
+                areaSelect.innerHTML = '<option value="">Tất cả địa điểm</option>';
                 
                 areas.forEach(area => {
                     const option = document.createElement('option');

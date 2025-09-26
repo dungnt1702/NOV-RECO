@@ -5,13 +5,13 @@
 ### Admin
 - **Full System Access**: Quản lý toàn bộ hệ thống
 - **User Management**: Tạo, sửa, xóa người dùng
-- **Area Management**: Quản lý khu vực làm việc
+- **Area Management**: Quản lý địa điểm làm việc
 - **System Settings**: Cấu hình hệ thống
 
 ### Manager
 - **Team Management**: Quản lý nhân viên trong team
 - **Reports**: Xem báo cáo check-in
-- **Area Overview**: Xem tổng quan khu vực
+- **Area Overview**: Xem tổng quan địa điểm
 - **Check-in History**: Xem lịch sử check-in của team
 
 ### Employee
@@ -28,7 +28,7 @@
 
 ### 2. Check-in Process
 1. Click "Bắt đầu Check-in"
-2. Chọn khu vực làm việc
+2. Chọn địa điểm làm việc
 3. Chụp ảnh (tùy chọn)
 4. Click "Check-in"
 
@@ -46,8 +46,8 @@
 ## 🗺️ Area Management
 
 ### For Admin/Manager:
-1. Truy cập "Quản lý khu vực"
-2. Click "Thêm khu vực mới"
+1. Truy cập "Quản lý địa điểm"
+2. Click "Thêm địa điểm mới"
 3. Nhập tên và địa chỉ
 4. Thiết lập bán kính cho phép
 5. Click "Lưu"
@@ -60,8 +60,8 @@
 - Tỷ lệ đúng giờ
 
 ### Area Statistics
-- Số lượng check-in theo khu vực
-- Thời gian làm việc tại mỗi khu vực
+- Số lượng check-in theo địa điểm
+- Thời gian làm việc tại mỗi địa điểm
 - Biểu đồ thống kê
 
 ## 🔧 Mobile Usage
@@ -85,7 +85,7 @@ A: Vào "Thông tin cá nhân" > "Đổi mật khẩu"
 A: Click "Quên mật khẩu" trên trang login
 
 **Q: Check-in không được thì sao?**
-A: Kiểm tra GPS và quyền camera, đảm bảo trong bán kính khu vực
+A: Kiểm tra GPS và quyền camera, đảm bảo trong bán kính địa điểm
 
 **Q: Xem lịch sử từ khi nào?**
 A: Hệ thống lưu trữ tất cả lịch sử từ khi tạo tài khoản
