@@ -12,9 +12,7 @@ class CheckinSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(
         source='user.get_display_name', read_only=True
     )
-    location_name = serializers.CharField(
-        source='location.name', read_only=True
-    )
+    location_name = serializers.SerializerMethodField()
     checkin_type_display = serializers.CharField(
         source='get_checkin_type_display', read_only=True
     )
@@ -49,6 +47,12 @@ class CheckinSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return value
 
+    def get_location_name(self, obj):
+        """Get location name or return default text"""
+        if obj.location:
+            return obj.location.name
+        return "Chưa xác định"
+
     def get_photo_url(self, obj):
         try:
             if obj.photo:
@@ -76,9 +80,7 @@ class CheckinListSerializer(serializers.ModelSerializer):
     location_id = serializers.IntegerField(
         source='location.id', read_only=True
     )
-    location_name = serializers.CharField(
-        source='location.name', read_only=True
-    )
+    location_name = serializers.SerializerMethodField()
     checkin_type_display = serializers.CharField(
         source='get_checkin_type_display', read_only=True
     )
@@ -92,6 +94,12 @@ class CheckinListSerializer(serializers.ModelSerializer):
             'created_at', 'distance_m'
         ]
         read_only_fields = ['id', 'user', 'created_at', 'distance_m']
+
+    def get_location_name(self, obj):
+        """Get location name or return default text"""
+        if obj.location:
+            return obj.location.name
+        return "Chưa xác định"
 
     def get_photo_url(self, obj):
         try:
