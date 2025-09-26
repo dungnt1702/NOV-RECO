@@ -1,0 +1,612 @@
+/* Check-in page specific styles */
+.checkin-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.checkin-page .checkin-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    overflow: hidden;
+}
+
+.checkin-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0A5597, #F5831F);
+}
+
+.checkin-page .checkin-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.checkin-header h1 {
+    color: #0A5597;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.checkin-page .checkin-subtitle {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* Permissions check section - Compact mobile design */
+.checkin-page .permissions-check-section {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.checkin-page .permissions-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 12px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.checkin-page .permissions-grid {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.checkin-page .permission-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 8px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  min-height: 80px;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.checkin-page .permission-label {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 11px;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.checkin-page .permission-status {
+  font-size: 10px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: #6c757d;
+  color: white;
+  text-align: center;
+  min-width: 60px;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.permission-status.granted {
+  background: #48bb78;
+}
+
+.permission-status.denied {
+  background: #f56565;
+}
+
+.permission-status.prompt {
+  background: #ed8936;
+  color: white;
+}
+
+.checkin-page .btn-test-permission {
+  background: #0A5597;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 10px;
+  transition: all 0.2s;
+  min-width: 50px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.btn-test-permission:hover {
+  background: #0056b3;
+}
+
+.checkin-page .permissions-help {
+  background: #e6fffa;
+  border: 1px solid #81e6d9;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  color: #234e52;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* User info section */
+.checkin-page .user-info-section {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.checkin-page .user-info-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 10px;
+}
+
+.checkin-page .user-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.checkin-page .user-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.checkin-page .user-info-label {
+    font-size: 12px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.checkin-page .user-info-value {
+    font-size: 14px;
+    color: #2d3748;
+    font-weight: 600;
+}
+
+/* Form styles */
+.checkin-page .checkin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.checkin-page .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.checkin-page .form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.checkin-page .form-input {
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #0A5597;
+    box-shadow: 0 0 0 3px rgba(10, 85, 151, 0.1);
+}
+
+.checkin-page .form-textarea {
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: #0A5597;
+    box-shadow: 0 0 0 3px rgba(10, 85, 151, 0.1);
+}
+
+/* Map styles */
+.checkin-page .map-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.checkin-page .map-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+
+.checkin-page .map-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.checkin-page .btn-get-location {
+    background: #0A5597;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-get-location:hover {
+    background: #1D5795;
+    transform: translateY(-1px);
+}
+
+.btn-get-location:disabled {
+    background: #a0aec0;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+.checkin-page .coordinates {
+    font-size: 12px;
+    color: #718096;
+    font-family: monospace;
+}
+
+.checkin-page #map {
+    width: 100%;
+    height: 250px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Camera styles - Portrait orientation for mobile, same width as map */
+.checkin-page .camera-container {
+    position: relative;
+    margin-bottom: 20px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center camera horizontally */
+    width: 100%; /* Same as map container - full width */
+    /* Removed max-width to match map container width */
+}
+
+.checkin-page .camera-preview {
+    width: 100%;
+    max-width: 480px; /* Mobile-friendly width for better UX */
+    aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
+    min-height: 480px; /* Proportional height for 480px width */
+    height: auto; /* Auto height based on aspect ratio */
+    background: #f8fafc;
+    border: 2px dashed #cbd5e0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+.camera-preview:hover {
+    border-color: #0A5597;
+    background: #f7fafc;
+}
+
+.camera-preview.has-photo {
+    border-style: solid;
+    border-color: #48bb78;
+    background: #f0fff4;
+}
+
+.checkin-page .camera-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    color: #a0aec0;
+}
+
+.checkin-page .camera-text {
+    font-size: 14px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.checkin-page .camera-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Video element styles */
+.checkin-page #video {
+    width: 100%;
+    max-width: 480px; /* Mobile-friendly width for better UX */
+    aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
+    min-height: 480px; /* Proportional height for 480px width */
+    height: auto; /* Auto height based on aspect ratio */
+    object-fit: cover;
+    border-radius: 12px;
+    background: #000;
+    margin: 0 auto; /* Center the video */
+    display: block; /* Ensure block display for centering */
+}
+
+/* Camera preview when showing video */
+.camera-preview.showing-video {
+    padding: 0;
+    background: #000;
+    border: 2px solid #0A5597;
+}
+
+/* Canvas element for captured photo - same portrait aspect ratio */
+.checkin-page canvas {
+    width: 100%;
+    max-width: 480px; /* Same as video - mobile-friendly width */
+    aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 0 auto;
+    display: block;
+}
+
+.camera-preview.showing-video .camera-icon,
+.camera-preview.showing-video .camera-text {
+    display: none;
+}
+
+.checkin-page .btn-camera {
+    flex: 1;
+    padding: 10px 16px;
+    border: 2px solid #0A5597;
+    background: white;
+    color: #0A5597;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-camera:hover {
+    background: #0A5597;
+    color: white;
+}
+
+.btn-camera.danger {
+    border-color: #e53e3e;
+    color: #e53e3e;
+}
+
+.btn-camera.danger:hover {
+    background: #e53e3e;
+    color: white;
+}
+
+.btn-camera.secondary {
+    border-color: #718096;
+    color: #718096;
+}
+
+.btn-camera.secondary:hover {
+    background: #718096;
+    color: white;
+}
+
+/* Submit button */
+.checkin-page .btn-checkin {
+    background: linear-gradient(135deg, #0A5597 0%, #F5831F 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-checkin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(10, 85, 151, 0.3);
+}
+
+.btn-checkin:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-checkin .btn-text {
+    display: block;
+}
+
+.btn-checkin .loading {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-checkin.loading .btn-text {
+    display: none;
+}
+
+.btn-checkin.loading .loading {
+    display: flex;
+}
+
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .checkin-page {
+        padding: 0;
+    }
+    
+    .checkin-page .checkin-container {
+        padding: 30px 20px !important;
+        border-radius: 16px;
+    }
+    
+    /* Ultra-compact permissions on mobile */
+    .checkin-page .permissions-check-section {
+        padding: 12px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .checkin-page .permissions-title {
+        font-size: 12px !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .checkin-page .permission-item {
+        min-height: 60px !important;
+        padding: 8px 6px !important;
+    }
+    
+    .checkin-page .permissions-help {
+        font-size: 10px !important;
+        padding: 6px 8px !important;
+        line-height: 1.2 !important;
+    }
+    
+    .checkin-header h1 {
+        font-size: 24px;
+    }
+    
+    .user-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #map {
+        height: 200px;
+    }
+    
+    .camera-preview {
+        height: 150px;
+    }
+    
+    /* Ensure camera controls are visible on mobile */
+    .camera-controls {
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .btn-camera {
+        min-width: 100px;
+        font-size: 12px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .checkin-page {
+        padding: 0;
+    }
+    
+    .checkin-page .checkin-container {
+        padding: 20px !important;
+        border-radius: 16px;
+    }
+    
+    /* Super-compact permissions on small mobile */
+    .checkin-page .permissions-check-section {
+        padding: 8px !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .checkin-page .permissions-title {
+        font-size: 11px !important;
+        margin-bottom: 6px !important;
+    }
+    
+    .checkin-page .permission-item {
+        min-height: 50px !important;
+        padding: 6px 4px !important;
+        gap: 6px !important;
+    }
+    
+    .checkin-page .permission-label {
+        font-size: 10px !important;
+    }
+    
+    .checkin-page .permission-status {
+        font-size: 9px !important;
+        padding: 2px 4px !important;
+        min-width: 50px !important;
+    }
+    
+    .checkin-page .btn-test-permission {
+        font-size: 9px !important;
+        padding: 3px 6px !important;
+        min-width: 40px !important;
+    }
+    
+    .checkin-page .permissions-help {
+        font-size: 9px !important;
+        padding: 4px 6px !important;
+    }
+    
+    .checkin-header h1 {
+        font-size: 20px;
+    }
+    
+    #map {
+        height: 180px;
+    }
+    
+    .camera-preview {
+        height: 120px;
+    }
+    
+    .camera-icon {
+        font-size: 36px;
+    }
+}
+
+/* Desktop view - keep mobile-like appearance */
+@media (min-width: 768px) {
+    .checkin-container {
+        max-width: 400px;
+    }
+}
