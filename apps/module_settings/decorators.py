@@ -35,8 +35,8 @@ def module_enabled_context_processor(request):
     """
     Context processor để thêm thông tin về modules vào tất cả templates
     """
-    enabled_modules = ModuleSettings.get_enabled_modules()
-    disabled_modules = ModuleSettings.get_disabled_modules()
+    enabled_modules = list(ModuleSettings.get_enabled_modules())
+    disabled_modules = list(ModuleSettings.get_disabled_modules())
     
     return {
         'enabled_modules': enabled_modules,

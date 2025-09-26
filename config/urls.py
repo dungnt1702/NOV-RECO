@@ -18,7 +18,7 @@ urlpatterns = [
     path("employee/", include("apps.employee.urls")),
     path("personal/", include("apps.personal.urls")),
     path("dashboard/", include("apps.dashboard.urls")),
-    path("users/", include("apps.users.urls")),
+    path("users/", include(("apps.users.urls", "users"), namespace="users")),
     path("automation-test/", include("apps.automation_test.urls")),
     path("absence/", include("apps.absence.urls")),
     path("notifications/", include("apps.notifications.urls")),

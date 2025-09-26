@@ -12,7 +12,7 @@ from apps.location.models import Location
 from apps.users.models import User
 from apps.users.permissions import permission_required
 from .serializers import CheckinListSerializer
-from .utils import haversine_m, find_nearest_location
+from .utils import find_best_location_for_checkin
 
 
 @login_required
@@ -44,12 +44,20 @@ def checkin_submit_view(request):
                 {'success': False, 'error': 'Vui lòng chụp ảnh'}, status=400
             )
         # Tự động tìm địa điểm gần nhất dựa trên tọa độ
-        location, distance = find_nearest_location(lat, lng, location_id)
+        location_name, distance = find_best_location_for_checkin(lat, lng)
+        
+        # Lấy location object nếu có (để lưu vào DB cho backward compatibility)
+        location = None
+        if location_name != "Không xác định":
+            try:
+                location = Location.objects.filter(name=location_name, is_active=True).first()
+            except Location.DoesNotExist:
+                pass
 
         # Tạo check-in
         checkin = Checkin.objects.create(
             user=request.user,
-            location=location,
+            location=location,  # Có thể là None
             lat=lat,
             lng=lng,
             address=address,
@@ -87,69 +95,52 @@ def checkin_submit_view(request):
 
 
 @login_required
-def checkin_success_view(request, checkin_id=None):
+def checkin_success_view(request, checkin_id):
     """Trang thành công sau check-in"""
-    checkin_id = checkin_id or request.GET.get('checkin_id')
-    if checkin_id:
-        try:
-            checkin = Checkin.objects.get(id=checkin_id, user=request.user)
-            success_data = {
-                'user_name': checkin.user.get_full_name(),
-                'user_email': checkin.user.email,
-                'user_department': (
-                    checkin.user.department.name
-                    if checkin.user.department else 'N/A'
-                ),
-                'user_employee_id': checkin.user.username,
-                'location_name': checkin.get_location_name(),
-                'coordinates': (
-                    f"{checkin.lat:.6f}, {checkin.lng:.6f}"
-                ),
-                'address': checkin.address or 'Không xác định',
-                'checkin_time': checkin.created_at.strftime(
-                    '%d/%m/%Y %H:%M:%S'
-                ),
-                'note': checkin.note or '',
-                'photo_url': (
-                    checkin.photo.url if checkin.photo else None
-                ),
-            }
-            context = {
-                'checkin': checkin,
-                'success_data': success_data,
-                'location_name': checkin.get_location_name(),
-                'distance': checkin.distance_m,
-            }
-            return render(request, 'checkin/success.html', context)
-        except Checkin.DoesNotExist:
-            pass
-
-    # Default success data if no checkin_id provided
-    success_data = {
-        'user_name': request.user.get_full_name(),
-        'user_email': request.user.email,
-        'user_department': (
-            request.user.department.name
-            if request.user.department else 'N/A'
-        ),
-        'user_employee_id': request.user.username,
-        'location_name': 'N/A',
-        'coordinates': 'N/A',
-        'checkin_time': 'N/A',
-        'note': '',
-        'photo_url': None,
-    }
-    context = {
-        'success_data': success_data,
-    }
-    return render(request, 'checkin/success.html', context)
+    try:
+        checkin = Checkin.objects.get(id=checkin_id, user=request.user)
+        success_data = {
+            'user_name': checkin.user.get_full_name(),
+            'user_email': checkin.user.email,
+            'user_department': (
+                checkin.user.department.name
+                if checkin.user.department else 'N/A'
+            ),
+            'user_employee_id': checkin.user.username,
+            'location_name': checkin.get_location_name(),
+            'coordinates': (
+                f"{checkin.lat:.6f}, {checkin.lng:.6f}"
+            ),
+            'address': checkin.address or 'Không xác định',
+            'checkin_time': checkin.created_at.strftime(
+                '%d/%m/%Y %H:%M:%S'
+            ),
+            'note': checkin.note or '',
+            'photo_url': (
+                checkin.photo.url if checkin.photo else None
+            ),
+        }
+        context = {
+            'checkin': checkin,
+            'success_data': success_data,
+            'location_name': checkin.get_location_name(),
+            'distance': checkin.distance_m,
+        }
+        return render(request, 'checkin/success.html', context)
+    except Checkin.DoesNotExist:
+        return render(request, 'checkin/success.html', {
+            'error': 'Không tìm thấy thông tin check-in'
+        })
+    except Exception as e:
+        return render(request, 'checkin/success.html', {
+            'error': f'Có lỗi xảy ra: {str(e)}'
+        })
 
 
 @login_required
 def checkin_history_view(request):
     """Lịch sử check-in"""
     checkins = (Checkin.objects.filter(user=request.user)
-                .select_related('location')
                 .order_by('-created_at'))
 
     # Pagination
@@ -167,7 +158,7 @@ def checkin_history_view(request):
 @permission_required('checkin.can_view_all_checkins')
 def checkin_list_view(request):
     """Danh sách check-in cho quản lý"""
-    checkins = (Checkin.objects.select_related('user', 'location')
+    checkins = (Checkin.objects.select_related('user')
                 .order_by('-created_at'))
 
     # Filtering
@@ -233,7 +224,7 @@ def checkin_list_view(request):
 @login_required
 def checkin_list_api(request):
     """API danh sách check-in"""
-    checkins = (Checkin.objects.select_related('user', 'location')
+    checkins = (Checkin.objects.select_related('user')
                 .order_by('-created_at'))
 
     # Filtering
@@ -279,7 +270,6 @@ def checkin_history_api(request):
 
     # Chỉ lấy check-in của user hiện tại
     checkins = (Checkin.objects.filter(user=request.user)
-                .select_related('location')
                 .order_by('-created_at'))
 
     # Filtering

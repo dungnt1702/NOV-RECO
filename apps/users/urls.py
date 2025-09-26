@@ -1,5 +1,6 @@
 from django.urls import path
 from django.shortcuts import redirect, render
+from .test_view import test_user_update_view, simple_user_update_view
 from .views import (
     user_list_view,
     user_create_view,
@@ -42,10 +43,11 @@ urlpatterns = [
     path("create/", user_create_view, name="create"),
     path("import/", user_import_view, name="import"),
     path("import/template/", user_import_template_view, name="import_template"),
-    path("update/<int:id>/", user_update_view, name="update"),
-    path("detail/<int:id>/", user_detail_view, name="detail"),
-    path("delete/<int:id>/", user_delete_view, name="delete"),
-    path("toggle/<int:id>/", user_toggle_active_view, name="toggle"),
+    path("<int:id>/update/", user_update_view, name="update"),
+    path("test/<int:id>/", test_user_update_view, name="test"),
+    path("<int:id>/detail/", user_detail_view, name="detail"),
+    path("<int:id>/delete/", user_delete_view, name="delete"),
+    path("<int:id>/toggle/", user_toggle_active_view, name="toggle"),
     
     # Office management views
     path("offices/", office_list_view, name="office_list"),

@@ -388,6 +388,74 @@
     display: block;
 }
 
+/* Photo display styles - Portrait orientation for mobile users */
+.mobile-card-photo,
+.detail-photo,
+.checkin-photo-preview {
+    width: 100%;
+    max-width: 200px;
+    aspect-ratio: 3/4; /* Portrait aspect ratio (3:4) */
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Photo containers */
+.mobile-card-photo-container,
+.photo-container {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+/* Photo placeholder */
+.mobile-card-photo-placeholder {
+    width: 100%;
+    max-width: 200px;
+    aspect-ratio: 3/4;
+    background: #f7fafc;
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #a0aec0;
+}
+
+/* Custom checkout button styles */
+.checkout-btn {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    color: #000 !important;
+    font-weight: 600 !important;
+}
+
+.checkout-btn:hover,
+.checkout-btn:focus,
+.checkout-btn:active {
+    background-color: #e0a800 !important;
+    border-color: #d39e00 !important;
+    color: #000 !important;
+}
+
+.checkout-detail-btn {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+.checkout-detail-btn:hover,
+.checkout-detail-btn:focus,
+.checkout-detail-btn:active {
+    background-color: #218838 !important;
+    border-color: #1e7e34 !important;
+    color: #fff !important;
+}
+
 .camera-preview.showing-video .camera-icon,
 .camera-preview.showing-video .camera-text {
     display: none;

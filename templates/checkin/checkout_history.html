@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lịch sử Check-out{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-title">
+        <h1>Lịch sử Check-out</h1>
+        <p>Danh sách các lần Check-out của bạn</p>
+        <div class="page-actions">
+            <a href="{% url 'checkin:history' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Quay lại lịch sử check-in
+            </a>
+        </div>
+    </div>
+
+    <div class="checkout-history-container">
+        {% if checkouts %}
+        <div class="history-list">
+            {% for checkout in checkouts %}
+            <div class="history-item">
+                <div class="history-header">
+                    <div class="history-time">
+                        <svg class="time-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>{{ checkout.created_at|date:"d/m/Y H:i:s" }}</span>
+                    </div>
+                    <div class="history-status">
+                        <span class="status-badge status-checkout">Check-out</span>
+                        <a href="{% url 'checkin:checkout_detail' checkout.checkin.id %}" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-eye"></i>
+                            Chi tiết
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="history-content">
+                    <div class="history-details">
+                        <div class="detail-item">
+                            <label>Địa điểm:</label>
+                            <span>{{ checkout.get_location_name }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Check-in ID:</label>
+                            <span>{{ checkout.checkin.id }}</span>
+                        </div>
+                        {% if checkout.note %}
+                        <div class="detail-item">
+                            <label>Ghi chú:</label>
+                            <span>{{ checkout.note }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if checkout.photo %}
+                    <div class="history-photo">
+                        <img src="{{ checkout.photo.url }}" alt="Checkout photo" class="photo-thumbnail">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if checkouts.has_other_pages %}
+        <div class="pagination">
+            {% if checkouts.has_previous %}
+                <a href="?page=1" class="page-link">&laquo; Đầu</a>
+                <a href="?page={{ checkouts.previous_page_number }}" class="page-link">Trước</a>
+            {% endif %}
+            
+            <span class="page-info">
+                Trang {{ checkouts.number }} / {{ checkouts.paginator.num_pages }}
+            </span>
+            
+            {% if checkouts.has_next %}
+                <a href="?page={{ checkouts.next_page_number }}" class="page-link">Tiếp</a>
+                <a href="?page={{ checkouts.paginator.num_pages }}" class="page-link">Cuối &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="no-history-card">
+            <div class="no-history-content">
+                <svg class="no-history-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                <h3>Chưa có lịch sử Check-out</h3>
+                <p>Bạn chưa thực hiện Check-out nào.</p>
+                <a href="{% url 'checkin:checkout' %}" class="btn btn-primary">
+                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Thực hiện Check-out
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/checkin/checkout_history.js' %}"></script>
+{% endblock %}

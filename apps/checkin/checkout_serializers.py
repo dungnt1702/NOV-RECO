@@ -1,32 +1,31 @@
 """
-Serializers for checkin module
+Serializers for checkout module
 """
 
 from rest_framework import serializers
-from .models import Checkin, Checkout
+from .models import Checkout
 from .utils import get_location_name_for_checkin
-from .checkout_serializers import CheckoutSerializer, CheckoutListSerializer
 
 
-class CheckinSerializer(serializers.ModelSerializer):
-    """Serializer for Checkin model"""
+class CheckoutSerializer(serializers.ModelSerializer):
+    """Serializer for Checkout model"""
     
     user_name = serializers.CharField(
         source='user.get_display_name', read_only=True
     )
-    location_name = serializers.SerializerMethodField()
-    checkin_type_display = serializers.CharField(
-        source='get_checkin_type_display', read_only=True
+    checkin_id = serializers.IntegerField(
+        source='checkin.id', read_only=True
     )
+    checkin_location_name = serializers.SerializerMethodField()
+    location_name = serializers.SerializerMethodField()
     photo_url = serializers.SerializerMethodField()
-    has_checkout = serializers.SerializerMethodField()
     
     class Meta:
-        model = Checkin
+        model = Checkout
         fields = [
-            'id', 'user', 'user_name', 'location', 'location_name', 'lat', 'lng', 'address',
-            'photo', 'photo_url', 'note', 'checkin_type', 'checkin_type_display', 
-            'created_at', 'distance_m', 'ip', 'user_agent', 'has_checkout'
+            'id', 'user', 'user_name', 'checkin', 'checkin_id', 'checkin_location_name',
+            'location_name', 'lat', 'lng', 'address', 'photo', 'photo_url', 'note',
+            'created_at', 'distance_m', 'ip', 'user_agent'
         ]
         read_only_fields = [
             'id', 'user', 'created_at', 'distance_m', 'ip', 'user_agent'
@@ -50,8 +49,12 @@ class CheckinSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(msg)
         return value
 
+    def get_checkin_location_name(self, obj):
+        """Get location name from related checkin"""
+        return get_location_name_for_checkin(obj.checkin)
+
     def get_location_name(self, obj):
-        """Get location name based on lat/lng coordinates"""
+        """Get location name based on checkout lat/lng coordinates"""
         return get_location_name_for_checkin(obj)
 
     def get_photo_url(self, obj):
@@ -62,13 +65,9 @@ class CheckinSerializer(serializers.ModelSerializer):
             pass
         return None
 
-    def get_has_checkout(self, obj):
-        """Check if this checkin has a checkout"""
-        return obj.checkouts.exists()
 
-
-class CheckinListSerializer(serializers.ModelSerializer):
-    """Serializer for Checkin list view"""
+class CheckoutListSerializer(serializers.ModelSerializer):
+    """Serializer for Checkout list view"""
     
     user_id = serializers.IntegerField(
         source='user.id', read_only=True
@@ -82,27 +81,28 @@ class CheckinListSerializer(serializers.ModelSerializer):
     user_department_id = serializers.IntegerField(
         source='user.department_id', read_only=True
     )
-    location_id = serializers.IntegerField(
-        source='location.id', read_only=True
+    checkin_id = serializers.IntegerField(
+        source='checkin.id', read_only=True
     )
+    checkin_location_name = serializers.SerializerMethodField()
     location_name = serializers.SerializerMethodField()
-    checkin_type_display = serializers.CharField(
-        source='get_checkin_type_display', read_only=True
-    )
     photo_url = serializers.SerializerMethodField()
-    has_checkout = serializers.SerializerMethodField()
     
     class Meta:
-        model = Checkin
+        model = Checkout
         fields = [
-            'id', 'user', 'user_id', 'employee_id', 'user_name', 'user_department_id', 'location', 'location_id', 'location_name', 'lat', 'lng', 'address',
-            'photo', 'photo_url', 'note', 'checkin_type', 'checkin_type_display', 
-            'created_at', 'distance_m', 'has_checkout'
+            'id', 'user', 'user_id', 'employee_id', 'user_name', 'user_department_id',
+            'checkin', 'checkin_id', 'checkin_location_name', 'location_name', 'lat', 'lng', 'address',
+            'photo', 'photo_url', 'note', 'created_at', 'distance_m'
         ]
         read_only_fields = ['id', 'user', 'created_at', 'distance_m']
 
+    def get_checkin_location_name(self, obj):
+        """Get location name from related checkin"""
+        return get_location_name_for_checkin(obj.checkin)
+
     def get_location_name(self, obj):
-        """Get location name based on lat/lng coordinates"""
+        """Get location name based on checkout lat/lng coordinates"""
         return get_location_name_for_checkin(obj)
 
     def get_photo_url(self, obj):
@@ -112,7 +112,3 @@ class CheckinListSerializer(serializers.ModelSerializer):
         except Exception:
             pass
         return None
-
-    def get_has_checkout(self, obj):
-        """Check if this checkin has a checkout"""
-        return obj.checkouts.exists()

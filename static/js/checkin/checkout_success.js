@@ -1,16 +1,16 @@
-// Check-in Success Page JavaScript
-// This file handles data and UI for checkin success page
+// Checkout Success Page JavaScript
+// This file handles data and UI for checkout success page
 
 // ===== DATA HANDLING =====
 
-// Global variable to store checkin success data
-window.checkinSuccessData = null;
+// Global variable to store checkout success data
+window.checkoutSuccessData = null;
 
-// Function to get checkin success data from data attributes
-function getCheckinSuccessDataFromAttributes() {
+// Function to get checkout success data from data attributes
+function getCheckoutSuccessDataFromAttributes() {
     const container = document.querySelector('.checkin-success-page');
     if (!container) {
-        return getDefaultCheckinSuccessData();
+        return getDefaultCheckoutSuccessData();
     }
     
     return {
@@ -20,14 +20,16 @@ function getCheckinSuccessDataFromAttributes() {
         userEmployeeId: container.dataset.userEmployeeId || 'N/A',
         locationName: container.dataset.locationName || 'N/A',
         coordinates: container.dataset.coordinates || 'N/A',
-        checkinTime: container.dataset.checkinTime || 'N/A',
+        checkoutTime: container.dataset.checkoutTime || 'N/A',
         note: container.dataset.note || '',
-        photoUrl: container.dataset.photoUrl || ''
+        photoUrl: container.dataset.photoUrl || '',
+        checkinId: container.dataset.checkinId || 'N/A',
+        checkoutId: container.dataset.checkoutId || 'N/A'
     };
 }
 
-// Function to get default checkin success data
-function getDefaultCheckinSuccessData() {
+// Function to get default checkout success data
+function getDefaultCheckoutSuccessData() {
     return {
         userName: 'N/A',
         userEmail: 'N/A',
@@ -35,16 +37,18 @@ function getDefaultCheckinSuccessData() {
         userEmployeeId: 'N/A',
         locationName: 'N/A',
         coordinates: 'N/A',
-        checkinTime: 'N/A',
+        checkoutTime: 'N/A',
         note: '',
-        photoUrl: ''
+        photoUrl: '',
+        checkinId: 'N/A',
+        checkoutId: 'N/A'
     };
 }
 
-// Function to get checkin success data with fallback
-function getCheckinSuccessData() {
+// Function to get checkout success data with fallback
+function getCheckoutSuccessData() {
     // Try to get from data attributes first
-    const dataFromAttributes = getCheckinSuccessDataFromAttributes();
+    const dataFromAttributes = getCheckoutSuccessDataFromAttributes();
     
     // If we have valid data from attributes, use it
     if (dataFromAttributes.userName !== 'N/A' || dataFromAttributes.userEmployeeId !== 'N/A') {
@@ -52,19 +56,19 @@ function getCheckinSuccessData() {
     }
     
     // Fallback to global variable or default
-    return window.checkinSuccessData || getDefaultCheckinSuccessData();
+    return window.checkoutSuccessData || getDefaultCheckoutSuccessData();
 }
 
 // ===== UI FUNCTIONS =====
 
-// Get check-in data from template context (passed from Django view)
-function getCheckinData() {
-    return getCheckinSuccessData();
+// Get checkout data from template context (passed from Django view)
+function getCheckoutData() {
+    return getCheckoutSuccessData();
 }
 
-// Display check-in data
-function displayCheckinData() {
-    const data = getCheckinData();
+// Display checkout data
+function displayCheckoutData() {
+    const data = getCheckoutData();
     
     const elUserName = document.getElementById('userName');
     const elUserEmail = document.getElementById('userEmail');
@@ -72,7 +76,9 @@ function displayCheckinData() {
     const elUserEmpId = document.getElementById('userEmployeeId');
     const elLocationName = document.getElementById('locationName');
     const elCoordinates = document.getElementById('coordinates');
-    const elCheckinTime = document.getElementById('checkinTime');
+    const elCheckoutTime = document.getElementById('checkoutTime');
+    const elCheckinId = document.getElementById('checkinId');
+    const elCheckoutId = document.getElementById('checkoutId');
 
     if (elUserName) elUserName.textContent = data.userName;
     if (elUserEmail) elUserEmail.textContent = data.userEmail;
@@ -80,7 +86,9 @@ function displayCheckinData() {
     if (elUserEmpId) elUserEmpId.textContent = data.userEmployeeId;
     if (elLocationName) elLocationName.textContent = data.locationName;
     if (elCoordinates) elCoordinates.textContent = data.coordinates;
-    if (elCheckinTime) elCheckinTime.textContent = data.checkinTime;
+    if (elCheckoutTime) elCheckoutTime.textContent = data.checkoutTime;
+    if (elCheckinId) elCheckinId.textContent = data.checkinId;
+    if (elCheckoutId) elCheckoutId.textContent = data.checkoutId;
     
     // Show note if exists
     if (data.note && data.note.trim() !== '') {
@@ -95,26 +103,14 @@ function displayCheckinData() {
     }
 }
 
-// Quick check-in function
-function quickCheckin() {
-    // Get current check-in data from URL
-    const data = getUrlParams();
-    
-    // Redirect to quick check-in with current data
-    const quickData = {
-        lat: data.coordinates.split(',')[0]?.trim() || '',
-        lng: data.coordinates.split(',')[1]?.trim() || '',
-        location_name: data.locationName,
-        note: data.note
-    };
-    
-    const params = new URLSearchParams(quickData);
-    window.location.href = `/action/?${params.toString()}`;
+// Quick checkout function
+function quickCheckout() {
+    window.location.href = '/checkin/checkout/';
 }
 
-// View history function
-function viewHistory() {
-    window.location.href = '/history/';
+// View checkout history function
+function viewCheckoutHistory() {
+    window.location.href = '/checkin/checkout/history/';
 }
 
 // Go to dashboard function
@@ -122,19 +118,19 @@ function goToDashboard() {
     window.location.href = '/dashboard/';
 }
 
-// Print check-in details
-function printCheckin() {
+// Print checkout details
+function printCheckout() {
     window.print();
 }
 
-// Share check-in (copy to clipboard)
-function shareCheckin() {
-    const data = getUrlParams();
-    const shareText = `Check-in thành công!\nNgười dùng: ${data.userName}\nĐịa điểm: ${data.locationName}\nThời gian: ${data.checkinTime}\nTọa độ: ${data.coordinates}`;
+// Share checkout (copy to clipboard)
+function shareCheckout() {
+    const data = getCheckoutData();
+    const shareText = `Check-out thành công!\nNgười dùng: ${data.userName}\nĐịa điểm: ${data.locationName}\nThời gian: ${data.checkoutTime}\nTọa độ: ${data.coordinates}\nCheck-in ID: ${data.checkinId}\nCheck-out ID: ${data.checkoutId}`;
     
     if (navigator.clipboard) {
         navigator.clipboard.writeText(shareText).then(() => {
-            alert('Đã copy thông tin check-in vào clipboard!');
+            alert('Đã copy thông tin check-out vào clipboard!');
         }).catch(err => {
             console.error('Copy failed:', err);
             alert('Không thể copy thông tin');
@@ -147,7 +143,7 @@ function shareCheckin() {
         textArea.select();
         try {
             document.execCommand('copy');
-            alert('Đã copy thông tin check-in vào clipboard!');
+            alert('Đã copy thông tin check-out vào clipboard!');
         } catch (err) {
             alert('Không thể copy thông tin');
         }
@@ -161,27 +157,27 @@ function shareCheckin() {
 document.addEventListener('DOMContentLoaded', function() {
     // Canonicalize URL: if query param exists, redirect to pretty URL once
     const params = new URLSearchParams(window.location.search);
-    const qId = params.get('checkin_id');
+    const qId = params.get('checkout_id');
     if (qId) {
-        const pretty = `/checkin/success/checkin_id/${qId}/`;
+        const pretty = `/checkin/checkout/success/checkout_id/${qId}/`;
         if (window.location.pathname !== pretty) {
             window.location.replace(pretty);
             return; // Stop further execution; page will reload at pretty URL
         }
     }
 
-    displayCheckinData();
+    displayCheckoutData();
     
     // Add event listeners for action buttons
-    const quickCheckinBtn = document.getElementById('quick-checkin-btn');
+    const quickCheckoutBtn = document.getElementById('quick-checkout-btn');
     const historyBtn = document.getElementById('history-btn');
     const dashboardBtn = document.getElementById('dashboard-btn');
     const printBtn = document.getElementById('print-btn');
     const shareBtn = document.getElementById('share-btn');
     
-    if (quickCheckinBtn) quickCheckinBtn.addEventListener('click', quickCheckin);
-    if (historyBtn) historyBtn.addEventListener('click', viewHistory);
+    if (quickCheckoutBtn) quickCheckoutBtn.addEventListener('click', quickCheckout);
+    if (historyBtn) historyBtn.addEventListener('click', viewCheckoutHistory);
     if (dashboardBtn) dashboardBtn.addEventListener('click', goToDashboard);
-    if (printBtn) printBtn.addEventListener('click', printCheckin);
-    if (shareBtn) shareBtn.addEventListener('click', shareCheckin);
+    if (printBtn) printBtn.addEventListener('click', printCheckout);
+    if (shareBtn) shareBtn.addEventListener('click', shareCheckout);
 });

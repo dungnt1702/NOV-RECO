@@ -2,14 +2,14 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from .models import Checkin
 from apps.location.models import Location
-from .utils import haversine_m
+from .utils import haversine_distance
 
 
 @receiver(post_save, sender=Checkin)
 def update_checkin_distance(sender, instance, created, **kwargs):
     """Cập nhật khoảng cách khi tạo check-in"""
     if created and instance.location:
-        distance = haversine_m(
+        distance = haversine_distance(
             instance.location.lat, 
             instance.location.lng, 
             instance.lat, 
@@ -25,7 +25,7 @@ def update_checkins_for_location(sender, instance, created, **kwargs):
     if not created:  # Chỉ cập nhật khi địa điểm được sửa đổi
         checkins = Checkin.objects.filter(location=instance)
         for checkin in checkins:
-            distance = haversine_m(
+            distance = haversine_distance(
                 instance.lat, 
                 instance.lng, 
                 checkin.lat, 

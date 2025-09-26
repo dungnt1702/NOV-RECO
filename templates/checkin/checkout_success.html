@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Check-in Thành công - NOV-RECO{% endblock %}
+{% block title %}Check-out Thành công - NOV-RECO{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/checkin/success.css' %}">
+<link rel="stylesheet" href="{% static 'css/checkin/checkout_success.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -15,22 +15,25 @@
      data-user-employee-id="{{ success_data.user_employee_id|escapejs }}"
      data-location-name="{{ success_data.location_name|escapejs }}"
      data-coordinates="{{ success_data.coordinates|escapejs }}"
-     data-checkin-time="{{ success_data.checkin_time|escapejs }}"
+     data-checkout-time="{{ success_data.created_at|escapejs }}"
      data-note="{{ success_data.note|escapejs }}"
-     data-photo-url="{{ success_data.photo_url|escapejs }}">
+     data-photo-url="{{ success_data.photo_url|escapejs }}"
+     data-checkin-id="{{ success_data.checkin_id|escapejs }}"
+     data-checkout-id="{{ success_data.checkout_id|escapejs }}">
     <div class="success-container">
         <div class="success-header">
             <div class="success-icon">
                 <i class="fas fa-check-circle"></i>
             </div>
-            <h1 class="success-title">Check-in Thành công!</h1>
-            <p class="success-subtitle">Bạn đã check-in thành công vào hệ thống</p>
+            <h1 class="success-title">Check-out Thành công!</h1>
+            <p class="success-subtitle">Bạn đã check-out thành công khỏi hệ thống</p>
         </div>
 
         <div class="success-content">
+            {% if success_data %}
             <div class="success-card">
                 <div class="card-header">
-                    <h3><i class="fas fa-user"></i> Thông tin Check-in</h3>
+                    <h3><i class="fas fa-user"></i> Thông tin Check-out</h3>
                 </div>
                 <div class="card-body">
                     <div class="info-grid">
@@ -64,7 +67,7 @@
                         </div>
                         <div class="info-item">
                             <label>Thời gian:</label>
-                            <span id="checkinTime">{{ success_data.checkin_time|escapejs }}</span>
+                            <span id="checkoutTime">{{ success_data.created_at|escapejs }}</span>
                         </div>
                         {% if success_data.note %}
                         <div class="info-item">
@@ -72,6 +75,14 @@
                             <span id="note">{{ success_data.note|escapejs }}</span>
                         </div>
                         {% endif %}
+                        <div class="info-item">
+                            <label>Check-in ID:</label>
+                            <span id="checkinId">{{ success_data.checkin_id|escapejs }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Check-out ID:</label>
+                            <span id="checkoutId">{{ success_data.checkout_id|escapejs }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -79,32 +90,52 @@
             {% if success_data.photo_url %}
             <div class="photo-card">
                 <div class="card-header">
-                    <h3><i class="fas fa-camera"></i> Ảnh Check-in</h3>
+                    <h3><i class="fas fa-camera"></i> Ảnh Check-out</h3>
                 </div>
                 <div class="card-body">
                     <div class="photo-container">
-                        <img src="{{ success_data.photo_url }}" alt="Check-in Photo" class="checkin-photo-preview">
+                        <img src="{{ success_data.photo_url }}" alt="Check-out Photo" class="checkin-photo-preview">
                     </div>
                 </div>
             </div>
             {% endif %}
 
             <div class="action-buttons">
-                <a href="{% url 'checkin:action' %}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Check-in Tiếp
+                <a href="{% url 'checkin:checkout' %}" class="btn btn-primary">
+                    <i class="fas fa-sign-out-alt"></i> Check-out Tiếp
                 </a>
-                <a href="{% url 'checkin:history' %}" class="btn btn-secondary">
-                    <i class="fas fa-history"></i> Xem Lịch sử
+                <a href="{% url 'checkin:checkout_history' %}" class="btn btn-secondary">
+                    <i class="fas fa-history"></i> Xem Lịch sử Check-out
                 </a>
                 <a href="{% url 'dashboard:main' %}" class="btn btn-outline">
                     <i class="fas fa-home"></i> Về Trang chủ
                 </a>
             </div>
+            {% else %}
+            <div class="error-container">
+                <div class="error-card">
+                    <div class="error-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h2>Có lỗi xảy ra</h2>
+                    <p>{{ error|default:"Không thể hiển thị thông tin Check-out." }}</p>
+                    
+                    <div class="action-buttons">
+                        <a href="{% url 'checkin:checkout' %}" class="btn btn-primary">
+                            <i class="fas fa-sign-out-alt"></i> Thử lại Check-out
+                        </a>
+                        <a href="{% url 'checkin:checkout_history' %}" class="btn btn-secondary">
+                            <i class="fas fa-history"></i> Xem Lịch sử
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/checkin/success.js' %}"></script>
+<script src="{% static 'js/checkin/checkout_success.js' %}"></script>
 {% endblock %}

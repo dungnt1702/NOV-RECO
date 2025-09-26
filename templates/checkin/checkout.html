@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Check-in - NOV-RECO{% endblock %}
+{% block title %}Check-out - NOV-RECO{% endblock %}
 
 {% block extra_css %}
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin>
-<link rel="stylesheet" href="{% static 'css/checkin/action.css' %}">
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -14,30 +14,61 @@
     <div class="checkin-container">
         <div class="checkin-header">
             <h1 class="checkin-title">
-                Check-in
+                Check-out
             </h1>
             
-            <!-- Checkin Type Selection -->
-            <div class="checkin-type-selection">
-                <div class="type-buttons">
-                    <button type="button" id="workTypeBtn" class="type-btn active" data-type="1">
-                        <i class="fas fa-briefcase"></i>
-                        <span>Chấm công</span>
-                    </button>
-                    <button type="button" id="visitorTypeBtn" class="type-btn" data-type="2">
-                        <i class="fas fa-handshake"></i>
-                        <span>Tiếp khách</span>
-                    </button>
+            {% if latest_checkin %}
+            <!-- Thông tin Checkin hiện tại -->
+            <div class="checkin-info-card">
+                <div class="info-header">
+                    <h3><i class="fas fa-info-circle"></i> Thông tin Check-in hiện tại</h3>
                 </div>
-                <input type="hidden" id="checkinType" name="checkin_type" value="1">
+                <div class="checkin-details">
+                    <div class="detail-item">
+                        <i class="fas fa-clock"></i>
+                        <div class="detail-content">
+                            <span class="detail-label">Thời gian Check-in:</span>
+                            <span class="detail-value">{{ latest_checkin.created_at|date:"d/m/Y H:i:s" }}</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div class="detail-content">
+                            <span class="detail-label">Địa điểm:</span>
+                            <span class="detail-value">{{ latest_checkin.get_location_name }}</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-tag"></i>
+                        <div class="detail-content">
+                            <span class="detail-label">Loại:</span>
+                            <span class="detail-value">{{ latest_checkin.get_checkin_type_display }}</span>
+                        </div>
+                    </div>
+                    {% if latest_checkin.note %}
+                    <div class="detail-item">
+                        <i class="fas fa-sticky-note"></i>
+                        <div class="detail-content">
+                            <span class="detail-label">Ghi chú:</span>
+                            <span class="detail-value">{{ latest_checkin.note }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
+            {% endif %}
         </div>
 
+        {% if latest_checkin %}
         <div class="checkin-content">
-            <!-- Main Check-in Form -->
-            <div id="checkinForm" class="checkin-form">
-                <form id="checkinFormElement">
+            <!-- Main Check-out Form -->
+            <div id="checkoutForm" class="checkin-form">
+                <form id="checkoutFormElement">
                     {% csrf_token %}
+                    <input type="hidden" id="checkinId" name="checkin_id" value="{{ latest_checkin.id }}">
+                    <input type="hidden" id="lat" name="lat">
+                    <input type="hidden" id="lng" name="lng">
+                    <input type="hidden" id="address" name="address">
                     
                     <!-- Camera Section -->
                     <div class="camera-section">
@@ -46,34 +77,34 @@
                             <p class="section-subtitle">Chụp ảnh để xác minh danh tính</p>
                         </div>
                         <div class="camera-container">
-                            <div id="camera-preview" class="camera-preview">
+                            <div id="checkoutCameraPreview" class="camera-preview">
                                 <div class="camera-placeholder">
                                     <div class="camera-icon">📷</div>
                                     <div class="camera-text">Chạm để mở camera</div>
                                     <div class="camera-hint">Camera sẽ tự động lấy vị trí</div>
                                 </div>
                             </div>
-                            <video id="video" autoplay muted class="hidden"></video>
-                            <canvas id="canvas" class="hidden"></canvas>
+                            <video id="checkoutVideo" autoplay muted style="display: none;"></video>
+                            <canvas id="checkoutCanvas" style="display: none;"></canvas>
                             
                             <!-- Camera Controls -->
                             <div class="camera-controls">
-                                <button type="button" id="captureBtn" class="btn-capture">
+                                <button type="button" id="checkoutCaptureBtn" class="btn-capture">
                                     <i class="fas fa-camera"></i>
                                     <span>Chụp ảnh</span>
                                 </button>
-                                <button type="button" id="switchCameraBtn" class="btn-switch">
+                                <button type="button" id="checkoutSwitchCameraBtn" class="btn-switch">
                                     <i class="fas fa-sync-alt"></i>
                                     <span>Đổi camera</span>
                                 </button>
                             </div>
                             
                             <!-- Photo Preview -->
-                            <div id="photoPreview" class="photo-preview hidden">
+                            <div id="checkoutPhotoPreview" class="photo-preview" style="display: none;">
                                 <div class="photo-container">
-                                    <img id="previewImg" alt="Preview">
+                                    <img id="checkoutPreviewImg" alt="Preview">
                                     <div class="photo-overlay">
-                                        <button type="button" id="retakeBtn" class="btn-retake">
+                                        <button type="button" id="checkoutRetakeBtn" class="btn-retake">
                                             <i class="fas fa-redo"></i>
                                             <span>Chụp lại</span>
                                         </button>
@@ -92,7 +123,7 @@
                         
                         <!-- Location Status -->
                         <div class="location-status-container">
-                            <div id="locationStatus" class="location-status hidden">
+                            <div id="locationStatus" class="location-status" style="display: none;">
                                 <div class="status-icon">
                                     <i class="fas fa-spinner fa-spin"></i>
                                 </div>
@@ -103,34 +134,34 @@
                             </div>
                             
                             <!-- Location Button -->
-                            <button type="button" id="getLocationBtn" class="btn-location">
+                            <button type="button" id="checkoutGetLocationBtn" class="btn-location">
                                 <i class="fas fa-location-arrow"></i>
                                 <span>Lấy vị trí</span>
                             </button>
                         </div>
                         
                         <!-- Location Details -->
-                        <div id="locationDetails" class="location-details hidden">
+                        <div id="checkoutLocationDetails" class="location-details" style="display: none;">
                             <div class="location-info-card">
                                 <div class="info-item">
                                     <i class="fas fa-globe"></i>
                                     <div class="info-content">
                                         <span class="info-label">Vĩ độ</span>
-                                        <span class="info-value" id="currentLat">-</span>
+                                        <span class="info-value" id="checkoutCurrentLat">-</span>
                                     </div>
                                 </div>
                                 <div class="info-item">
                                     <i class="fas fa-globe"></i>
                                     <div class="info-content">
                                         <span class="info-label">Kinh độ</span>
-                                        <span class="info-value" id="currentLng">-</span>
+                                        <span class="info-value" id="checkoutCurrentLng">-</span>
                                     </div>
                                 </div>
                                 <div class="info-item">
                                     <i class="fas fa-crosshairs"></i>
                                     <div class="info-content">
                                         <span class="info-label">Độ chính xác</span>
-                                        <span class="info-value" id="locationAccuracy">-</span>
+                                        <span class="info-value" id="checkoutLocationAccuracy">-</span>
                                     </div>
                                 </div>
                             </div>
@@ -140,14 +171,14 @@
                         <div id="map" class="map-container"></div>
                         
                         <!-- Address Display -->
-                        <div id="addressDisplay" class="address-display hidden">
+                        <div id="checkoutAddressDisplay" class="address-display" style="display: none;">
                             <div class="address-card">
                                 <div class="address-header">
                                     <i class="fas fa-map-marker-alt"></i>
                                     <span class="address-title">Địa chỉ hiện tại</span>
                                 </div>
                                 <div class="address-content">
-                                    <p id="currentAddress" class="address-text">Đang tải địa chỉ...</p>
+                                    <p id="checkoutCurrentAddress" class="address-text">Đang tải địa chỉ...</p>
                                 </div>
                             </div>
                         </div>
@@ -157,10 +188,10 @@
                     <div class="note-section">
                         <div class="section-header">
                             <h3><i class="fas fa-sticky-note"></i> Ghi chú</h3>
-                            <p class="section-subtitle">Thêm ghi chú cho lần check-in này (tùy chọn)</p>
+                            <p class="section-subtitle">Thêm ghi chú cho lần check-out này (tùy chọn)</p>
                         </div>
                         <div class="note-container">
-                            <textarea id="note" name="note" class="note-textarea" rows="3" placeholder="Nhập ghi chú về lần check-in này..."></textarea>
+                            <textarea id="note" name="note" class="note-textarea" rows="3" placeholder="Nhập ghi chú về lần check-out này..."></textarea>
                         </div>
                     </div>
 
@@ -169,9 +200,9 @@
                         <button type="submit" id="submitBtn" class="btn-submit" disabled>
                             <div class="btn-content">
                                 <i class="fas fa-check"></i>
-                                <span>Hoàn thành Check-in</span>
+                                <span>Hoàn thành Check-out</span>
                             </div>
-                            <div class="btn-loading hidden">
+                            <div class="btn-loading" style="display: none;">
                                 <i class="fas fa-spinner fa-spin"></i>
                                 <span>Đang xử lý...</span>
                             </div>
@@ -180,11 +211,26 @@
                 </form>
             </div>
         </div>
+        {% else %}
+        <div class="no-checkin-card">
+            <div class="no-checkin-content">
+                <div class="no-checkin-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Không có Check-in để Check-out</h3>
+                <p>Bạn cần thực hiện Check-in trước khi có thể Check-out.</p>
+                <a href="{% url 'checkin:action' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Thực hiện Check-in
+                </a>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin></script>
-<script src="{% static 'js/checkin/action.js' %}"></script>
+<script src="{% static 'js/checkout.js' %}"></script>
 {% endblock %}

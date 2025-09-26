@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chi tiết Check-out - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="checkout-detail-page">
+    <div class="detail-container">
+        {% if error %}
+        <div class="error-container">
+            <div class="error-content">
+                <i class="fas fa-exclamation-triangle error-icon"></i>
+                <h2>Lỗi</h2>
+                <p>{{ error }}</p>
+                <a href="{% url 'checkin:history' %}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại lịch sử check-in
+                </a>
+            </div>
+        </div>
+        {% else %}
+        
+        <!-- Header -->
+        <div class="detail-header">
+            <div class="header-content">
+                <h1 class="detail-title">
+                    <i class="fas fa-eye"></i> Chi tiết Check-out
+                </h1>
+                <p class="detail-subtitle">
+                    Thông tin chi tiết về lần checkout này
+                </p>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'checkin:history' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Quay lại lịch sử check-in
+                </a>
+            </div>
+        </div>
+
+        <!-- Check-in Information -->
+        <div class="info-section">
+            <div class="section-header">
+                <h3><i class="fas fa-sign-in-alt"></i> Thông tin Check-in</h3>
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Thời gian Check-in:</label>
+                    <span>{{ checkin.created_at|date:"d/m/Y H:i:s" }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Địa điểm:</label>
+                    <span>{{ checkin.get_location_name }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Tọa độ:</label>
+                    <span>{{ checkin.lat|floatformat:6 }}, {{ checkin.lng|floatformat:6 }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Địa chỉ:</label>
+                    <span>{{ checkin.address|default:"Không xác định" }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Loại Check-in:</label>
+                    <span>{{ checkin.get_checkin_type_display }}</span>
+                </div>
+                {% if checkin.note %}
+                <div class="info-item">
+                    <label>Ghi chú:</label>
+                    <span>{{ checkin.note }}</span>
+                </div>
+                {% endif %}
+                {% if checkin.photo %}
+                <div class="info-item full-width">
+                    <label>Ảnh Check-in:</label>
+                    <div class="photo-container">
+                        <img src="{{ checkin.photo.url }}" alt="Check-in photo" class="detail-photo">
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Check-out Information -->
+        <div class="info-section">
+            <div class="section-header">
+                <h3><i class="fas fa-sign-out-alt"></i> Thông tin Check-out</h3>
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Thời gian Check-out:</label>
+                    <span>{{ checkout.created_at|date:"d/m/Y H:i:s" }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Địa điểm Check-out:</label>
+                    <span>{{ checkout.get_location_name }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Tọa độ Check-out:</label>
+                    <span>{{ checkout.lat|floatformat:6 }}, {{ checkout.lng|floatformat:6 }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Địa chỉ Check-out:</label>
+                    <span>{{ checkout.address|default:"Không xác định" }}</span>
+                </div>
+                {% if checkout.distance_m %}
+                <div class="info-item">
+                    <label>Khoảng cách:</label>
+                    <span>{{ checkout.distance_m|floatformat:2 }} mét</span>
+                </div>
+                {% endif %}
+                {% if checkout.note %}
+                <div class="info-item">
+                    <label>Ghi chú Check-out:</label>
+                    <span>{{ checkout.note }}</span>
+                </div>
+                {% endif %}
+                {% if checkout.photo %}
+                <div class="info-item full-width">
+                    <label>Ảnh Check-out:</label>
+                    <div class="photo-container">
+                        <img src="{{ checkout.photo.url }}" alt="Check-out photo" class="detail-photo">
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-section">
+            <div class="section-header">
+                <h3><i class="fas fa-chart-line"></i> Tóm tắt</h3>
+            </div>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">Thời gian làm việc</div>
+                    <div class="summary-value">
+                        {% with duration=checkout.created_at|timesince:checkin.created_at %}
+                            {{ duration }}
+                        {% endwith %}
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Trạng thái</div>
+                    <div class="summary-value">
+                        <span class="status-badge status-success">Hoàn thành</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions-section">
+            <div class="actions-content">
+                <a href="{% url 'checkin:history' %}" class="btn btn-primary">
+                    <i class="fas fa-history"></i>
+                    Quay lại lịch sử check-in
+                </a>
+                <a href="{% url 'checkin:checkout_history' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-list"></i>
+                    Xem lịch sử checkout
+                </a>
+            </div>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/checkin/checkout_detail.js' %}"></script>
+{% endblock %}
