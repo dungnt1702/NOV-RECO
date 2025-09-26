@@ -1,21 +1,22 @@
-// Area Form JavaScript
+// Location Form JavaScript
 let map;
-let currentArea = null;
+let currentLocation = null;
 let isEditing = false;
 let editingMarker = null;
 let editingCircle = null;
+let currentAddress = null;
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('Area form page loaded');
+    console.log('Location form page loaded');
     
-    // Check if we're editing an existing area
+    // Check if we're editing an existing location
     const pathParts = window.location.pathname.split('/');
-    const areaId = pathParts[pathParts.length - 2];
+    const locationId = pathParts[pathParts.length - 2];
     
-    if (areaId && !isNaN(areaId)) {
+    if (locationId && !isNaN(locationId)) {
         isEditing = true;
-        loadArea(parseInt(areaId));
+        loadLocation(parseInt(locationId));
     }
     
     initializeMap();
@@ -41,13 +42,16 @@ function initializeMap() {
 
         // Update map marker
         updateMapMarker(lat, lng);
+        
+        // Get address from coordinates
+        reverseGeocode(lat, lng);
     });
 }
 
 // Setup event listeners
 function setupEventListeners() {
     // Form submission
-    document.getElementById('saveAreaBtn').addEventListener('click', handleFormSubmit);
+    document.getElementById('saveLocationBtn').addEventListener('click', handleFormSubmit);
 
     // Get current location button
     document.getElementById('getCurrentLocationBtn').addEventListener('click', getCurrentLocation);
@@ -56,32 +60,38 @@ function setupEventListeners() {
     document.getElementById('lat').addEventListener('input', updateMapFromInputs);
     document.getElementById('lng').addEventListener('input', updateMapFromInputs);
     document.getElementById('radius_m').addEventListener('input', updateMapFromInputs);
+    
+    // Address field manual edit tracking
+    document.getElementById('address').addEventListener('input', function() {
+        this.dataset.autoFilled = 'false';
+    });
 }
 
-// Load area data for editing
-async function loadArea(areaId) {
+// Load location data for editing
+async function loadLocation(locationId) {
     try {
-        const response = await fetch(`/area/api/${areaId}/`);
-        const area = await response.json();
+        const response = await fetch(`/location/api/${locationId}/`);
+        const location = await response.json();
 
-        currentArea = area;
+        currentLocation = location;
 
         // Fill form
-        document.getElementById('name').value = area.name;
-        document.getElementById('description').value = area.description || '';
-        document.getElementById('lat').value = area.lat;
-        document.getElementById('lng').value = area.lng;
-        document.getElementById('radius_m').value = area.radius_m;
-        document.getElementById('is_active').checked = area.is_active;
+        document.getElementById('name').value = location.name;
+        document.getElementById('description').value = location.description || '';
+        document.getElementById('address').value = location.address || '';
+        document.getElementById('lat').value = location.lat;
+        document.getElementById('lng').value = location.lng;
+        document.getElementById('radius_m').value = location.radius_m;
+        document.getElementById('is_active').checked = location.is_active;
 
         // Update map
-        updateMapMarker(area.lat, area.lng);
-        map.setView([area.lat, area.lng], 15);
+        updateMapMarker(location.lat, location.lng);
+        map.setView([location.lat, location.lng], 15);
 
-        showAlert('Đang chỉnh sửa khu vực', 'info');
+        showAlert('Đang chỉnh sửa địa điểm', 'info');
     } catch (error) {
-        console.error('Error loading area:', error);
-        showAlert('Lỗi khi tải thông tin khu vực', 'danger');
+        console.error('Error loading location:', error);
+        showAlert('Lỗi khi tải thông tin địa điểm', 'danger');
     }
 }
 
@@ -135,6 +145,11 @@ function updateMapFromInputs() {
         if (editingCircle) {
             editingCircle.setRadius(radius);
         }
+        
+        // Get address from coordinates (only if both lat and lng are valid)
+        if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+            reverseGeocode(lat, lng);
+        }
     }
 }
 
@@ -164,6 +179,9 @@ function getCurrentLocation() {
             // Update map marker
             updateMapMarker(lat, lng);
             map.setView([lat, lng], 15);
+            
+            // Get address from coordinates
+            reverseGeocode(lat, lng);
             
             // Show success message
             showAlert('Đã lấy vị trí hiện tại thành công!', 'success');
@@ -213,22 +231,23 @@ async function handleFormSubmit() {
     const formData = {
         name: document.getElementById('name').value,
         description: document.getElementById('description').value,
+        address: document.getElementById('address').value,
         lat: parseFloat(document.getElementById('lat').value),
         lng: parseFloat(document.getElementById('lng').value),
         radius_m: parseInt(document.getElementById('radius_m').value),
         is_active: document.getElementById('is_active').checked
     };
 
-    const btn = document.getElementById('saveAreaBtn');
+    const btn = document.getElementById('saveLocationBtn');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
     btn.disabled = true;
 
     try {
         let response;
-        if (currentArea) {
-            // Update existing area
-            response = await fetch(`/area/api/${currentArea.id}/`, {
+        if (currentLocation) {
+            // Update existing location
+            response = await fetch(`/location/api/${currentLocation.id}/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -237,8 +256,8 @@ async function handleFormSubmit() {
                 body: JSON.stringify(formData)
             });
         } else {
-            // Create new area
-            response = await fetch('/area/api/', {
+            // Create new location
+            response = await fetch('/location/api/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -249,20 +268,20 @@ async function handleFormSubmit() {
         }
 
         if (response.ok) {
-            const message = currentArea ? 'Cập nhật khu vực thành công' : 'Tạo khu vực thành công';
+            const message = currentLocation ? 'Cập nhật địa điểm thành công' : 'Tạo địa điểm thành công';
             showAlert(message, 'success');
             
             // Redirect to list after 2 seconds
             setTimeout(() => {
-                window.location.href = '/area/list/';
+                window.location.href = '/location/list/';
             }, 2000);
         } else {
             const error = await response.json();
-            throw new Error(error.detail || 'Failed to save area');
+            throw new Error(error.detail || 'Failed to save location');
         }
     } catch (error) {
-        console.error('Error saving area:', error);
-        showAlert('Lỗi khi lưu khu vực: ' + error.message, 'danger');
+        console.error('Error saving location:', error);
+        showAlert('Lỗi khi lưu địa điểm: ' + error.message, 'danger');
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -284,7 +303,7 @@ function validateForm() {
     // Validate name
     const name = document.getElementById('name').value.trim();
     if (!name) {
-        showFieldError('name', 'Tên khu vực là bắt buộc');
+        showFieldError('name', 'Tên địa điểm là bắt buộc');
         isValid = false;
     }
 
@@ -332,7 +351,7 @@ function showAlert(message, type) {
         ${message}
     `;
 
-    const container = document.querySelector('.area-form-content');
+    const container = document.querySelector('.location-form-content');
     container.insertBefore(alertDiv, container.firstChild);
 
     // Auto remove after 5 seconds
@@ -341,6 +360,34 @@ function showAlert(message, type) {
             alertDiv.parentNode.removeChild(alertDiv);
         }
     }, 5000);
+}
+
+// Reverse geocoding function
+async function reverseGeocode(lat, lng) {
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+        const data = await response.json();
+        
+        if (data && data.display_name) {
+            currentAddress = data.display_name;
+            
+            // Update address field if it's empty or if user hasn't manually edited it
+            const addressField = document.getElementById('address');
+            if (!addressField.value.trim() || addressField.dataset.autoFilled === 'true') {
+                addressField.value = currentAddress;
+                addressField.dataset.autoFilled = 'true';
+                
+                // Add visual indicator that address was auto-filled
+                addressField.style.backgroundColor = '#e8f5e8';
+                setTimeout(() => {
+                    addressField.style.backgroundColor = '';
+                }, 2000);
+            }
+        }
+    } catch (error) {
+        console.error('Reverse geocoding error:', error);
+        // Don't show error to user as this is a background operation
+    }
 }
 
 // Get CSRF token

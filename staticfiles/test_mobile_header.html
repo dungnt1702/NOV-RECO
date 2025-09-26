@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Header Test</title>
+    <link rel="stylesheet" href="/static/css/base.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8fafc;
+        }
+        
+        .test-container {
+            margin-top: 80px;
+            padding: 20px;
+        }
+        
+        .test-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .test-info h2 {
+            color: #3b82f6;
+            margin-bottom: 10px;
+        }
+        
+        .test-info p {
+            color: #64748b;
+            margin: 5px 0;
+        }
+        
+        .breakpoint-info {
+            background: #e0f2fe;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #0284c7;
+        }
+        
+        .breakpoint-info h3 {
+            color: #0284c7;
+            margin: 0 0 10px 0;
+        }
+        
+        .breakpoint-info ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .breakpoint-info li {
+            margin: 5px 0;
+            color: #0f172a;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Template -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <!-- Left side: Hamburger + Logo -->
+            <div class="nav-left">
+                <button class="nav-toggle" id="nav-toggle">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                
+                <a href="/" class="nav-logo">
+                    <img src="/static/logo.svg" alt="NOV-RECO Logo" onerror="this.style.display='none'">
+                    <span>NOV-RECO</span>
+                </a>
+            </div>
+            
+            <!-- Center: App Title (Mobile only) -->
+            <div class="nav-center">
+                <span class="app-title">Check-in System</span>
+            </div>
+            
+            <!-- Right side: User info -->
+            <div class="nav-right">
+                <div class="user-info">
+                    <a href="#" class="user-profile-link" title="Thông tin cá nhân">
+                        <div class="user-avatar">
+                            AB
+                        </div>
+                    </a>
+                    <a href="#" class="logout-btn" title="Đăng xuất">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-info">
+            <h2>📱 Mobile Header Layout Test</h2>
+            <p><strong>Current Screen:</strong> <span id="screen-size"></span></p>
+            <p><strong>Layout:</strong> <span id="layout-type"></span></p>
+            <p><strong>App Title Visible:</strong> <span id="title-visible"></span></p>
+        </div>
+
+        <div class="breakpoint-info">
+            <h3>🖥️ Desktop (≥769px)</h3>
+            <ul>
+                <li>Logo ở bên trái</li>
+                <li>Menu navigation ở giữa</li>
+                <li>User info ở bên phải</li>
+                <li>App title ẩn</li>
+            </ul>
+        </div>
+
+        <div class="breakpoint-info">
+            <h3>📱 Mobile (≤768px)</h3>
+            <ul>
+                <li>Hamburger + Logo ở bên trái</li>
+                <li>App title ở giữa</li>
+                <li>Avatar + Logout ở bên phải</li>
+                <li>Menu navigation slide từ trái</li>
+            </ul>
+        </div>
+
+        <div class="breakpoint-info">
+            <h3>📱 Small Mobile (≤480px)</h3>
+            <ul>
+                <li>Font size nhỏ hơn</li>
+                <li>Logo nhỏ hơn</li>
+                <li>App title nhỏ hơn</li>
+                <li>Spacing compact hơn</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function updateScreenInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const screenSize = document.getElementById('screen-size');
+            const layoutType = document.getElementById('layout-type');
+            const titleVisible = document.getElementById('title-visible');
+            
+            screenSize.textContent = `${width} × ${height}`;
+            
+            if (width >= 769) {
+                layoutType.textContent = 'Desktop';
+                titleVisible.textContent = 'No (Hidden)';
+            } else if (width <= 480) {
+                layoutType.textContent = 'Small Mobile';
+                titleVisible.textContent = 'Yes (Small)';
+            } else {
+                layoutType.textContent = 'Mobile';
+                titleVisible.textContent = 'Yes (Normal)';
+            }
+        }
+        
+        // Update on load and resize
+        updateScreenInfo();
+        window.addEventListener('resize', updateScreenInfo);
+        
+        // Mobile menu toggle
+        document.getElementById('nav-toggle').addEventListener('click', function() {
+            alert('Mobile menu toggle clicked!');
+        });
+    </script>
+</body>
+</html>

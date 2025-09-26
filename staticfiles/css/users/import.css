@@ -1,0 +1,70 @@
+/* Import page custom styles */
+.office-form-page {
+  padding: 24px 12px;
+}
+
+.office-form-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.office-form-header {
+  margin-bottom: 20px;
+}
+
+.office-form-card {
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+.office-form-group {
+  margin-bottom: 16px;
+}
+
+.office-form-actions {
+  margin-top: 12px;
+  gap: 10px !important;
+  flex-wrap: wrap;
+}
+
+.import-guidance {
+  color: #475569;
+  line-height: 1.75;
+  font-size: 14.5px;
+}
+.import-guidance code {
+  color: #f0abfc;
+}
+.import-dropzone {
+  border: 2px dashed #334155;
+  background: #0b1220;
+  color: #cbd5e1;
+  border-radius: 12px;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, transform .1s ease;
+}
+.import-dropzone:hover {
+  border-color: #60a5fa;
+  background: #0f172a;
+}
+.import-dropzone:active {
+  transform: scale(0.99);
+}
+.import-dropzone input[type="file"] {
+  display: none;
+}
+.import-dropzone .dz-icon {
+  font-size: 32px;
+  color: #60a5fa;
+}
+.import-dropzone .dz-text {
+  font-weight: 600;
+}
+.import-dropzone .dz-hint {
+  font-size: 12px;
+  color: #94a3b8;
+}

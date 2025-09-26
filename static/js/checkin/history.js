@@ -233,7 +233,7 @@ function handleSort(field) {
 // Load areas for filter
 async function loadAreas() {
     try {
-        const response = await api('/area/api/');
+        const response = await api('/location/api/');
         if (response.ok) {
             const data = await response.json();
             const areas = Array.isArray(data) ? data : (data.areas || data.results || []);

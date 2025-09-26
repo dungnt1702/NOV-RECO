@@ -514,9 +514,9 @@ async function loadAreas() {
   try {
     let response;
     if (typeof api === 'function') {
-      response = await api('/area/api/');
+      response = await api('/location/api/');
     } else {
-      response = await fetch('/area/api/', {
+      response = await fetch('/location/api/', {
         method: 'GET',
         headers: {
           'X-Requested-With': 'XMLHttpRequest',

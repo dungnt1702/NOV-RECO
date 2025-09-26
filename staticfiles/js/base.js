@@ -298,3 +298,41 @@ function getUserInfo() {
     }
     return null;
 }
+
+// User Menu Dropdown functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const userMenuToggle = document.getElementById('userMenuToggle');
+    const userMenuContent = document.getElementById('userMenuContent');
+    
+    if (userMenuToggle && userMenuContent) {
+        // Toggle user menu dropdown
+        userMenuToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            userMenuContent.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!userMenuContent.contains(e.target) && !userMenuToggle.contains(e.target)) {
+                userMenuContent.classList.remove('show');
+            }
+        });
+        
+        // Close dropdown when pressing Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                userMenuContent.classList.remove('show');
+            }
+        });
+        
+        // Handle menu item clicks
+        const menuItems = userMenuContent.querySelectorAll('.menu-item');
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Close dropdown after clicking a menu item
+                userMenuContent.classList.remove('show');
+            });
+        });
+    }
+});

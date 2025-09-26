@@ -5,8 +5,23 @@ let map;
 let marker;
 let currentPosition = null;
 let currentPhoto = null;
+let currentAddress = null;
 let stream = null;
 let currentFacingMode = 'environment'; // 'environment' for back camera, 'user' for front camera
+
+// Helper: determine if current context is allowed to use camera/GPS in dev
+function isTrustedContext() {
+    try {
+        if (window.isSecureContext) return true;
+        const host = (location.hostname || '').toLowerCase();
+        if (host === 'localhost' || host === '127.0.0.1') return true;
+        // Any *.local domain (e.g., reco.local, nov-reco.local)
+        if (/^[a-z0-9-]+\.local$/.test(host)) return true;
+        // Private IPv4 ranges commonly used in LAN/dev
+        if (/^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(host)) return true;
+    } catch (_) {}
+    return false;
+}
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
@@ -14,8 +29,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeMap();
     loadUserInfo();
     setupEventListeners();
+    setupCheckinTypeSelection();
     updateSubmitButtonState();
     checkBrowserSupport();
+    // Auto get location on page load
+    autoGetLocation();
     console.log('Checkin page initialization complete');
 });
 
@@ -24,7 +42,7 @@ function checkBrowserSupport() {
     const warnings = [];
     
     // Check HTTPS
-    const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+    const isSecureContext = isTrustedContext();
     
     if (!isSecureContext) {
         warnings.push('⚠️ Trang web không bảo mật - GPS và Camera có thể không hoạt động');
@@ -71,6 +89,12 @@ function initializeMap() {
     const mapElement = document.getElementById('map');
     if (!mapElement) {
         console.log('Map element not found, skipping map initialization');
+        return;
+    }
+    
+    // Check if Leaflet is loaded
+    if (typeof L === 'undefined') {
+        console.error('Leaflet library not loaded');
         return;
     }
     
@@ -212,7 +236,7 @@ async function getCurrentLocation() {
     setLoading(btn, true);
     
     // Check if running on HTTPS or localhost
-    const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+    const isSecureContext = isTrustedContext();
     
     if (!isSecureContext) {
         showAlert('⚠️ GPS chỉ hoạt động trên HTTPS hoặc localhost.\n\nVui lòng truy cập qua:\n• https:// (bảo mật)\n• localhost\n• reco.local', 'error');
@@ -232,10 +256,12 @@ async function getCurrentLocation() {
             const permission = await navigator.permissions.query({ name: 'geolocation' });
             console.log('Geolocation permission:', permission.state);
             
-            if (permission.state === 'denied') {
-                showAlert('🚫 Quyền truy cập vị trí bị từ chối!\n\n📋 Cách khắc phục:\n1️⃣ Nhấp vào biểu tượng 🔒 bên trái thanh địa chỉ\n2️⃣ Chọn "Vị trí" → "Cho phép"\n3️⃣ Tải lại trang và thử lại', 'error');
-                setLoading(btn, false);
-                return;
+            if (permission.state === 'granted') {
+                console.log('GPS permission already granted, proceeding...');
+            } else if (permission.state === 'prompt') {
+                console.log('GPS permission prompt expected...');
+            } else if (permission.state === 'denied') {
+                console.warn('Permissions API reports geolocation denied; will verify via getCurrentPosition');
             }
         }
         
@@ -262,6 +288,9 @@ async function getCurrentLocation() {
             if (coordsElement) {
                 coordsElement.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
             }
+            
+            // Reverse geocoding to get address
+            reverseGeocode(lat, lng);
             
             updateSubmitButtonState();
             showAlert('✅ Đã lấy vị trí thành công!', 'success');
@@ -302,6 +331,61 @@ async function getCurrentLocation() {
     );
 }
 
+// Reverse geocoding to get address from coordinates
+async function reverseGeocode(lat, lng) {
+    try {
+        // Show loading state for address
+        const addressElement = document.getElementById('currentAddress');
+        const addressDisplay = document.getElementById('addressDisplay');
+        
+        if (addressElement) {
+            addressElement.textContent = 'Đang tải địa chỉ...';
+        }
+        if (addressDisplay) {
+            addressDisplay.style.display = 'block';
+        }
+        
+        // Using OpenStreetMap Nominatim API
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=vi`
+        );
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data && data.display_name) {
+            currentAddress = data.display_name;
+            
+            // Update address display
+            if (addressElement) {
+                addressElement.textContent = currentAddress;
+            }
+            
+            console.log('Address found:', currentAddress);
+        } else {
+            throw new Error('No address data received');
+        }
+        
+    } catch (error) {
+        console.error('Reverse geocoding error:', error);
+        currentAddress = 'Không thể xác định địa chỉ';
+        
+        // Update address display with error message
+        const addressElement = document.getElementById('currentAddress');
+        if (addressElement) {
+            addressElement.textContent = currentAddress;
+        }
+        
+        const addressDisplay = document.getElementById('addressDisplay');
+        if (addressDisplay) {
+            addressDisplay.style.display = 'block';
+        }
+    }
+}
+
 // Open camera handler
 function openCameraHandler() {
     console.log('Camera button clicked');
@@ -321,7 +405,7 @@ async function openCamera() {
         console.log('Requesting camera access...');
         
         // Check if running on HTTPS or localhost
-        const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+        const isSecureContext = isTrustedContext();
         
         if (!isSecureContext) {
             showAlert('⚠️ Camera chỉ hoạt động trên HTTPS hoặc localhost.\n\nVui lòng truy cập qua:\n• https:// (bảo mật)\n• localhost\n• reco.local', 'error');
@@ -339,9 +423,12 @@ async function openCamera() {
                 const permission = await navigator.permissions.query({ name: 'camera' });
                 console.log('Camera permission:', permission.state);
                 
-                if (permission.state === 'denied') {
-                    showAlert('🚫 Quyền truy cập camera bị từ chối!\n\n📋 Cách khắc phục:\n1️⃣ Nhấp vào biểu tượng 🔒 bên trái thanh địa chỉ\n2️⃣ Chọn "Camera" → "Cho phép"\n3️⃣ Tải lại trang và thử lại', 'error');
-                    return;
+                if (permission.state === 'granted') {
+                    console.log('Camera permission already granted, proceeding...');
+                } else if (permission.state === 'prompt') {
+                    console.log('Camera permission prompt expected...');
+                } else if (permission.state === 'denied') {
+                    console.warn('Permissions API reports camera denied; will verify via getUserMedia');
                 }
             } catch (permError) {
                 console.log('Camera permission check not supported, proceeding...');
@@ -633,6 +720,7 @@ async function handleSubmit(e) {
         const formData = new FormData();
         formData.append('lat', currentPosition.lat);
         formData.append('lng', currentPosition.lng);
+        formData.append('address', currentAddress || '');
         formData.append('photo', currentPhoto);
         
         const note = document.getElementById('note').value;
@@ -644,40 +732,35 @@ async function handleSubmit(e) {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         formData.append('csrfmiddlewaretoken', csrfToken);
         
-        const response = await fetch('/submit/', {
+        const response = await fetch('/checkin/submit/', {
             method: 'POST',
             body: formData,
             credentials: 'include'
         });
         
         if (response.ok) {
-            // Check if response is a redirect to success page
-            if (response.redirected && response.url.includes('/success/')) {
-                window.location.href = response.url;
-            } else {
-                // Try to parse JSON response
-                try {
-                    const result = await response.json();
-                    if (result.success && result.redirect_url) {
-                        window.location.href = result.redirect_url;
-                    } else if (result.success) {
-                        showAlert('Check-in thành công!', 'success');
-                        // Reset form
-                        resetForm();
-                    } else {
-                        showAlert(result.message || 'Có lỗi xảy ra', 'error');
-                    }
-                } catch (e) {
-                    // If not JSON, check if it's HTML (success page)
-                    const text = await response.text();
-                    if (text.includes('Check-in Thành công') || text.includes('success')) {
-                        // This is the success page, redirect to it
-                        window.location.href = '/success/';
-                    } else {
-                        showAlert('Check-in thành công!', 'success');
-                        resetForm();
-                    }
+            // Always parse JSON and prioritize pretty URL
+            try {
+                const result = await response.json();
+                let target = null;
+                if (result && result.redirect_url) {
+                    target = result.redirect_url;
+                } else if (result && result.success && result.checkin_id) {
+                    target = `/checkin/success/checkin_id/${result.checkin_id}/`;
                 }
+                if (target) {
+                    console.log('Redirecting to:', target);
+                    window.location.href = target;
+                    return;
+                }
+                if (result && result.success) {
+                    showAlert('Check-in thành công!', 'success');
+                    resetForm();
+                } else {
+                    showAlert((result && result.message) || 'Có lỗi xảy ra', 'error');
+                }
+            } catch (e) {
+                showAlert('Có lỗi xảy ra khi xử lý phản hồi', 'error');
             }
         } else if (response.status === 302) {
             // Redirect to login
@@ -733,7 +816,7 @@ async function testGpsPermission() {
     
     try {
         // Check secure context
-        const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+        const isSecureContext = isTrustedContext();
         
         if (!isSecureContext) {
             if (statusElement) {
@@ -797,7 +880,7 @@ async function testCameraPermission() {
     
     try {
         // Check secure context
-        const isSecureContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === 'reco.local';
+        const isSecureContext = isTrustedContext();
         
         if (!isSecureContext) {
             if (statusElement) {
@@ -850,6 +933,75 @@ async function testCameraPermission() {
     }
 }
 
+
+// Setup checkin type selection
+function setupCheckinTypeSelection() {
+    const workBtn = document.getElementById('workTypeBtn');
+    const visitorBtn = document.getElementById('visitorTypeBtn');
+    const checkinTypeInput = document.getElementById('checkinType');
+    
+    if (workBtn && visitorBtn && checkinTypeInput) {
+        workBtn.addEventListener('click', function() {
+            workBtn.classList.add('active');
+            visitorBtn.classList.remove('active');
+            checkinTypeInput.value = '1';
+        });
+        
+        visitorBtn.addEventListener('click', function() {
+            visitorBtn.classList.add('active');
+            workBtn.classList.remove('active');
+            checkinTypeInput.value = '2';
+        });
+    }
+}
+
+// Auto get location on page load
+function autoGetLocation() {
+    console.log('Auto getting location...');
+    
+    // Check if geolocation is supported
+    if (!navigator.geolocation) {
+        console.log('Geolocation not supported');
+        return;
+    }
+    
+    // Check if location permission is already granted
+    if (navigator.permissions) {
+        navigator.permissions.query({name: 'geolocation'}).then(function(result) {
+            if (result.state === 'granted') {
+                console.log('Location permission already granted, getting location...');
+                getCurrentLocation();
+            } else if (result.state === 'prompt') {
+                console.log('Location permission prompt, getting location...');
+                getCurrentLocation();
+            } else {
+                console.log('Location permission denied, showing button...');
+                showLocationButton();
+            }
+        }).catch(function(error) {
+            console.log('Permission query failed, trying to get location...');
+            getCurrentLocation();
+        });
+    } else {
+        // Fallback for browsers that don't support permissions API
+        console.log('Permissions API not supported, trying to get location...');
+        getCurrentLocation();
+    }
+}
+
+// Show location button when permission is denied
+function showLocationButton() {
+    const locationStatus = document.getElementById('locationStatus');
+    const getLocationBtn = document.getElementById('getLocationBtn');
+    
+    if (locationStatus) {
+        locationStatus.style.display = 'none';
+    }
+    
+    if (getLocationBtn) {
+        getLocationBtn.style.display = 'flex';
+    }
+}
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', function() {

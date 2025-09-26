@@ -7,6 +7,114 @@ let currentSort = { field: 'created_at', direction: 'desc' };
 
 console.log('Checkin list JS loaded');
 
+// Export current filtered data to CSV (Excel-compatible)
+function exportCurrentToCSV() {
+  // Use the filtered data if available; otherwise use allCheckins
+  const data = (typeof window !== 'undefined' && window.paginationComponent && typeof window.paginationComponent.getAllItems === 'function')
+    ? window.paginationComponent.getAllItems()
+    : (window.originalCheckins && allCheckins.length && allCheckins.length <= (window.originalCheckins.length))
+      ? allCheckins
+      : (window.originalCheckins || allCheckins);
+
+  const rows = [];
+  // Header
+  rows.push(['Số thứ tự', 'Nhân viên', 'Địa điểm', 'Tọa độ (lat)', 'Tọa độ (lng)', 'Khoảng cách (mét)', 'Loại checkin', 'Thời gian', 'Ghi chú']);
+  
+  // Data rows
+  data.forEach((c, index) => {
+    rows.push([
+      String(index + 1),
+      c.user_name || '',
+      c.area_name || '',
+      c.lat != null ? (Number(c.lat).toFixed(6)) : '',
+      c.lng != null ? (Number(c.lng).toFixed(6)) : '',
+      c.distance_m != null ? (Number(c.distance_m).toFixed(2)) : '',
+      c.checkin_type_display || '',
+      c.created_at || '',
+      c.note || ''
+    ]);
+  });
+
+  // Convert to CSV string
+  const csv = rows.map(r => r.map(field => {
+    const s = String(field ?? '');
+    if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }).join(',')).join('\n');
+
+  // Download as .csv (Excel opens fine)
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `checkins_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Export to XLSX using local SheetJS if available
+function exportCurrentToXLSX() {
+  const hasXLSX = typeof XLSX !== 'undefined' && XLSX && typeof XLSX.utils !== 'undefined';
+  if (!hasXLSX) {
+    console.warn('XLSX library not found, falling back to CSV');
+    exportCurrentToCSV();
+    return;
+  }
+
+  const data = (typeof window !== 'undefined' && window.paginationComponent && typeof window.paginationComponent.getAllItems === 'function')
+    ? window.paginationComponent.getAllItems()
+    : (window.originalCheckins && allCheckins.length && allCheckins.length <= (window.originalCheckins.length))
+      ? allCheckins
+      : (window.originalCheckins || allCheckins);
+
+  const header = ['Số thứ tự', 'Mã nhân viên', 'Nhân viên', 'Địa điểm', 'Tọa độ (lat)', 'Tọa độ (lng)', 'Khoảng cách (mét)', 'Loại checkin', 'Thời gian', 'Ghi chú'];
+  const rows = data.map((c, idx) => [
+    idx + 1,
+    c.employee_id || '',
+    c.user_name || '',
+    c.area_name || '',
+    c.lat != null ? Number(c.lat).toFixed(6) : '',
+    c.lng != null ? Number(c.lng).toFixed(6) : '',
+    c.distance_m != null ? Number(c.distance_m).toFixed(2) : '',
+    c.checkin_type_display || '',
+    c.created_at || '',
+    c.note || ''
+  ]);
+
+  const wsData = [header, ...rows];
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Checkins');
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = `checkins_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function normalizePhotoSrc(photoUrl, photoField) {
+  if (photoUrl) return photoUrl;
+  if (!photoField) return null;
+  const val = String(photoField);
+  if (val.startsWith('http') || val.startsWith('/media/')) return val;
+  return `/media/${val.replace(/^\/+/, '')}`;
+}
+
+function formatDistanceNumber(meters) {
+  const n = parseFloat(meters) || 0;
+  return `${n.toFixed(2)} mét`;
+}
+
 // Sample data for testing when API is not available
 const sampleCheckins = [
   {
@@ -40,11 +148,11 @@ async function loadCheckins() {
     
     let response;
     if (typeof api === 'function') {
-      response = await api('/checkin/api/');
+      response = await api('/checkin/api/?per_page=1000');
     } else {
       // Fallback to fetch if api() not available
       console.warn('api() function not found, using fetch fallback');
-      response = await fetch('/checkin/api/', {
+      response = await fetch('/checkin/api/?per_page=1000', {
         method: 'GET',
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
@@ -56,7 +164,7 @@ async function loadCheckins() {
     if (response.ok) {
       const data = await response.json();
       console.log('Data received:', data);
-      allCheckins = data.results || [];
+      allCheckins = data.checkins || data.results || [];
       window.originalCheckins = allCheckins; // Store original data for filtering
       
       // Initialize sort icons
@@ -69,6 +177,8 @@ async function loadCheckins() {
       console.log('Checkins loaded:', allCheckins.length);
       loadDepartments();
       loadAreas();
+      loadAllUsers();
+      initializeDepartmentFilter();
     } else {
       console.error('API error:', response.status, response.statusText);
       // Use sample data for demonstration when API fails
@@ -167,17 +277,23 @@ function renderCheckinsTable(items = null) {
   const tbody = document.getElementById('checkins-table');
   if (tbody) {
     if (checkinsToRender.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #6c757d;">Không có dữ liệu check-in</td></tr>';
-    } else {
-      tbody.innerHTML = checkinsToRender.map(checkin => `
+      tbody.innerHTML = `
         <tr>
-          <td>${checkin.id}</td>
-          <td>
-            <div class="user-info">
-              <div class="user-name">${checkin.user_name || 'N/A'}</div>
-              <div class="user-email">${checkin.user_email || ''}</div>
+          <td colspan="8" class="empty-state-cell">
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <h3>Không có check-in nào</h3>
+              <p>Chưa có dữ liệu check-in phù hợp với bộ lọc.</p>
             </div>
           </td>
+        </tr>
+      `;
+    } else {
+      tbody.innerHTML = checkinsToRender.map((checkin, idx) => `
+        <tr>
+          <td>${startIndex + idx + 1}</td>
+          <td>${checkin.employee_id || ''}</td>
+          <td>${checkin.user_name || 'N/A'}</td>
           <td class="area-cell">
             <i class="fas fa-map-marker-alt"></i>${checkin.area_name || 'N/A'}
           </td>
@@ -185,18 +301,23 @@ function renderCheckinsTable(items = null) {
             ${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}
           </td>
           <td>
-            <span class="distance-badge">${formatDistance(checkin.distance_m || 0)}</span>
+            <span class="distance-cell">${formatDistanceNumber(checkin.distance_m || 0)}</span>
+          </td>
+          <td>
+            <span class="checkin-type-badge ${checkin.checkin_type === '1' ? 'work' : 'visitor'}">
+              ${checkin.checkin_type_display || 'N/A'}
+            </span>
           </td>
           <td>${formatDate(checkin.created_at)}</td>
           <td>${checkin.note || '-'}</td>
           <td>
-            ${checkin.photo_url ? `
-              <img src="${checkin.photo_url}" alt="Check-in photo" class="photo-thumbnail" onclick="openPhotoModal('${checkin.photo_url}')">
-            ` : `
-              <div class="photo-placeholder">
-                <i class="fas fa-camera"></i>
-              </div>
-            `}
+            ${(() => {
+              const src = normalizePhotoSrc(checkin.photo_url, checkin.photo);
+              if (src) {
+                return `<img src="${src}" alt="Check-in photo" class="photo-thumbnail" onclick="openPhotoModal('${src}')" onerror="this.style.display='none'">`;
+              }
+              return `<div class=\"photo-placeholder\"><i class=\"fas fa-camera\"></i></div>`;
+            })()}
           </td>
         </tr>
       `).join('');
@@ -233,7 +354,13 @@ function renderMobileCards(items = null) {
   console.log('Mobile cards container found:', mobileCards);
   
   if (checkinsToRender.length === 0) {
-    mobileCards.innerHTML = '<div style="text-align: center; padding: 40px; color: #6c757d;">Không có dữ liệu check-in</div>';
+    mobileCards.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <h3>Không có check-in nào</h3>
+        <p>Chưa có dữ liệu check-in phù hợp với bộ lọc.</p>
+      </div>
+    `;
   } else {
   mobileCards.innerHTML = checkinsToRender.map(checkin => `
     <div class="mobile-card">
@@ -255,6 +382,16 @@ function renderMobileCards(items = null) {
           </div>
           
           <div class="mobile-card-row">
+            <span class="mobile-card-label">📏 Khoảng cách:</span>
+            <span class="mobile-card-value">${formatDistanceNumber(checkin.distance_m || 0)}</span>
+          </div>
+          
+          <div class="mobile-card-row">
+            <span class="mobile-card-label">🏷️ Loại checkin:</span>
+            <span class="mobile-card-value">${checkin.checkin_type_display || 'N/A'}</span>
+          </div>
+          
+          <div class="mobile-card-row">
             <span class="mobile-card-label">📅 Thời gian:</span>
             <span class="mobile-card-value">${formatDate(checkin.created_at)}</span>
           </div>
@@ -268,18 +405,17 @@ function renderMobileCards(items = null) {
         </div>
         
         <div class="mobile-card-photo-container">
-          ${checkin.photo_url ? `
-            <img src="${checkin.photo_url}" alt="Check-in photo" class="mobile-card-photo">
-          ` : `
-            <div class="mobile-card-photo-placeholder">📷</div>
-          `}
+          ${(function(){
+            const src = normalizePhotoSrc(checkin.photo_url, checkin.photo);
+            if (src) {
+              return `<img src="${src}" alt="Check-in photo" class="mobile-card-photo" onclick="openPhotoModal('${src}')" onerror="this.style.display='none'">`;
+            }
+            return `<div class=\"mobile-card-photo-placeholder\">📷</div>`;
+          })()}
         </div>
       </div>
         
-        <div class="mobile-card-badges">
-          <span class="mobile-card-badge location">${checkin.area_name}</span>
-          <span class="mobile-card-badge distance">${formatDistance(checkin.distance_m || 0)}</span>
-        </div>
+        <div class="mobile-card-badges"></div>
       </div>
     `).join('');
     
@@ -342,12 +478,13 @@ async function loadAllUsers() {
       populateUserFilter(users);
     }
   } catch (error) {
-    console.error('Error loading users:', error);
+    console.error('Error loading all users:', error);
   }
 }
 
 async function loadUsersByDepartment(departmentId) {
   try {
+    console.log('Loading users for department:', departmentId);
     let response;
     if (typeof api === 'function') {
       response = await api(`/users/api/?department=${departmentId}`);
@@ -360,9 +497,12 @@ async function loadUsersByDepartment(departmentId) {
         }
       });
     }
+    console.log('API response status:', response.status);
     if (response.ok) {
       const data = await response.json();
+      console.log('API response data:', data);
       const users = Array.isArray(data) ? data : data.results || [];
+      console.log('Users found:', users.length);
       populateUserFilter(users);
     }
   } catch (error) {
@@ -374,9 +514,9 @@ async function loadAreas() {
   try {
     let response;
     if (typeof api === 'function') {
-      response = await api('/area/api/');
+      response = await api('/location/api/');
     } else {
-      response = await fetch('/area/api/', {
+      response = await fetch('/location/api/', {
         method: 'GET',
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
@@ -398,10 +538,17 @@ function populateDepartmentFilter(departments) {
   const departmentFilter = document.getElementById('departmentFilter');
   if (departmentFilter) {
     departmentFilter.innerHTML = '<option value="">Tất cả phòng ban</option>' +
-      departments.map(dept => `<option value="${dept.id}">${dept.name}</option>`).join('');
-    
-    // Add event listener for department change
+      departments.map(dept => `<option value="${dept.id}">${dept.full_name || dept.name}</option>`).join('');
+  }
+}
+
+// Initialize department filter event listener once
+function initializeDepartmentFilter() {
+  const departmentFilter = document.getElementById('departmentFilter');
+  if (departmentFilter && !departmentFilter.hasAttribute('data-initialized')) {
+    departmentFilter.setAttribute('data-initialized', 'true');
     departmentFilter.addEventListener('change', function() {
+      console.log('Department changed to:', this.value);
       const departmentId = this.value;
       if (departmentId) {
         loadUsersByDepartment(departmentId);
@@ -413,17 +560,32 @@ function populateDepartmentFilter(departments) {
 }
 
 function populateUserFilter(users) {
+  console.log('Populating user filter with users:', users);
   const userFilter = document.getElementById('userFilter');
   if (userFilter) {
-    userFilter.innerHTML = '<option value="">Tất cả nhân viên</option>' +
-      users.map(user => `<option value="${user.id}">${user.first_name} ${user.last_name}</option>`).join('');
+    if (users.length === 0) {
+      console.log('No users found, showing "Không có nhân viên"');
+      userFilter.innerHTML = '<option value="">Không có nhân viên</option>';
+    } else {
+      console.log('Found users, showing user list');
+      userFilter.innerHTML = '<option value="">Tất cả nhân viên</option>' +
+        users.map(user => {
+          // Use full_name from API, otherwise construct from first_name and last_name
+          const fullName = user.full_name || 
+            (user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : 
+             user.first_name || user.last_name || user.username || 'Unknown User');
+          return `<option value="${user.id}">${fullName}</option>`;
+        }).join('');
+    }
+  } else {
+    console.error('User filter element not found');
   }
 }
 
 function populateAreaFilter(areas) {
   const areaFilter = document.getElementById('areaFilter');
   if (areaFilter) {
-    areaFilter.innerHTML = '<option value="">Tất cả khu vực</option>' +
+    areaFilter.innerHTML = '<option value="">Tất cả địa điểm</option>' +
       areas.map(area => `<option value="${area.id}">${area.name}</option>`).join('');
   }
 }
@@ -434,6 +596,8 @@ function applyFilters() {
   const departmentId = document.getElementById('departmentFilter')?.value || '';
   const userId = document.getElementById('userFilter')?.value || '';
   const areaId = document.getElementById('areaFilter')?.value || '';
+  const checkinType = document.getElementById('checkinTypeFilter')?.value || '';
+  const employeeIdSearch = (document.getElementById('employeeIdSearch')?.value || '').trim().toLowerCase();
 
   // Get original data (not filtered data)
   const originalData = window.originalCheckins || allCheckins;
@@ -452,6 +616,15 @@ function applyFilters() {
     // Area filter
     if (areaId && checkin.area_id !== parseInt(areaId)) return false;
 
+    // Checkin type filter
+    if (checkinType && checkin.checkin_type !== checkinType) return false;
+
+    // Employee ID search (contains)
+    if (employeeIdSearch) {
+      const eid = String(checkin.employee_id || '').toLowerCase();
+      if (!eid.includes(employeeIdSearch)) return false;
+    }
+
     return true;
   });
 
@@ -468,11 +641,13 @@ function clearFilters() {
   const dateFrom = document.getElementById('date-from');
   const dateTo = document.getElementById('date-to');
   const userFilter = document.getElementById('user-filter');
+  const checkinTypeFilter = document.getElementById('checkinTypeFilter');
   
   if (searchInput) searchInput.value = '';
   if (dateFrom) dateFrom.value = '';
   if (dateTo) dateTo.value = '';
   if (userFilter) userFilter.value = '';
+  if (checkinTypeFilter) checkinTypeFilter.value = '';
   
   // Reset pagination component with all data
   if (window.paginationComponent) {
@@ -551,7 +726,8 @@ function openPhotoModal(photoUrl) {
 
 // Pagination functions
 function updatePagination() {
-  totalPages = Math.ceil(allCheckins.length / itemsPerPage);
+  const totalItems = allCheckins.length;
+  totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
   
   const paginationContainer = document.getElementById('pagination');
   if (paginationContainer) {
@@ -585,10 +761,12 @@ function updatePagination() {
     nextBtn.addEventListener('click', () => loadPage(currentPage + 1));
     paginationContainer.appendChild(nextBtn);
     
-    // Add pagination info
+    // Add pagination info with counts
+    const start = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+    const end = Math.min(currentPage * itemsPerPage, totalItems);
     const info = document.createElement('div');
     info.className = 'pagination-info';
-    info.textContent = `Trang ${currentPage} / ${totalPages}`;
+    info.textContent = `Trang ${currentPage}/${totalPages} • Hiển thị ${start}–${end} / ${totalItems}`;
     paginationContainer.appendChild(info);
   }
 }
@@ -613,6 +791,22 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Load checkins
   loadCheckins();
+
+  // Collapse filters by default
+  const filtersPanel = document.getElementById('filtersPanel');
+  const filterToggle = document.getElementById('filterToggle');
+  const filterToggleIcon = document.getElementById('filterToggleIcon');
+  if (filtersPanel) {
+    filtersPanel.classList.add('collapsed');
+  }
+  if (filterToggle && filtersPanel) {
+    filterToggle.addEventListener('click', function() {
+      const isCollapsed = filtersPanel.classList.toggle('collapsed');
+      if (filterToggleIcon) {
+        filterToggleIcon.className = isCollapsed ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+      }
+    });
+  }
   
   // Add event listeners for sorting
   document.querySelectorAll('.checkin-table th.sortable').forEach(th => {
@@ -634,6 +828,42 @@ document.addEventListener('DOMContentLoaded', function() {
   if (itemsPerPageSelect) {
     itemsPerPageSelect.addEventListener('change', function() {
       itemsPerPage = parseInt(this.value);
+      currentPage = 1;
+      renderCheckinsTable();
+      updatePagination();
+    });
+  }
+
+  // Export Excel (CSV) button
+  const exportBtn = document.getElementById('exportExcelBtn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', function() {
+      exportCurrentToXLSX();
+    });
+  }
+
+  // Reset filters button
+  const resetBtn = document.getElementById('resetFilters');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', function() {
+      // Clear inputs
+      const employeeIdSearch = document.getElementById('employeeIdSearch');
+      if (employeeIdSearch) employeeIdSearch.value = '';
+      const departmentFilter = document.getElementById('departmentFilter');
+      if (departmentFilter) departmentFilter.value = '';
+      const userFilterSel = document.getElementById('userFilter');
+      if (userFilterSel) userFilterSel.value = '';
+      const areaFilterSel = document.getElementById('areaFilter');
+      if (areaFilterSel) areaFilterSel.value = '';
+      const dateFromSel = document.getElementById('dateFrom');
+      if (dateFromSel) dateFromSel.value = '';
+      const dateToSel = document.getElementById('dateTo');
+      if (dateToSel) dateToSel.value = '';
+      const checkinTypeSel = document.getElementById('checkinTypeFilter');
+      if (checkinTypeSel) checkinTypeSel.value = '';
+      
+      // Reset data
+      allCheckins = window.originalCheckins || allCheckins;
       currentPage = 1;
       renderCheckinsTable();
       updatePagination();
@@ -663,5 +893,11 @@ document.addEventListener('DOMContentLoaded', function() {
   const dateTo = document.getElementById('dateTo');
   if (dateTo) {
     dateTo.addEventListener('change', applyFilters);
+  }
+
+  // Checkin type filter
+  const checkinTypeFilter = document.getElementById('checkinTypeFilter');
+  if (checkinTypeFilter) {
+    checkinTypeFilter.addEventListener('change', applyFilters);
   }
 });

@@ -1,0 +1,64 @@
+/* Collapsible filter bar styling akin to check-in list */
+.users-page .search-filter-section {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin: 16px 0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  transition: all .2s ease;
+}
+
+.users-page .search-filter-section .filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.users-page .search-filter-section .filter-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.users-page .search-filter-section .filter-toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+.users-page .search-filter-section.collapsed .filter-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.users-page .search-filter-section .filter-body {
+  padding: 12px;
+  max-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out, padding 0.4s ease-out, opacity 0.3s ease-out;
+  opacity: 1;
+}
+
+.users-page .search-filter-section.collapsed .filter-body {
+  max-height: 0;
+  padding: 0 12px;
+  opacity: 0;
+}
+
+.users-page .search-input-group {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 992px) {
+  .users-page .search-input-group {
+    grid-template-columns: repeat(2, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .users-page .search-input-group {
+    grid-template-columns: 1fr;
+  }
+}

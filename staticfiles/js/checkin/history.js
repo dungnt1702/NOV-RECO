@@ -1,9 +1,27 @@
+function normalizePhotoSrc(photoUrl, photoField) {
+    if (photoUrl) return photoUrl;
+    if (!photoField) return null;
+    const val = String(photoField);
+    if (val.startsWith('http') || val.startsWith('/media/')) return val;
+    return `/media/${val.replace(/^\/+/, '')}`;
+}
+
+// Format distance number to "000.00 mét" format
+function formatDistanceNumber(distance) {
+    if (!distance || distance === null || distance === undefined) {
+        return 'N/A';
+    }
+    const num = parseFloat(distance);
+    if (isNaN(num)) return 'N/A';
+    return `${num.toFixed(2)} mét`;
+}
 // History page specific JavaScript
 
 let allCheckins = [];
 let filteredCheckins = [];
 let currentPage = 1;
 let totalPages = 1;
+const itemsPerPage = 20;
 let currentSort = { field: 'created_at', direction: 'desc' };
 
 // Update view visibility based on screen size
@@ -35,6 +53,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show appropriate view based on screen size
     updateViewVisibility();
     
+    // Collapse filters by default
+    const filtersPanel = document.getElementById('filtersPanel');
+    const filterToggle = document.getElementById('filterToggle');
+    const filterToggleIcon = document.getElementById('filterToggleIcon');
+    if (filtersPanel) {
+        filtersPanel.classList.add('collapsed');
+    }
+    if (filterToggle && filtersPanel) {
+        filterToggle.addEventListener('click', function() {
+            const isCollapsed = filtersPanel.classList.toggle('collapsed');
+            if (filterToggleIcon) {
+                filterToggleIcon.className = isCollapsed ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+            }
+        });
+    }
+
     loadCheckins();
     setupEventListeners();
     
@@ -71,8 +105,8 @@ function setupEventListeners() {
     }
     
     // Date filters
-    const dateFrom = document.getElementById('date-from');
-    const dateTo = document.getElementById('date-to');
+    const dateFrom = document.getElementById('dateFrom');
+    const dateTo = document.getElementById('dateTo');
     
     if (dateFrom) {
         dateFrom.addEventListener('change', applyFilters);
@@ -83,9 +117,20 @@ function setupEventListeners() {
     }
     
     // Location filter
-    const areaFilter = document.getElementById('area-filter');
+    const areaFilter = document.getElementById('areaFilter');
     if (areaFilter) {
         areaFilter.addEventListener('change', applyFilters);
+    }
+
+    const checkinTypeFilter = document.getElementById('checkinTypeFilter');
+    if (checkinTypeFilter) {
+        checkinTypeFilter.addEventListener('change', applyFilters);
+    }
+
+    // Apply Filters button
+    const applyBtn = document.getElementById('applyFilters');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', applyFilters);
     }
 }
 
@@ -95,14 +140,14 @@ async function loadCheckins() {
         const response = await api('/checkin/api/history/?page=1');
         if (response.ok) {
             const data = await response.json();
-            allCheckins = data.results || [];
+            allCheckins = data.checkins || data.results || [];
             filteredCheckins = [...allCheckins];
             
             // Initialize sort icons
             updateSortIcons(currentSort.field, currentSort.direction);
             
-            updatePagination(data);
             renderCheckins();
+            updatePagination();
             loadAreas();
             updateFilterCount();
         } else {
@@ -188,15 +233,15 @@ function handleSort(field) {
 // Load areas for filter
 async function loadAreas() {
     try {
-        const response = await api('/area/api/');
+        const response = await api('/location/api/');
         if (response.ok) {
             const data = await response.json();
-            const areas = data.areas || [];
+            const areas = Array.isArray(data) ? data : (data.areas || data.results || []);
             
-            const areaSelect = document.getElementById('area-filter');
+            const areaSelect = document.getElementById('areaFilter');
             if (areaSelect) {
                 // Clear existing options except first one
-                areaSelect.innerHTML = '<option value="">Tất cả khu vực</option>';
+                areaSelect.innerHTML = '<option value="">Tất cả địa điểm</option>';
                 
                 areas.forEach(area => {
                     const option = document.createElement('option');
@@ -212,14 +257,14 @@ async function loadAreas() {
 }
 
 // Update pagination
-function updatePagination(data) {
-    currentPage = data.current_page || 1;
-    totalPages = data.total_pages || 1;
-    
+function updatePagination() {
     const paginationContainer = document.getElementById('pagination');
     if (paginationContainer) {
         paginationContainer.innerHTML = '';
         
+        const totalItems = filteredCheckins?.length || allCheckins.length || 0;
+        totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
         // Previous button
         const prevBtn = document.createElement('button');
         prevBtn.textContent = '← Trước';
@@ -248,40 +293,31 @@ function updatePagination(data) {
         nextBtn.addEventListener('click', () => loadPage(currentPage + 1));
         paginationContainer.appendChild(nextBtn);
         
-        // Add pagination info
+        // Add pagination info with counts
+        const start = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+        const end = Math.min(currentPage * itemsPerPage, totalItems);
         const info = document.createElement('div');
         info.className = 'pagination-info';
-        info.textContent = `Trang ${currentPage} / ${totalPages}`;
+        info.textContent = `Trang ${currentPage}/${totalPages} • Hiển thị ${start}–${end} / ${totalItems}`;
         paginationContainer.appendChild(info);
     }
 }
 
 // Load specific page
-async function loadPage(page) {
+function loadPage(page) {
     if (page < 1 || page > totalPages) return;
-    
-    try {
-        const response = await api(`/checkin/api/history/?page=${page}`);
-        if (response.ok) {
-            const data = await response.json();
-            allCheckins = data.results || [];
-            filteredCheckins = [...allCheckins];
-            
-            updatePagination(data);
-            renderCheckins();
-        }
-    } catch (error) {
-        console.error('Error loading page:', error);
-        showError('Lỗi tải trang');
-    }
+    currentPage = page;
+    renderCheckins();
+    updatePagination();
 }
 
 // Apply filters
 function applyFilters() {
     const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
-    const dateFrom = document.getElementById('date-from')?.value || '';
-    const dateTo = document.getElementById('date-to')?.value || '';
-    const area = document.getElementById('area-filter')?.value || '';
+    const dateFrom = document.getElementById('dateFrom')?.value || '';
+    const dateTo = document.getElementById('dateTo')?.value || '';
+    const area = document.getElementById('areaFilter')?.value || '';
+    const checkinType = document.getElementById('checkinTypeFilter')?.value || '';
     
     filteredCheckins = allCheckins.filter(checkin => {
         // Search filter
@@ -309,6 +345,11 @@ function applyFilters() {
             return false;
         }
         
+        // Checkin type filter
+        if (checkinType && checkin.checkin_type !== checkinType) {
+            return false;
+        }
+        
         return true;
     });
     
@@ -322,6 +363,7 @@ function clearFilters() {
     document.getElementById('date-from').value = '';
     document.getElementById('date-to').value = '';
     document.getElementById('area-filter').value = '';
+    document.getElementById('checkinTypeFilter').value = '';
     
     // Reset to all check-ins
     filteredCheckins = [...allCheckins];
@@ -370,7 +412,9 @@ function renderCheckins(checkins = null) {
     
     // Use provided checkins or sort filtered checkins
     const dataToRender = checkins || sortCheckins(filteredCheckins, currentSort.field, currentSort.direction);
-    const checkinsToRender = dataToRender;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const checkinsToRender = dataToRender.slice(startIndex, endIndex);
     console.log('Rendering history checkins, count:', checkinsToRender.length);
     
     if (checkinsToRender.length === 0) {
@@ -382,8 +426,20 @@ function renderCheckins(checkins = null) {
             </div>
         `;
         
+        const emptyStateTable = `
+            <tr>
+                <td colspan="8" class="empty-state-cell">
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>Không có check-in nào</h3>
+                        <p>Chưa có dữ liệu check-in phù hợp với bộ lọc.</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+        
         if (mobileContainer) mobileContainer.innerHTML = emptyState;
-        if (tableBody) tableBody.innerHTML = emptyState;
+        if (tableBody) tableBody.innerHTML = emptyStateTable;
         return;
     }
     
@@ -404,13 +460,18 @@ function renderCheckins(checkins = null) {
                         </div>
                         
                         <div class="mobile-card-row">
-                            <span class="mobile-card-label">📏 Khoảng cách:</span>
-                            <span class="mobile-card-value">${formatDistance(checkin.distance_m || 0)}</span>
+                            <span class="mobile-card-label">🗺️ Tọa độ:</span>
+                            <span class="mobile-card-value">${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}</span>
                         </div>
                         
                         <div class="mobile-card-row">
-                            <span class="mobile-card-label">🗺️ Tọa độ:</span>
-                            <span class="mobile-card-value">${checkin.lat ? checkin.lat.toFixed(6) : 'N/A'}, ${checkin.lng ? checkin.lng.toFixed(6) : 'N/A'}</span>
+                            <span class="mobile-card-label">📏 Khoảng cách:</span>
+                            <span class="mobile-card-value">${formatDistanceNumber(checkin.distance_m)}</span>
+                        </div>
+                        
+                        <div class="mobile-card-row">
+                            <span class="mobile-card-label">🏷️ Loại checkin:</span>
+                            <span class="mobile-card-value">${checkin.checkin_type_display || 'N/A'}</span>
                         </div>
                         
                         <div class="mobile-card-row">
@@ -427,18 +488,17 @@ function renderCheckins(checkins = null) {
                     </div>
                     
                     <div class="mobile-card-photo-container">
-                        ${checkin.photo_url ? `
-                            <img src="${checkin.photo_url}" alt="Check-in photo" class="mobile-card-photo">
-                        ` : `
-                            <div class="mobile-card-photo-placeholder">📷</div>
-                        `}
+                        ${(() => {
+                            const src = normalizePhotoSrc(checkin.photo_url, checkin.photo);
+                            if (src) {
+                                return `<img src="${src}" alt="Check-in photo" class="mobile-card-photo" onclick="openPhotoModal('${src}')" onerror="this.style.display='none'">`;
+                            }
+                            return `<div class=\"mobile-card-photo-placeholder\">📷</div>`;
+                        })()}
                     </div>
                 </div>
                 
-                <div class="mobile-card-badges">
-                    <span class="mobile-badge area-badge">${checkin.area_name || 'N/A'}</span>
-                    <span class="mobile-badge distance-badge">${formatDistance(checkin.distance_m || 0)}</span>
-                </div>
+                <div class="mobile-card-badges"></div>
             </div>
         `).join('');
     }
@@ -466,18 +526,30 @@ function renderCheckins(checkins = null) {
                     </div>
                 </td>
                 <td>
+                    <div class="distance-cell">
+                        ${formatDistanceNumber(checkin.distance_m)}
+                    </div>
+                </td>
+                <td>
+                    <div class="checkin-type-cell">
+                        <span class="checkin-type-badge ${checkin.checkin_type === '1' ? 'work' : 'visitor'}">
+                            ${checkin.checkin_type_display || 'N/A'}
+                        </span>
+                    </div>
+                </td>
+                <td>
                     <div class="note-cell">
                         ${checkin.note || '-'}
                     </div>
                 </td>
                 <td>
-                    ${checkin.photo_url ? `
-                        <img src="${checkin.photo_url}" alt="Check-in photo" class="photo-thumbnail" onclick="openPhotoModal('${checkin.photo_url}')">
-                    ` : `
-                        <div class="photo-placeholder">
-                            <i class="fas fa-camera"></i>
-                        </div>
-                    `}
+                    ${(() => {
+                        const src = normalizePhotoSrc(checkin.photo_url, checkin.photo);
+                        if (src) {
+                            return `<img src="${src}" alt="Check-in photo" class="photo-thumbnail" onclick="openPhotoModal('${src}')" onerror="this.style.display='none'">`;
+                        }
+                        return `<div class=\"photo-placeholder\"><i class=\"fas fa-camera\"></i></div>`;
+                    })()}
                 </td>
                 <td>
                     <span class="status-badge status-success">Thành công</span>
@@ -534,6 +606,24 @@ function formatDistance(distance) {
 
 // Open photo modal
 function openPhotoModal(photoUrl) {
-    // Simple implementation - can be enhanced with a proper modal
-    window.open(photoUrl, '_blank');
+    const modal = document.createElement('div');
+    modal.style.cssText = (
+        'position:fixed;top:0;left:0;width:100%;height:100%;' +
+        'background:rgba(0,0,0,0.8);display:flex;align-items:center;' +
+        'justify-content:center;z-index:1000;cursor:pointer;'
+    );
+
+    const img = document.createElement('img');
+    img.src = photoUrl;
+    img.alt = 'Check-in photo';
+    img.style.cssText = (
+        'max-width:90%;max-height:90%;border-radius:8px;' +
+        'box-shadow:0 8px 32px rgba(0,0,0,0.3);'
+    );
+
+    modal.appendChild(img);
+    document.body.appendChild(modal);
+    modal.addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
 }

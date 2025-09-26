@@ -20,24 +20,32 @@ function getCheckinData() {
 function displayCheckinData() {
   const data = getCheckinData();
   
-  document.getElementById('user-name').textContent = data.userName;
-  document.getElementById('user-email').textContent = data.userEmail;
-  document.getElementById('user-department').textContent = data.userDepartment;
-  document.getElementById('user-employee-id').textContent = data.userEmployeeId;
-  document.getElementById('location-name').textContent = data.locationName;
-  document.getElementById('coordinates').textContent = data.coordinates;
-  document.getElementById('checkin-time').textContent = data.checkinTime;
+  const elUserName = document.getElementById('userName');
+  const elUserEmail = document.getElementById('userEmail');
+  const elUserDept = document.getElementById('userDepartment');
+  const elUserEmpId = document.getElementById('userEmployeeId');
+  const elLocationName = document.getElementById('locationName');
+  const elCoordinates = document.getElementById('coordinates');
+  const elCheckinTime = document.getElementById('checkinTime');
+
+  if (elUserName) elUserName.textContent = data.userName;
+  if (elUserEmail) elUserEmail.textContent = data.userEmail;
+  if (elUserDept) elUserDept.textContent = data.userDepartment;
+  if (elUserEmpId) elUserEmpId.textContent = data.userEmployeeId;
+  if (elLocationName) elLocationName.textContent = data.locationName;
+  if (elCoordinates) elCoordinates.textContent = data.coordinates;
+  if (elCheckinTime) elCheckinTime.textContent = data.checkinTime;
   
   // Show note if exists
   if (data.note && data.note.trim() !== '') {
-    document.getElementById('note-text').textContent = data.note;
-    document.getElementById('note-item').style.display = 'flex';
+    const elNote = document.getElementById('note');
+    if (elNote) elNote.textContent = data.note;
   }
   
   // Show photo if exists
   if (data.photoUrl && data.photoUrl.trim() !== '') {
-    document.getElementById('photo-preview').src = data.photoUrl;
-    document.getElementById('photo-container').style.display = 'block';
+    const img = document.querySelector('.checkin-photo');
+    if (img) img.src = data.photoUrl;
   }
 }
 
@@ -103,6 +111,17 @@ function shareCheckin() {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+  // Canonicalize URL: if query param exists, redirect to pretty URL once
+  const params = new URLSearchParams(window.location.search);
+  const qId = params.get('checkin_id');
+  if (qId) {
+    const pretty = `/checkin/success/checkin_id/${qId}/`;
+    if (window.location.pathname !== pretty) {
+      window.location.replace(pretty);
+      return; // Stop further execution; page will reload at pretty URL
+    }
+  }
+
   displayCheckinData();
   
   // Add event listeners for action buttons

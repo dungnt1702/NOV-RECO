@@ -1,0 +1,322 @@
+/* Location Form Specific Styles */
+.location-form-page {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    padding-bottom: 40px;
+    min-height: 100vh;
+}
+
+.location-form-page .location-form-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.location-form-page .location-form-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.location-form-page .location-form-title {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.location-form-page .location-form-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.location-form-page .location-form-content {
+    padding: 30px;
+}
+
+.location-form-page .location-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.location-form-page .location-form-section {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 25px;
+    border: 1px solid #e9ecef;
+}
+
+.location-form-page .location-form-section h3 {
+    color: #495057;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.location-form-page .location-form-section h3 i {
+    color: #667eea;
+    margin-right: 10px;
+}
+
+/* Form Styles */
+.location-form-page .form-group {
+    margin-bottom: 20px;
+}
+
+.location-form-page .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.location-form-page .form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.location-form-page .form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.location-form-page .form-control:invalid {
+    border-color: #dc3545;
+}
+
+.location-form-page textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Map Container */
+.location-form-page .map-container {
+    height: 400px;
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+/* Address Field */
+.location-form-page .address-field {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #e9ecef;
+}
+
+.location-form-page .address-field label {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.location-form-page .address-field label i {
+    color: #667eea;
+}
+
+.location-form-page .address-field .form-text {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.location-form-page .address-field .form-text i {
+    color: #17a2b8;
+}
+
+/* Location Methods */
+.location-form-page .location-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.location-form-page .location-method {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+}
+
+.location-form-page .location-method h4 {
+    color: #495057;
+    margin-bottom: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.location-form-page .location-method h4 i {
+    color: #667eea;
+    margin-right: 8px;
+}
+
+.location-form-page .location-method p {
+    color: #6c757d;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.location-form-page .coordinate-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* Buttons */
+.location-form-page .btn {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.location-form-page .btn i {
+    margin-right: 8px;
+}
+
+.location-form-page .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.location-form-page .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.location-form-page .btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.location-form-page .btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+.location-form-page .btn-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.location-form-page .btn-info:hover {
+    background: #138496;
+    transform: translateY(-2px);
+}
+
+/* Form Actions */
+.location-form-page .location-form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .location-form-page .location-form-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .location-form-page .location-form-title {
+        font-size: 2rem;
+    }
+    
+    .location-form-page .location-form-content {
+        padding: 20px;
+    }
+    
+    .location-form-page .coordinate-inputs {
+        grid-template-columns: 1fr;
+    }
+    
+    .location-form-page .location-form-actions {
+        flex-direction: column;
+    }
+    
+    .location-form-page .btn {
+        width: 100%;
+    }
+}
+
+/* Alert Styles */
+.location-form-page .alert {
+    border-radius: 10px;
+    border: none;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+}
+
+.location-form-page .alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.location-form-page .alert-danger i {
+    color: #dc3545;
+}
+
+/* Checkbox Styles */
+.location-form-page .form-group label input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+
+/* Loading States */
+.location-form-page .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Success States */
+.location-form-page .form-control.is-valid {
+    border-color: #28a745;
+}
+
+.location-form-page .form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.location-form-page .location-form-container {
+    animation: fadeIn 0.6s ease-out;
+}

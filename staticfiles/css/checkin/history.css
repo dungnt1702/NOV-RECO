@@ -291,6 +291,14 @@
     color: #4a5568;
 }
 
+.checkin-table .distance-cell {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+    color: #0A5597;
+    font-weight: 600;
+    text-align: center;
+}
+
 .checkin-table .note-cell {
     max-width: 200px;
     overflow: hidden;
@@ -443,6 +451,12 @@
     color: #6b7280;
 }
 
+.empty-state-cell {
+    text-align: center;
+    padding: 0;
+    border: none;
+}
+
 .empty-state i {
     font-size: 4rem;
     color: #d1d5db;
@@ -459,6 +473,35 @@
 .empty-state p {
     font-size: 1rem;
     margin: 0;
+}
+
+/* Collapsible filters */
+.filters-toggle {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+
+.toggle-btn {
+    background: #e2e8f0;
+    color: #1a202c;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+#filtersPanel {
+    max-height: 600px;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.4s ease-out, opacity 0.3s ease-out;
+    opacity: 1;
+}
+
+#filtersPanel.collapsed {
+    max-height: 0;
+    padding: 0 20px;
+    opacity: 0;
 }
 
 /* Pagination */
@@ -611,6 +654,33 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Checkin Type Badge Styles */
+.checkin-type-cell {
+    text-align: center;
+}
+
+.checkin-type-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.checkin-type-badge.work {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.checkin-type-badge.visitor {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
 }
 
 .mobile-card {
