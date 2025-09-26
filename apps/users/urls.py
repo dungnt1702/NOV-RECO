@@ -42,10 +42,10 @@ urlpatterns = [
     path("create/", user_create_view, name="create"),
     path("import/", user_import_view, name="import"),
     path("import/template/", user_import_template_view, name="import_template"),
-    path("update/<int:user_id>/", user_update_view, name="update"),
-    path("detail/<int:user_id>/", user_detail_view, name="detail"),
-    path("delete/<int:user_id>/", user_delete_view, name="delete"),
-    path("toggle/<int:user_id>/", user_toggle_active_view, name="toggle"),
+    path("update/<int:id>/", user_update_view, name="update"),
+    path("detail/<int:id>/", user_detail_view, name="detail"),
+    path("delete/<int:id>/", user_delete_view, name="delete"),
+    path("toggle/<int:id>/", user_toggle_active_view, name="toggle"),
     
     # Office management views
     path("offices/", office_list_view, name="office_list"),
@@ -63,6 +63,6 @@ urlpatterns = [
     # APIs
     path("api/", user_list_api, name="list_api"),
     path("api/create/", user_create_api, name="create_api"),
-    path("api/<int:user_id>/update/", user_update_api, name="update_api"),
+    path("api/<int:id>/update/", user_update_api, name="update_api"),
     path("api/departments/", department_list_api, name="department_list_api"),
 ]

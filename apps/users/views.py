@@ -230,9 +230,9 @@ def user_import_template_view(request):
 
 
 @permission_required('users.can_edit_users')
-def user_update_view(request, user_id):
+def user_update_view(request, id):
     """Cập nhật thông tin người dùng"""
-    target_user = get_object_or_404(User, id=user_id)
+    target_user = get_object_or_404(User, id=id)
     
     if request.method == 'POST':
         form = UserUpdateForm(request.POST, instance=target_user)
@@ -254,9 +254,9 @@ def user_update_view(request, user_id):
 
 
 @permission_required('users.can_view_users')
-def user_detail_view(request, user_id):
+def user_detail_view(request, id):
     """Chi tiết người dùng"""
-    user = get_object_or_404(User, id=user_id)
+    user = get_object_or_404(User, id=id)
     
     # Get user's check-ins
     from apps.checkin.models import Checkin
@@ -270,9 +270,9 @@ def user_detail_view(request, user_id):
 
 
 @permission_required('users.can_edit_users')
-def user_toggle_active_view(request, user_id):
+def user_toggle_active_view(request, id):
     """Bật/tắt trạng thái hoạt động của người dùng"""
-    user = get_object_or_404(User, id=user_id)
+    user = get_object_or_404(User, id=id)
     
     if request.method == 'POST':
         user.is_active = not user.is_active
@@ -285,9 +285,9 @@ def user_toggle_active_view(request, user_id):
 
 
 @permission_required('users.can_delete_users')
-def user_delete_view(request, user_id):
+def user_delete_view(request, id):
     """Xóa người dùng"""
-    user = get_object_or_404(User, id=user_id)
+    user = get_object_or_404(User, id=id)
     
     if request.method == 'POST':
         user_name = user.get_full_name()
@@ -414,9 +414,9 @@ def user_create_api(request):
 
 @api_view(['PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
-def user_update_api(request, user_id):
+def user_update_api(request, id):
     """API cập nhật người dùng"""
-    user = get_object_or_404(User, id=user_id)
+    user = get_object_or_404(User, id=id)
     serializer = UserUpdateSerializer(user, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
