@@ -1,34 +1,34 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Danh sách Khu vực - NOV-RECO{% endblock %}
+{% block title %}Danh sách Địa điểm - NOV-RECO{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/area/list.css' %}">
+<link rel="stylesheet" href="{% static 'css/location/list.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="area-list-page">
-    <div class="area-list-container">
-        <div class="area-list-header">
-            <h1 class="area-list-title">
-                <i class="fas fa-map-marked-alt"></i> Danh sách Khu vực
+<div class="location-list-page">
+    <div class="location-list-container">
+        <div class="location-list-header">
+            <h1 class="location-list-title">
+                <i class="fas fa-map-marked-alt"></i> Danh sách Địa điểm
             </h1>
-            <p class="area-list-subtitle">
-                Quản lý các khu vực check-in trong hệ thống
+            <p class="location-list-subtitle">
+                Quản lý các địa điểm check-in trong hệ thống
             </p>
         </div>
 
-        <div class="area-list-content">
+        <div class="location-list-content">
             <!-- Action Buttons -->
-            <div class="area-list-actions">
-                <a href="{% url 'area:create' %}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Thêm Khu vực Mới
+            <div class="location-list-actions">
+                <a href="{% url 'location:create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Thêm Địa điểm Mới
                 </a>
             </div>
 
             <!-- Filters and Controls -->
-            <div class="area-list-controls">
+            <div class="location-list-controls">
                 <div class="filter-group">
                     <label for="statusFilter">Trạng thái:</label>
                     <select id="statusFilter" class="form-control">
@@ -39,7 +39,7 @@
                 </div>
                 <div class="filter-group">
                     <label for="searchInput">Tìm kiếm:</label>
-                    <input type="text" id="searchInput" class="form-control" placeholder="Tên khu vực...">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Tên địa điểm...">
                 </div>
                 <div class="filter-group">
                     <label for="itemsPerPage">Hiển thị:</label>
@@ -52,16 +52,16 @@
                 </div>
             </div>
 
-            <!-- Areas List -->
-            <div class="area-list-section">
+            <!-- Locations List -->
+            <div class="location-list-section">
                 <!-- Desktop Table View -->
-                <div id="areasTableContainer" class="areas-table-container d-none d-lg-block">
+                <div id="locationsTableContainer" class="locations-table-container d-none d-lg-block">
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Tên khu vực</th>
-                                <th>Mô tả</th>
+                                <th>Tên địa điểm</th>
+                                <th>Địa chỉ</th>
                                 <th>Tọa độ</th>
                                 <th>Bán kính</th>
                                 <th>Trạng thái</th>
@@ -69,7 +69,7 @@
                                 <th>Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody id="areasTableBody">
+                        <tbody id="locationsTableBody">
                             <tr>
                                 <td colspan="8" class="text-center">
                                     <i class="fas fa-spinner fa-spin"></i> Đang tải...
@@ -80,7 +80,7 @@
                 </div>
 
                 <!-- Mobile Card View -->
-                <div id="areasList" class="areas-list d-lg-none">
+                <div id="locationsList" class="locations-list d-lg-none">
                     <div class="loading">
                         <i class="fas fa-spinner fa-spin"></i> Đang tải...
                     </div>
@@ -97,5 +97,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/area/list.js' %}"></script>
+<script src="{% static 'js/location/list.js' %}"></script>
 {% endblock %}

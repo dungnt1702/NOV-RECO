@@ -2,43 +2,47 @@
 {% load static %}
 
 {% block title %}
-{% if area %}Chỉnh sửa Khu vực{% else %}Thêm Khu vực Mới{% endif %} - NOV-RECO
+{% if location %}Chỉnh sửa Địa điểm{% else %}Thêm Địa điểm Mới{% endif %} - NOV-RECO
 {% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="{% static 'css/area/form.css' %}">
+<link rel="stylesheet" href="{% static 'css/location/form.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="area-form-page">
-    <div class="area-form-container">
-        <div class="area-form-header">
-            <h1 class="area-form-title">
-                <i class="fas fa-{% if area %}edit{% else %}plus{% endif %}"></i> 
-                {% if area %}Chỉnh sửa Khu vực{% else %}Thêm Khu vực Mới{% endif %}
+<div class="location-form-page">
+    <div class="location-form-container">
+        <div class="location-form-header">
+            <h1 class="location-form-title">
+                <i class="fas fa-{% if location %}edit{% else %}plus{% endif %}"></i> 
+                {% if location %}Chỉnh sửa Địa điểm{% else %}Thêm Địa điểm Mới{% endif %}
             </h1>
-            <p class="area-form-subtitle">
-                {% if area %}Cập nhật thông tin khu vực{% else %}Tạo khu vực check-in mới{% endif %}
+            <p class="location-form-subtitle">
+                {% if location %}Cập nhật thông tin địa điểm{% else %}Tạo địa điểm check-in mới{% endif %}
             </p>
         </div>
 
-        <div class="area-form-content">
-            <div class="area-form-grid">
+        <div class="location-form-content">
+            <div class="location-form-grid">
                 <!-- Form Section -->
-                <div class="area-form-section">
+                <div class="location-form-section">
                     <h3>
-                        <i class="fas fa-edit"></i> Thông tin Khu vực
+                        <i class="fas fa-edit"></i> Thông tin Địa điểm
                     </h3>
-                    <form id="areaFormElement">
+                    <form id="locationFormElement">
                         {% csrf_token %}
                         <div class="form-group">
-                            <label for="name">Tên khu vực *</label>
+                            <label for="name">Tên địa điểm *</label>
                             <input type="text" id="name" name="name" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label for="description">Mô tả</label>
                             <textarea id="description" name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Địa chỉ chi tiết</label>
+                            <textarea id="address" name="address" class="form-control" rows="2"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="radius_m">Bán kính (mét) *</label>
@@ -47,16 +51,16 @@
                         <div class="form-group">
                             <label>
                                 <input type="checkbox" id="is_active" name="is_active" checked> 
-                                Khu vực hoạt động
+                                Địa điểm hoạt động
                             </label>
                         </div>
                     </form>
                 </div>
 
                 <!-- Map Section -->
-                <div class="area-form-section">
+                <div class="location-form-section">
                     <h3>
-                        <i class="fas fa-map"></i> Vị trí Khu vực
+                        <i class="fas fa-map"></i> Vị trí Địa điểm
                     </h3>
                     <div id="map" class="map-container"></div>
                     
@@ -64,7 +68,7 @@
                     <div class="location-methods">
                         <div class="location-method">
                             <h4><i class="fas fa-mouse-pointer"></i> Chọn trên bản đồ</h4>
-                            <p>Nhấp vào bản đồ để chọn vị trí khu vực</p>
+                            <p>Nhấp vào bản đồ để chọn vị trí địa điểm</p>
                         </div>
                         
                         <div class="location-method">
@@ -92,11 +96,11 @@
             </div>
 
             <!-- Form Actions -->
-            <div class="area-form-actions">
-                <button type="button" id="saveAreaBtn" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Lưu Khu vực
+            <div class="location-form-actions">
+                <button type="button" id="saveLocationBtn" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Lưu Địa điểm
                 </button>
-                <a href="{% url 'area:list' %}" class="btn btn-secondary">
+                <a href="{% url 'location:list' %}" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Quay lại
                 </a>
             </div>
@@ -107,5 +111,5 @@
 
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="{% static 'js/area/form.js' %}"></script>
+<script src="{% static 'js/location/form.js' %}"></script>
 {% endblock %}

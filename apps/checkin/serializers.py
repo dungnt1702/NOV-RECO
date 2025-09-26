@@ -12,8 +12,8 @@ class CheckinSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(
         source='user.get_display_name', read_only=True
     )
-    area_name = serializers.CharField(
-        source='area.name', read_only=True
+    location_name = serializers.CharField(
+        source='location.name', read_only=True
     )
     checkin_type_display = serializers.CharField(
         source='get_checkin_type_display', read_only=True
@@ -23,7 +23,7 @@ class CheckinSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkin
         fields = [
-            'id', 'user', 'user_name', 'area', 'area_name', 'lat', 'lng', 'address',
+            'id', 'user', 'user_name', 'location', 'location_name', 'lat', 'lng', 'address',
             'photo', 'photo_url', 'note', 'checkin_type', 'checkin_type_display', 
             'created_at', 'distance_m', 'ip', 'user_agent'
         ]
@@ -73,11 +73,11 @@ class CheckinListSerializer(serializers.ModelSerializer):
     user_department_id = serializers.IntegerField(
         source='user.department_id', read_only=True
     )
-    area_id = serializers.IntegerField(
-        source='area.id', read_only=True
+    location_id = serializers.IntegerField(
+        source='location.id', read_only=True
     )
-    area_name = serializers.CharField(
-        source='area.name', read_only=True
+    location_name = serializers.CharField(
+        source='location.name', read_only=True
     )
     checkin_type_display = serializers.CharField(
         source='get_checkin_type_display', read_only=True
@@ -87,7 +87,7 @@ class CheckinListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Checkin
         fields = [
-            'id', 'user', 'user_id', 'employee_id', 'user_name', 'user_department_id', 'area', 'area_id', 'area_name', 'lat', 'lng', 'address',
+            'id', 'user', 'user_id', 'employee_id', 'user_name', 'user_department_id', 'location', 'location_id', 'location_name', 'lat', 'lng', 'address',
             'photo', 'photo_url', 'note', 'checkin_type', 'checkin_type_display', 
             'created_at', 'distance_m'
         ]

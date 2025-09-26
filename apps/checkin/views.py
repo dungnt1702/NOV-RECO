@@ -101,7 +101,7 @@ def checkin_success_view(request, checkin_id=None):
                     if checkin.user.department else 'N/A'
                 ),
                 'user_employee_id': checkin.user.username,
-                'area_name': checkin.get_location_name(),
+                'location_name': checkin.get_location_name(),
                 'coordinates': (
                     f"{checkin.lat:.6f}, {checkin.lng:.6f}"
                 ),
@@ -117,7 +117,7 @@ def checkin_success_view(request, checkin_id=None):
             context = {
                 'checkin': checkin,
                 'success_data': success_data,
-                'area_name': checkin.get_location_name(),
+                'location_name': checkin.get_location_name(),
                 'distance': checkin.distance_m,
             }
             return render(request, 'checkin/success.html', context)

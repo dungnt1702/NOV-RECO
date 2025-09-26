@@ -1,5 +1,5 @@
-/* Modern Area Update Page Styles */
-.area-update-wrapper {
+/* Modern Location Update Page Styles */
+.location-update-wrapper {
   max-width: 1200px;
   margin: 0 auto;
   padding: 24px 16px;
@@ -227,7 +227,7 @@ textarea.form-control {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .area-update-wrapper {
+  .location-update-wrapper {
     padding: 16px 12px;
   }
   

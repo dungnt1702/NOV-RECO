@@ -1,5 +1,5 @@
-/* Area List Specific Styles */
-.area-list-page {
+/* Location List Specific Styles */
+.location-list-page {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 20px;
@@ -8,11 +8,11 @@
 }
 
 /* Desktop Table Styles */
-.areas-table-container {
+.locations-table-container {
     margin-top: 20px;
 }
 
-.areas-table-container .table {
+.locations-table-container .table {
     margin-bottom: 0;
     background: white;
     border-radius: 8px;
@@ -20,7 +20,7 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.areas-table-container .table thead th {
+.locations-table-container .table thead th {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
@@ -30,30 +30,30 @@
     vertical-align: middle;
 }
 
-.areas-table-container .table tbody td {
+.locations-table-container .table tbody td {
     padding: 12px;
     vertical-align: middle;
     border-top: 1px solid #dee2e6;
 }
 
-.areas-table-container .table tbody tr:hover {
+.locations-table-container .table tbody tr:hover {
     background-color: #f8f9fa;
 }
 
-.areas-table-container .badge {
+.locations-table-container .badge {
     font-size: 0.8rem;
     padding: 6px 12px;
 }
 
-.areas-table-container .badge-success {
+.locations-table-container .badge-success {
     background-color: #28a745;
 }
 
-.areas-table-container .badge-secondary {
+.locations-table-container .badge-secondary {
     background-color: #6c757d;
 }
 
-.area-list-page .area-list-container {
+.location-list-page .location-list-container {
     max-width: 1200px;
     margin: 0 auto;
     background: white;
@@ -62,36 +62,36 @@
     overflow: hidden;
 }
 
-.area-list-page .area-list-header {
+.location-list-page .location-list-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 30px;
     text-align: center;
 }
 
-.area-list-page .area-list-title {
+.location-list-page .location-list-title {
     font-size: 2.5rem;
     margin-bottom: 10px;
     font-weight: 700;
 }
 
-.area-list-page .area-list-subtitle {
+.location-list-page .location-list-subtitle {
     font-size: 1.1rem;
     opacity: 0.9;
 }
 
-.area-list-page .area-list-content {
+.location-list-page .location-list-content {
     padding: 30px;
 }
 
-.area-list-page .area-list-actions {
+.location-list-page .location-list-actions {
     display: flex;
     gap: 15px;
     margin-bottom: 30px;
     flex-wrap: wrap;
 }
 
-.area-list-page .area-list-controls {
+.location-list-page .location-list-controls {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
@@ -102,19 +102,19 @@
     border: 1px solid #e9ecef;
 }
 
-.area-list-page .filter-group {
+.location-list-page .filter-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.area-list-page .filter-group label {
+.location-list-page .filter-group label {
     font-weight: 600;
     color: #495057;
     font-size: 0.9rem;
 }
 
-.area-list-page .form-control {
+.location-list-page .form-control {
     width: 100%;
     padding: 10px 15px;
     border: 2px solid #e9ecef;
@@ -123,13 +123,13 @@
     transition: all 0.3s ease;
 }
 
-.area-list-page .form-control:focus {
+.location-list-page .form-control:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.area-list-page .area-list-section {
+.location-list-page .location-list-section {
     background: #f8f9fa;
     border-radius: 15px;
     padding: 25px;
@@ -137,12 +137,12 @@
     margin-bottom: 30px;
 }
 
-.area-list-page .areas-list {
+.location-list-page .locations-list {
     display: grid;
     gap: 15px;
 }
 
-.area-list-page .area-item {
+.location-list-page .location-item {
     background: white;
     border: 1px solid #e9ecef;
     border-radius: 14px;
@@ -151,50 +151,50 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.area-list-page .area-item:hover {
+.location-list-page .location-item:hover {
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
     transform: translateY(-2px);
 }
 
-.area-list-page .area-item-header {
+.location-list-page .location-item-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
 }
 
-.area-list-page .area-name {
+.location-list-page .location-name {
     font-weight: 700;
     color: #2d3748;
     font-size: 1.2rem;
     letter-spacing: 0.2px;
 }
 
-.area-list-page .area-status {
+.location-list-page .location-status {
     padding: 6px 16px;
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 600;
 }
 
-.area-list-page .area-status.active {
+.location-list-page .location-status.active {
     background: #d4edda;
     color: #155724;
 }
 
-.area-list-page .area-status.inactive {
+.location-list-page .location-status.inactive {
     background: #f8d7da;
     color: #721c24;
 }
 
-.area-list-page .area-details {
+.location-list-page .location-details {
     color: #4a5568;
     font-size: 0.95rem;
     line-height: 1.6;
     margin-bottom: 15px;
 }
 
-.area-list-page .area-details > div {
+.location-list-page .location-details > div {
     display: grid;
     grid-template-columns: 120px 1fr;
     gap: 10px;
@@ -202,18 +202,18 @@
     margin-bottom: 8px;
 }
 
-.area-list-page .area-details strong {
+.location-list-page .location-details strong {
     color: #2d3748;
     font-weight: 600;
 }
 
-.area-list-page .area-actions {
+.location-list-page .location-actions {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
 }
 
-.area-list-page .area-actions .btn {
+.location-list-page .location-actions .btn {
     padding: 8px 16px;
     border-radius: 8px;
     font-size: 0.9rem;
@@ -221,13 +221,13 @@
     transition: all 0.3s ease;
 }
 
-.area-list-page .loading {
+.location-list-page .loading {
     text-align: center;
     padding: 40px;
     color: #6c757d;
 }
 
-.area-list-page .loading i {
+.location-list-page .loading i {
     font-size: 2rem;
     animation: spin 1s linear infinite;
 }
@@ -238,7 +238,7 @@
 }
 
 /* Pagination */
-.area-list-page .pagination-container {
+.location-list-page .pagination-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -250,18 +250,18 @@
     border: 1px solid #e9ecef;
 }
 
-.area-list-page .pagination-container .pagination-info {
+.location-list-page .pagination-container .pagination-info {
     color: #6c757d;
     font-size: 0.9rem;
     margin-right: 20px;
 }
 
-.area-list-page .pagination-container .pagination-buttons {
+.location-list-page .pagination-container .pagination-buttons {
     display: flex;
     gap: 5px;
 }
 
-.area-list-page .pagination-container .btn {
+.location-list-page .pagination-container .btn {
     padding: 8px 12px;
     border-radius: 8px;
     font-size: 0.9rem;
@@ -269,129 +269,129 @@
     text-align: center;
 }
 
-.area-list-page .pagination-container .btn.active {
+.location-list-page .pagination-container .btn.active {
     background: #667eea;
     color: white;
     border-color: #667eea;
 }
 
-.area-list-page .pagination-container .btn:disabled {
+.location-list-page .pagination-container .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
 /* Mobile Cards Layout */
 @media (max-width: 768px) {
-    .area-list-page {
+    .location-list-page {
         padding: 10px;
     }
 
-    .area-list-page .area-list-container {
+    .location-list-page .location-list-container {
         border-radius: 15px;
     }
 
-    .area-list-page .area-list-header {
+    .location-list-page .location-list-header {
         padding: 20px;
     }
 
-    .area-list-page .area-list-title {
+    .location-list-page .location-list-title {
         font-size: 2rem;
     }
 
-    .area-list-page .area-list-content {
+    .location-list-page .location-list-content {
         padding: 20px;
     }
 
-    .area-list-page .area-list-actions {
+    .location-list-page .location-list-actions {
         flex-direction: column;
     }
 
-    .area-list-page .area-list-actions .btn {
+    .location-list-page .location-list-actions .btn {
         width: 100%;
         padding: 12px;
         font-size: 1rem;
     }
 
-    .area-list-page .area-list-controls {
+    .location-list-page .location-list-controls {
         grid-template-columns: 1fr;
         gap: 15px;
         padding: 15px;
     }
 
-    .area-list-page .area-item {
+    .location-list-page .location-item {
         padding: 16px;
     }
 
-    .area-list-page .area-item-header {
+    .location-list-page .location-item-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
     }
 
-    .area-list-page .area-details > div {
+    .location-list-page .location-details > div {
         grid-template-columns: 100px 1fr;
         gap: 8px;
     }
 
-    .area-list-page .area-actions {
+    .location-list-page .location-actions {
         flex-direction: column;
     }
 
-    .area-list-page .area-actions .btn {
+    .location-list-page .location-actions .btn {
         width: 100%;
         padding: 10px;
         font-size: 0.95rem;
     }
 
-    .area-list-page .pagination-container {
+    .location-list-page .pagination-container {
         flex-direction: column;
         gap: 15px;
     }
 
-    .area-list-page .pagination-container .pagination-info {
+    .location-list-page .pagination-container .pagination-info {
         margin-right: 0;
         text-align: center;
     }
 }
 
 @media (max-width: 480px) {
-    .area-list-page .area-list-title {
+    .location-list-page .location-list-title {
         font-size: 1.5rem;
     }
 
-    .area-list-page .area-list-subtitle {
+    .location-list-page .location-list-subtitle {
         font-size: 1rem;
     }
 
-    .area-list-page .area-list-content {
+    .location-list-page .location-list-content {
         padding: 15px;
     }
 
-    .area-list-page .area-name {
+    .location-list-page .location-name {
         font-size: 1.1rem;
     }
 
-    .area-list-page .area-status {
+    .location-list-page .location-status {
         font-size: 0.8rem;
         padding: 4px 12px;
     }
 
-    .area-list-page .area-details {
+    .location-list-page .location-details {
         font-size: 0.9rem;
     }
 
-    .area-list-page .area-details > div {
+    .location-list-page .location-details > div {
         grid-template-columns: 90px 1fr;
     }
 }
 
 /* Desktop Table Layout */
 @media (min-width: 769px) {
-    .area-list-page .areas-list {
+    .location-list-page .locations-list {
         display: block;
     }
 
-    .area-list-page .area-item {
+    .location-list-page .location-item {
         display: grid;
         grid-template-columns: 2fr 1fr 1fr 1fr auto;
         gap: 20px;
@@ -399,25 +399,25 @@
         padding: 15px 20px;
     }
 
-    .area-list-page .area-item-header {
+    .location-list-page .location-item-header {
         margin-bottom: 0;
     }
 
-    .area-list-page .area-details {
+    .location-list-page .location-details {
         margin-bottom: 0;
         font-size: 0.9rem;
     }
 
-    .area-list-page .area-details > div {
+    .location-list-page .location-details > div {
         display: block;
         margin-bottom: 4px;
     }
 
-    .area-list-page .area-actions {
+    .location-list-page .location-actions {
         justify-content: flex-end;
     }
 
-    .area-list-page .area-actions .btn {
+    .location-list-page .location-actions .btn {
         padding: 6px 12px;
         font-size: 0.85rem;
     }

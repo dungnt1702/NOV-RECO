@@ -267,5 +267,5 @@
   `;
   document.head.appendChild(style);
 
-  console.log('Area update page initialized successfully');
+  console.log('Location update page initialized successfully');
 })();

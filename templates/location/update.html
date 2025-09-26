@@ -2,39 +2,39 @@
 {% load static %}
 {% load l10n %}
 
-{% block title %}Cập nhật Khu vực{% endblock %}
+{% block title %}Cập nhật Địa điểm{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="{% static 'css/area/update.css' %}">
+<link rel="stylesheet" href="{% static 'css/location/update.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="area-update-wrapper">
+<div class="location-update-wrapper">
   <h1 class="page-title">
     <i class="fas fa-edit"></i>
-    Cập nhật Khu vực
+    Cập nhật Địa điểm
   </h1>
 
   <form method="post">
     {% csrf_token %}
 
     <div class="update-grid">
-      <!-- Thông tin khu vực -->
+      <!-- Thông tin địa điểm -->
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">
             <i class="fas fa-info-circle"></i>
-            Thông tin khu vực
+            Thông tin địa điểm
           </h3>
         </div>
         <div class="card-body">
           <div class="form-group">
             <label for="name" class="form-label">
               <i class="fas fa-tag"></i>
-              Tên khu vực
+              Tên địa điểm
             </label>
-            <input type="text" id="name" name="name" class="form-control" value="{{ area.name }}" required placeholder="Nhập tên khu vực">
+            <input type="text" id="name" name="name" class="form-control" value="{{ location.name }}" required placeholder="Nhập tên địa điểm">
           </div>
 
           <div class="form-group">
@@ -42,7 +42,15 @@
               <i class="fas fa-align-left"></i>
               Mô tả
             </label>
-            <textarea id="description" name="description" class="form-control" rows="4" placeholder="Nhập mô tả khu vực">{{ area.description }}</textarea>
+            <textarea id="description" name="description" class="form-control" rows="4" placeholder="Nhập mô tả địa điểm">{{ location.description }}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="address" class="form-label">
+              <i class="fas fa-map-marker-alt"></i>
+              Địa chỉ chi tiết
+            </label>
+            <textarea id="address" name="address" class="form-control" rows="2" placeholder="Nhập địa chỉ chi tiết">{{ location.address }}</textarea>
           </div>
 
           <div class="form-row two">
@@ -51,14 +59,14 @@
                 <i class="fas fa-map-pin"></i>
                 Vĩ độ (Latitude)
               </label>
-              <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="lat" name="lat" class="form-control" value="{{ area.lat|unlocalize }}" required placeholder="10.762622">
+              <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="lat" name="lat" class="form-control" value="{{ location.lat|unlocalize }}" required placeholder="10.762622">
             </div>
             <div class="form-group">
               <label for="lng" class="form-label">
                 <i class="fas fa-map-pin"></i>
                 Kinh độ (Longitude)
               </label>
-              <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="lng" name="lng" class="form-control" value="{{ area.lng|unlocalize }}" required placeholder="106.660172">
+              <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="lng" name="lng" class="form-control" value="{{ location.lng|unlocalize }}" required placeholder="106.660172">
             </div>
           </div>
 
@@ -68,14 +76,14 @@
                 <i class="fas fa-circle"></i>
                 Bán kính (mét)
               </label>
-              <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="radius_m" name="radius_m" class="form-control" value="{{ area.radius_m|unlocalize }}" min="10" max="10000" required placeholder="100">
+              <input type="number" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" id="radius_m" name="radius_m" class="form-control" value="{{ location.radius_m|unlocalize }}" min="10" max="10000" required placeholder="100">
             </div>
             <div class="form-group">
               <div class="switch-row">
-                <input type="checkbox" id="is_active" name="is_active" {% if area.is_active %}checked{% endif %}>
+                <input type="checkbox" id="is_active" name="is_active" {% if location.is_active %}checked{% endif %}>
                 <label for="is_active">
                   <i class="fas fa-toggle-on"></i>
-                  Khu vực hoạt động
+                  Địa điểm hoạt động
                 </label>
               </div>
             </div>
@@ -108,7 +116,7 @@
     </div>
 
     <div class="actions">
-      <a href="{% url 'area:list' %}" class="btn btn-secondary">
+      <a href="{% url 'location:list' %}" class="btn btn-secondary">
         <i class="fas fa-times"></i>
         Hủy
       </a>
@@ -123,7 +131,5 @@
 
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="{% static 'js/area/update.js' %}"></script>
+<script src="{% static 'js/location/update.js' %}"></script>
 {% endblock %}
-
-

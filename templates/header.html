@@ -45,11 +45,11 @@
                                 </a>
                             </li>
                         {% endif %}
-                        {% if user|has_permission:'area.can_view_areas' %}
+                        {% if user|has_permission:'location.can_view_locations' %}
                             <li>
-                                <a href="{% url 'area:list' %}">
+                                <a href="{% url 'location:list' %}">
                                     <i class="fas fa-map-marker-alt"></i>
-                                    Quản lý khu vực
+                                    Quản lý địa điểm
                                 </a>
                             </li>
                         {% endif %}

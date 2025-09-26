@@ -43,7 +43,7 @@
                         </div>
                         <div class="info-item">
                             <label>Khu vực:</label>
-                            <span id="locationName">{{ success_data.area_name|escapejs }}</span>
+                            <span id="locationName">{{ success_data.location_name|escapejs }}</span>
                         </div>
                         <div class="info-item">
                             <label>Tọa độ:</label>
@@ -103,7 +103,7 @@ window.checkinSuccessData = {
     userEmail: "{{ success_data.user_email|escapejs }}",
     userDepartment: "{{ success_data.user_department|escapejs }}",
     userEmployeeId: "{{ success_data.user_employee_id|escapejs }}",
-    locationName: "{{ success_data.area_name|escapejs }}",
+    locationName: "{{ success_data.location_name|escapejs }}",
     coordinates: "{{ success_data.coordinates|escapejs }}",
     checkinTime: "{{ success_data.checkin_time|escapejs }}",
     note: "{{ success_data.note|escapejs }}",

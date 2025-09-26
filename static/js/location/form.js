@@ -1,21 +1,21 @@
-// Area Form JavaScript
+// Location Form JavaScript
 let map;
-let currentArea = null;
+let currentLocation = null;
 let isEditing = false;
 let editingMarker = null;
 let editingCircle = null;
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('Area form page loaded');
+    console.log('Location form page loaded');
     
-    // Check if we're editing an existing area
+    // Check if we're editing an existing location
     const pathParts = window.location.pathname.split('/');
-    const areaId = pathParts[pathParts.length - 2];
+    const locationId = pathParts[pathParts.length - 2];
     
-    if (areaId && !isNaN(areaId)) {
+    if (locationId && !isNaN(locationId)) {
         isEditing = true;
-        loadArea(parseInt(areaId));
+        loadLocation(parseInt(locationId));
     }
     
     initializeMap();
@@ -47,7 +47,7 @@ function initializeMap() {
 // Setup event listeners
 function setupEventListeners() {
     // Form submission
-    document.getElementById('saveAreaBtn').addEventListener('click', handleFormSubmit);
+    document.getElementById('saveLocationBtn').addEventListener('click', handleFormSubmit);
 
     // Get current location button
     document.getElementById('getCurrentLocationBtn').addEventListener('click', getCurrentLocation);
@@ -58,29 +58,29 @@ function setupEventListeners() {
     document.getElementById('radius_m').addEventListener('input', updateMapFromInputs);
 }
 
-// Load area data for editing
-async function loadArea(areaId) {
+// Load location data for editing
+async function loadLocation(locationId) {
     try {
-        const response = await fetch(`/area/api/${areaId}/`);
-        const area = await response.json();
+        const response = await fetch(`/location/api/${locationId}/`);
+        const location = await response.json();
 
-        currentArea = area;
+        currentLocation = location;
 
         // Fill form
-        document.getElementById('name').value = area.name;
-        document.getElementById('description').value = area.description || '';
-        document.getElementById('lat').value = area.lat;
-        document.getElementById('lng').value = area.lng;
-        document.getElementById('radius_m').value = area.radius_m;
-        document.getElementById('is_active').checked = area.is_active;
+        document.getElementById('name').value = location.name;
+        document.getElementById('description').value = location.description || '';
+        document.getElementById('lat').value = location.lat;
+        document.getElementById('lng').value = location.lng;
+        document.getElementById('radius_m').value = location.radius_m;
+        document.getElementById('is_active').checked = location.is_active;
 
         // Update map
-        updateMapMarker(area.lat, area.lng);
-        map.setView([area.lat, area.lng], 15);
+        updateMapMarker(location.lat, location.lng);
+        map.setView([location.lat, location.lng], 15);
 
         showAlert('Đang chỉnh sửa khu vực', 'info');
     } catch (error) {
-        console.error('Error loading area:', error);
+        console.error('Error loading location:', error);
         showAlert('Lỗi khi tải thông tin khu vực', 'danger');
     }
 }
@@ -219,16 +219,16 @@ async function handleFormSubmit() {
         is_active: document.getElementById('is_active').checked
     };
 
-    const btn = document.getElementById('saveAreaBtn');
+    const btn = document.getElementById('saveLocationBtn');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
     btn.disabled = true;
 
     try {
         let response;
-        if (currentArea) {
-            // Update existing area
-            response = await fetch(`/area/api/${currentArea.id}/`, {
+        if (currentLocation) {
+            // Update existing location
+            response = await fetch(`/location/api/${currentLocation.id}/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -237,8 +237,8 @@ async function handleFormSubmit() {
                 body: JSON.stringify(formData)
             });
         } else {
-            // Create new area
-            response = await fetch('/area/api/', {
+            // Create new location
+            response = await fetch('/location/api/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -249,19 +249,19 @@ async function handleFormSubmit() {
         }
 
         if (response.ok) {
-            const message = currentArea ? 'Cập nhật khu vực thành công' : 'Tạo khu vực thành công';
+            const message = currentLocation ? 'Cập nhật khu vực thành công' : 'Tạo khu vực thành công';
             showAlert(message, 'success');
             
             // Redirect to list after 2 seconds
             setTimeout(() => {
-                window.location.href = '/area/list/';
+                window.location.href = '/location/list/';
             }, 2000);
         } else {
             const error = await response.json();
-            throw new Error(error.detail || 'Failed to save area');
+            throw new Error(error.detail || 'Failed to save location');
         }
     } catch (error) {
-        console.error('Error saving area:', error);
+        console.error('Error saving location:', error);
         showAlert('Lỗi khi lưu khu vực: ' + error.message, 'danger');
     } finally {
         btn.innerHTML = originalText;
@@ -332,7 +332,7 @@ function showAlert(message, type) {
         ${message}
     `;
 
-    const container = document.querySelector('.area-form-content');
+    const container = document.querySelector('.location-form-content');
     container.insertBefore(alertDiv, container.firstChild);
 
     // Auto remove after 5 seconds
