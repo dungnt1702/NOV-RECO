@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     # Local apps
     "apps.common",
     "apps.checkin",
-    "apps.area",
+    "apps.location",
     "apps.employee", 
     "apps.dashboard",
     "apps.personal",

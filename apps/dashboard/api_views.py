@@ -9,7 +9,7 @@ import json
 
 from apps.checkin.models import Checkin
 from apps.users.models import User, Department, Office
-from apps.area.models import Area
+from apps.location.models import Location
 
 
 @login_required
@@ -239,7 +239,7 @@ def get_finance_data(user):
 
 def get_operations_data(user):
     """Dữ liệu module Operations - dựa trên check-in và area data"""
-    areas = Area.objects.filter(is_active=True)
+    areas = Location.objects.filter(is_active=True)
     today = timezone.now().date()
     
     # Operations data based on areas and check-ins

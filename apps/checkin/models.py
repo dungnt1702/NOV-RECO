@@ -11,8 +11,8 @@ class Checkin(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
     )
-    area = models.ForeignKey(
-        'area.Area', on_delete=models.CASCADE, null=True, blank=True
+    location = models.ForeignKey(
+        'location.Location', on_delete=models.CASCADE, null=True, blank=True
     )
     lat = models.FloatField()
     lng = models.FloatField()
@@ -52,8 +52,8 @@ class Checkin(models.Model):
     def __str__(self):
         return f"{self.user.get_full_name() if self.user else 'Unknown'} - {self.created_at.strftime('%d/%m/%Y %H:%M')}"
 
-    def get_area_name(self):
-        """Lấy tên khu vực"""
-        if self.area:
-            return self.area.name
-        return "Khu vực không xác định"
+    def get_location_name(self):
+        """Lấy tên địa điểm"""
+        if self.location:
+            return self.location.name
+        return "Địa điểm không xác định"

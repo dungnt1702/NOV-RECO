@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('area', '0001_initial'),
+        ('location', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -21,13 +21,14 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('lat', models.FloatField()),
                 ('lng', models.FloatField()),
+                ('address', models.TextField(blank=True, help_text='Địa chỉ được lấy từ reverse geocoding')),
                 ('photo', models.ImageField(upload_to='checkins/%Y/%m/%d/')),
                 ('note', models.CharField(blank=True, max_length=255)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('distance_m', models.FloatField(blank=True, null=True)),
                 ('ip', models.GenericIPAddressField(blank=True, null=True)),
                 ('user_agent', models.CharField(blank=True, max_length=255)),
-                ('area', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='area.area')),
+                ('location', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='location.location')),
                 ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={

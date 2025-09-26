@@ -5,7 +5,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 from apps.checkin.models import Checkin
-from apps.area.models import Area
+from apps.location.models import Location
 from apps.users.models import User, UserRole
 from apps.users.permissions import group_required
 
@@ -48,7 +48,7 @@ def dashboard_main_view(request):
     if user.role in [UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS]:
         # Thống kê tổng quan cho quản lý
         total_employees = User.objects.filter(is_active=True).count()  # Tất cả user active
-        total_areas = Area.objects.filter(is_active=True).count()
+        total_areas = Location.objects.filter(is_active=True).count()
         
         # Thống kê theo phòng ban
         from apps.users.models import Department
@@ -58,7 +58,7 @@ def dashboard_main_view(request):
         ).order_by('-employee_count')[:5]
         
         # Check-ins gần đây
-        recent_checkins = Checkin.objects.select_related('user', 'area').order_by('-created_at')[:10]
+        recent_checkins = Checkin.objects.select_related('user', 'location').order_by('-created_at')[:10]
         
         context.update({
             'total_employees': total_employees,
@@ -170,7 +170,7 @@ def dashboard_manager_view(request):
     ).order_by('-employee_count')
     
     # Check-ins gần đây
-    recent_checkins = Checkin.objects.select_related('user', 'area').order_by('-created_at')[:10]
+    recent_checkins = Checkin.objects.select_related('user', 'location').order_by('-created_at')[:10]
     
     context = {
         'total_employees': total_employees,
@@ -202,7 +202,7 @@ def dashboard_hr_view(request):
     today_checkins = Checkin.objects.filter(created_at__date=today).count()
     
     # Check-ins gần đây
-    recent_checkins = Checkin.objects.select_related('user', 'area').order_by('-created_at')[:10]
+    recent_checkins = Checkin.objects.select_related('user', 'location').order_by('-created_at')[:10]
     
     context = {
         'total_employees': total_employees,
@@ -219,20 +219,20 @@ def dashboard_hr_view(request):
 def dashboard_secretary_view(request):
     """Dashboard cho thư ký"""
     # Thống kê khu vực
-    total_areas = Area.objects.count()
-    active_areas = Area.objects.filter(is_active=True).count()
+    total_areas = Location.objects.count()
+    active_areas = Location.objects.filter(is_active=True).count()
     
     # Thống kê check-in
     today = timezone.now().date()
     today_checkins = Checkin.objects.filter(created_at__date=today).count()
     
     # Thống kê theo khu vực
-    area_stats = Area.objects.annotate(
+    area_stats = Location.objects.annotate(
         checkin_count=Count('checkin')
     ).order_by('-checkin_count')
     
     # Check-ins gần đây
-    recent_checkins = Checkin.objects.select_related('user', 'area').order_by('-created_at')[:10]
+    recent_checkins = Checkin.objects.select_related('user', 'location').order_by('-created_at')[:10]
     
     context = {
         'total_areas': total_areas,

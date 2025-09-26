@@ -14,7 +14,7 @@ urlpatterns = [
     ),
     # Mount checkin app under /checkin/ with namespace
     path("checkin/", include(("apps.checkin.urls", "checkin"), namespace="checkin")),
-    path("area/", include("apps.area.urls")),
+    path("location/", include("apps.location.urls")),
     path("employee/", include("apps.employee.urls")),
     path("personal/", include("apps.personal.urls")),
     path("dashboard/", include("apps.dashboard.urls")),

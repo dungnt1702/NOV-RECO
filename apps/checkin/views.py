@@ -8,17 +8,17 @@ from django.db.models import Q
 from datetime import datetime
 
 from .models import Checkin
-from apps.area.models import Area
+from apps.location.models import Location
 from apps.users.models import User
 from apps.users.permissions import permission_required
 from .serializers import CheckinListSerializer
-from .utils import haversine_m, find_nearest_area
+from .utils import haversine_m, find_nearest_location
 
 
 @login_required
 def checkin_action_view(request):
     """Trang check-in chính"""
-    areas = Area.objects.filter(is_active=True)
+    areas = Location.objects.filter(is_active=True)
     context = {
         'areas': areas,
     }
@@ -44,12 +44,12 @@ def checkin_submit_view(request):
                 {'success': False, 'error': 'Vui lòng chụp ảnh'}, status=400
             )
         # Tự động tìm khu vực gần nhất dựa trên tọa độ
-        area, distance = find_nearest_area(lat, lng, area_id)
+        area, distance = find_nearest_location(lat, lng, area_id)
 
         # Tạo check-in
         checkin = Checkin.objects.create(
             user=request.user,
-            area=area,
+            location=area,
             lat=lat,
             lng=lng,
             address=address,
@@ -101,7 +101,7 @@ def checkin_success_view(request, checkin_id=None):
                     if checkin.user.department else 'N/A'
                 ),
                 'user_employee_id': checkin.user.username,
-                'area_name': checkin.get_area_name(),
+                'area_name': checkin.get_location_name(),
                 'coordinates': (
                     f"{checkin.lat:.6f}, {checkin.lng:.6f}"
                 ),
@@ -117,7 +117,7 @@ def checkin_success_view(request, checkin_id=None):
             context = {
                 'checkin': checkin,
                 'success_data': success_data,
-                'area_name': checkin.get_area_name(),
+                'area_name': checkin.get_location_name(),
                 'distance': checkin.distance_m,
             }
             return render(request, 'checkin/success.html', context)
@@ -149,7 +149,7 @@ def checkin_success_view(request, checkin_id=None):
 def checkin_history_view(request):
     """Lịch sử check-in"""
     checkins = (Checkin.objects.filter(user=request.user)
-                .select_related('area')
+                .select_related('location')
                 .order_by('-created_at'))
 
     # Pagination
@@ -186,7 +186,7 @@ def checkin_list_view(request):
         )
 
     if area_id:
-        checkins = checkins.filter(area_id=area_id)
+        checkins = checkins.filter(location_id=area_id)
 
     if user_id:
         checkins = checkins.filter(user_id=user_id)
@@ -211,7 +211,7 @@ def checkin_list_view(request):
     page_obj = paginator.get_page(page_number)
 
     # Get filter options
-    areas = Area.objects.filter(is_active=True)
+    areas = Location.objects.filter(is_active=True)
     users = (User.objects.filter(is_active=True)
              .order_by('first_name', 'last_name'))
 
@@ -250,7 +250,7 @@ def checkin_list_api(request):
         )
 
     if area_id:
-        checkins = checkins.filter(area_id=area_id)
+        checkins = checkins.filter(location_id=area_id)
 
     if user_id:
         checkins = checkins.filter(user_id=user_id)
@@ -279,7 +279,7 @@ def checkin_history_api(request):
 
     # Chỉ lấy check-in của user hiện tại
     checkins = (Checkin.objects.filter(user=request.user)
-                .select_related('area')
+                .select_related('location')
                 .order_by('-created_at'))
 
     # Filtering
@@ -289,11 +289,11 @@ def checkin_history_api(request):
     if search:
         checkins = checkins.filter(
             Q(note__icontains=search) |
-            Q(area__name__icontains=search)
+            Q(location__name__icontains=search)
         )
 
     if area_id:
-        checkins = checkins.filter(area_id=area_id)
+        checkins = checkins.filter(location_id=area_id)
 
     # Pagination
     page = int(request.GET.get('page', 1))
