@@ -1,12 +1,12 @@
-/* HR Dashboard Styles */
-.hr-dashboard {
+/* Management Dashboard Styles */
+.homepage-manager {
     padding: 20px;
     max-width: 1400px;
     margin: 0 auto;
 }
 
-/* Header Section */
-.dashboard-header {
+/* Welcome Section */
+.welcome-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -17,13 +17,13 @@
     border-radius: 12px;
 }
 
-.header-content h1 {
+.welcome-content h1 {
     font-size: 28px;
     margin-bottom: 8px;
     font-weight: 700;
 }
 
-.page-subtitle {
+.welcome-subtitle {
     font-size: 16px;
     opacity: 0.9;
     margin: 0;
@@ -50,9 +50,16 @@
     opacity: 0.9;
 }
 
-/* Metrics Section */
-.metrics-section {
+/* Key Metrics */
+.key-metrics {
     margin-bottom: 30px;
+}
+
+.key-metrics h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+    color: #374151;
+    font-weight: 600;
 }
 
 .metrics-grid {
@@ -67,11 +74,6 @@
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border: 1px solid #e5e7eb;
-    transition: transform 0.2s ease;
-}
-
-.metric-card:hover {
-    transform: translateY(-2px);
 }
 
 .metric-header {
@@ -88,25 +90,26 @@
     margin: 0;
 }
 
-.metric-header i {
-    font-size: 20px;
-    opacity: 0.7;
+.metric-trend {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 12px;
 }
 
-.metric-card.primary .metric-header i {
-    color: #0A5597;
+.metric-trend.up {
+    background: #dcfce7;
+    color: #166534;
 }
 
-.metric-card.success .metric-header i {
-    color: #10b981;
+.metric-trend.down {
+    background: #fef2f2;
+    color: #dc2626;
 }
 
-.metric-card.warning .metric-header i {
-    color: #f59e0b;
-}
-
-.metric-card.info .metric-header i {
-    color: #3b82f6;
+.metric-trend.stable {
+    background: #f3f4f6;
+    color: #6b7280;
 }
 
 .metric-value {
@@ -127,7 +130,6 @@
     background: #f3f4f6;
     border-radius: 4px;
     overflow: hidden;
-    margin: 12px 0;
 }
 
 .progress-bar {
@@ -136,19 +138,30 @@
     transition: width 0.3s ease;
 }
 
-/* Actions Section */
-.actions-section {
+.metric-chart {
+    height: 60px;
+    background: #f9fafb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+/* Quick Actions */
+.quick-actions {
     margin-bottom: 30px;
 }
 
-.section-title {
+.quick-actions h2 {
     font-size: 20px;
     margin-bottom: 16px;
     color: #374151;
     font-weight: 600;
 }
 
-.actions-grid {
+.action-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 16px;
@@ -175,31 +188,17 @@
     color: inherit;
 }
 
-.action-card.primary {
-    background: linear-gradient(135deg, #0A5597, #084a85);
-    color: white;
-    border-color: #0A5597;
-}
-
-.action-card.primary:hover {
-    background: linear-gradient(135deg, #084a85, #063d6f);
-    color: white;
-}
-
 .action-icon {
     width: 48px;
     height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.1);
+    background: #f3f4f6;
     border-radius: 12px;
+    color: #0A5597;
     font-size: 20px;
     flex-shrink: 0;
-}
-
-.action-card.primary .action-icon {
-    background: rgba(255, 255, 255, 0.2);
 }
 
 .action-content h3 {
@@ -210,16 +209,23 @@
 
 .action-content p {
     font-size: 14px;
-    opacity: 0.8;
+    color: #6b7280;
     margin: 0;
 }
 
-/* Department Section */
-.department-section {
+/* Department Overview */
+.department-overview {
     margin-bottom: 30px;
 }
 
-.department-grid {
+.department-overview h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+    color: #374151;
+    font-weight: 600;
+}
+
+.department-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
@@ -278,12 +284,19 @@
     color: #6b7280;
 }
 
-/* Activity Section */
-.activity-section {
+/* Recent Check-ins */
+.recent-checkins {
     margin-bottom: 30px;
 }
 
-.activity-list {
+.recent-checkins h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+    color: #374151;
+    font-weight: 600;
+}
+
+.checkin-list {
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -291,7 +304,7 @@
     overflow: hidden;
 }
 
-.activity-item {
+.checkin-item {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -299,11 +312,11 @@
     border-bottom: 1px solid #f3f4f6;
 }
 
-.activity-item:last-child {
+.checkin-item:last-child {
     border-bottom: none;
 }
 
-.activity-avatar {
+.checkin-avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -311,46 +324,35 @@
     flex-shrink: 0;
 }
 
-.activity-avatar img {
+.checkin-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.avatar-placeholder {
-    width: 100%;
-    height: 100%;
-    background: #f3f4f6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #6b7280;
-    font-size: 16px;
-}
-
-.activity-content {
+.checkin-content {
     flex: 1;
 }
 
-.activity-content h4 {
+.checkin-content h4 {
     font-size: 16px;
     font-weight: 600;
     color: #111827;
     margin-bottom: 4px;
 }
 
-.activity-content p {
+.checkin-content p {
     font-size: 14px;
     color: #6b7280;
     margin-bottom: 4px;
 }
 
-.activity-time {
+.checkin-time {
     font-size: 12px;
     color: #9ca3af;
 }
 
-.activity-status {
+.checkin-status {
     flex-shrink: 0;
 }
 
@@ -397,17 +399,17 @@
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
-    .hr-dashboard {
+    .homepage-manager {
         padding: 16px;
     }
     
-    .dashboard-header {
+    .welcome-section {
         flex-direction: column;
         gap: 16px;
         text-align: center;
     }
     
-    .header-content h1 {
+    .welcome-content h1 {
         font-size: 24px;
     }
     
@@ -423,11 +425,11 @@
         grid-template-columns: 1fr;
     }
     
-    .actions-grid {
+    .action-cards {
         grid-template-columns: 1fr;
     }
     
-    .department-grid {
+    .department-cards {
         grid-template-columns: 1fr;
     }
     
@@ -450,11 +452,11 @@
         font-size: 20px;
     }
     
-    .activity-item {
+    .checkin-item {
         padding: 12px 16px;
     }
     
-    .activity-avatar {
+    .checkin-avatar {
         width: 36px;
         height: 36px;
     }

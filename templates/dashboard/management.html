@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Quản Lý - NOV-RECO{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/management.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="homepage-manager">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <div class="welcome-content">
+            <h1>Dashboard Quản lý</h1>
+            <p class="welcome-subtitle">Tổng quan hệ thống - {{ today|date:"d/m/Y" }}</p>
+        </div>
+        <div class="quick-stats">
+            <div class="quick-stat">
+                <span class="stat-number">{{ total_employees }}</span>
+                <span class="stat-label">Nhân viên</span>
+            </div>
+            <div class="quick-stat">
+                <span class="stat-number">{{ today_checkins }}</span>
+                <span class="stat-label">Check-in hôm nay</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="key-metrics">
+        <h2>Chỉ số quan trọng</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h3>Tỷ lệ điểm danh</h3>
+                    <span class="metric-trend up">+5%</span>
+                </div>
+                <div class="metric-value">{{ attendance_rate }}%</div>
+                <div class="metric-chart">
+                    <!-- Mini chart here -->
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h3>Nhân viên online</h3>
+                    <span class="metric-trend stable">0%</span>
+                </div>
+                <div class="metric-value">{{ online_employees }}/{{ total_employees }}</div>
+                <div class="metric-progress">
+                    <div class="progress-bar" style="width: {{ online_percentage }}%"></div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h3>Trễ giờ hôm nay</h3>
+                    <span class="metric-trend down">-2%</span>
+                </div>
+                <div class="metric-value">{{ late_employees }}</div>
+                <div class="metric-detail">Nhân viên</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h2>Thao tác nhanh</h2>
+        <div class="action-cards">
+            <a href="{% url 'dashboard:management' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Báo cáo</h3>
+                    <p>Xem báo cáo chi tiết</p>
+                </div>
+            </a>
+            
+            <a href="{% url 'checkin:list' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-list"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Danh sách check-in</h3>
+                    <p>Quản lý điểm danh</p>
+                </div>
+            </a>
+            
+            <a href="{% url 'location:list' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Địa điểm</h3>
+                    <p>Quản lý địa điểm</p>
+                </div>
+            </a>
+            
+            <a href="{% url 'users:list' %}" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Nhân viên</h3>
+                    <p>Quản lý nhân viên</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Department Overview -->
+    <div class="department-overview">
+        <h2>Theo phòng ban</h2>
+        <div class="department-cards">
+            {% for dept in department_stats %}
+            <div class="department-card">
+                <div class="department-header">
+                    <h3>{{ dept.name }}</h3>
+                    <span class="employee-count">{{ dept.employee_count }} nhân viên</span>
+                </div>
+                <div class="department-metrics">
+                    <div class="dept-metric">
+                        <span class="dept-value">0</span>
+                        <span class="dept-label">Check-in hôm nay</span>
+                    </div>
+                    <div class="dept-metric">
+                        <span class="dept-value">85%</span>
+                        <span class="dept-label">Tỷ lệ điểm danh</span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <i class="fas fa-building"></i>
+                <p>Chưa có phòng ban nào</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Check-ins -->
+    <div class="recent-checkins">
+        <h2>Check-in gần đây</h2>
+        <div class="checkin-list">
+            {% for checkin in recent_checkins %}
+            <div class="checkin-item">
+                <div class="checkin-avatar">
+                    <img src="{% if checkin.user.avatar %}{{ checkin.user.avatar.url }}{% else %}/static/images/default-avatar.png{% endif %}" alt="{{ checkin.user.get_full_name }}">
+                </div>
+                <div class="checkin-content">
+                    <h4>{{ checkin.user.get_full_name }}</h4>
+                    <p>{{ checkin.get_location_name|default:"Không xác định" }}</p>
+                    <span class="checkin-time">{{ checkin.created_at|date:"H:i" }}</span>
+                </div>
+                <div class="checkin-status">
+                    <span class="status-badge {{ checkin.get_checkin_type_display|lower }}">{{ checkin.get_checkin_type_display }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <i class="fas fa-clock"></i>
+                <p>Chưa có check-in nào</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto refresh every 5 minutes
+setInterval(function() {
+    location.reload();
+}, 300000);
+</script>
+{% endblock %}

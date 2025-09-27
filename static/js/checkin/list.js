@@ -18,20 +18,55 @@ function exportCurrentToCSV() {
 
   const rows = [];
   // Header
-  rows.push(['Số thứ tự', 'Nhân viên', 'Địa điểm', 'Tọa độ (lat)', 'Tọa độ (lng)', 'Khoảng cách (mét)', 'Loại checkin', 'Thời gian', 'Ghi chú']);
+  rows.push([
+    'Số thứ tự', 'Mã nhân viên', 'Nhân viên', 'Địa điểm', 
+    'Tọa độ Check-in (lat)', 'Tọa độ Check-in (lng)', 'Khoảng cách Check-in (mét)', 
+    'Loại checkin', 'Thời gian Check-in', 'Ghi chú Check-in',
+    'Trạng thái Checkout', 'Thời gian Checkout', 'Tọa độ Checkout (lat)', 'Tọa độ Checkout (lng)', 
+    'Khoảng cách Checkout (mét)', 'Địa chỉ Checkout', 'Ghi chú Checkout', 'Thời gian làm việc'
+  ]);
   
   // Data rows
   data.forEach((c, index) => {
+    const checkout = c.checkout_data;
+    
+    // Calculate working time if checkout exists
+    let workingTime = '';
+    if (checkout) {
+      const checkinTime = new Date(c.created_at);
+      const checkoutTime = new Date(checkout.created_at);
+      if (!isNaN(checkinTime.getTime()) && !isNaN(checkoutTime.getTime())) {
+        const workingTimeMs = checkoutTime - checkinTime;
+        if (workingTimeMs > 0) {
+          const workingHours = Math.floor(workingTimeMs / (1000 * 60 * 60));
+          const workingMinutes = Math.floor((workingTimeMs % (1000 * 60 * 60)) / (1000 * 60));
+          workingTime = workingHours > 0 ? `${workingHours}h ${workingMinutes}m` : `${workingMinutes}m`;
+        } else {
+          workingTime = '0m';
+        }
+      }
+    }
+    
     rows.push([
       String(index + 1),
+      c.employee_id || '',
       c.user_name || '',
       c.location_name || '',
       c.lat != null ? (Number(c.lat).toFixed(6)) : '',
       c.lng != null ? (Number(c.lng).toFixed(6)) : '',
       c.distance_m != null ? (Number(c.distance_m).toFixed(2)) : '',
       c.checkin_type_display || '',
-      c.created_at || '',
-      c.note || ''
+      formatDate(c.created_at) || '',
+      c.note || '',
+      // Checkout data
+      c.has_checkout ? 'Đã checkout' : 'Chưa checkout',
+      checkout ? formatDate(checkout.created_at) : '',
+      checkout ? (checkout.lat != null ? Number(checkout.lat).toFixed(6) : '') : '',
+      checkout ? (checkout.lng != null ? Number(checkout.lng).toFixed(6) : '') : '',
+      checkout ? (checkout.distance_m != null ? Number(checkout.distance_m).toFixed(2) : '') : '',
+      checkout ? (checkout.address || '') : '',
+      checkout ? (checkout.note || '') : '',
+      workingTime
     ]);
   });
 
@@ -71,19 +106,56 @@ function exportCurrentToXLSX() {
       ? allCheckins
       : (window.originalCheckins || allCheckins);
 
-  const header = ['Số thứ tự', 'Mã nhân viên', 'Nhân viên', 'Địa điểm', 'Tọa độ (lat)', 'Tọa độ (lng)', 'Khoảng cách (mét)', 'Loại checkin', 'Thời gian', 'Ghi chú'];
-  const rows = data.map((c, idx) => [
-    idx + 1,
-    c.employee_id || '',
-    c.user_name || '',
-    c.location_name || '',
-    c.lat != null ? Number(c.lat).toFixed(6) : '',
-    c.lng != null ? Number(c.lng).toFixed(6) : '',
-    c.distance_m != null ? Number(c.distance_m).toFixed(2) : '',
-    c.checkin_type_display || '',
-    c.created_at || '',
-    c.note || ''
-  ]);
+  const header = [
+    'Số thứ tự', 'Mã nhân viên', 'Nhân viên', 'Địa điểm', 
+    'Tọa độ Check-in (lat)', 'Tọa độ Check-in (lng)', 'Khoảng cách Check-in (mét)', 
+    'Loại checkin', 'Thời gian Check-in', 'Ghi chú Check-in',
+    'Trạng thái Checkout', 'Thời gian Checkout', 'Tọa độ Checkout (lat)', 'Tọa độ Checkout (lng)', 
+    'Khoảng cách Checkout (mét)', 'Địa chỉ Checkout', 'Ghi chú Checkout', 'Thời gian làm việc'
+  ];
+  
+  const rows = data.map((c, idx) => {
+    const checkout = c.checkout_data;
+    
+    // Calculate working time if checkout exists
+    let workingTime = '';
+    if (checkout) {
+      const checkinTime = new Date(c.created_at);
+      const checkoutTime = new Date(checkout.created_at);
+      if (!isNaN(checkinTime.getTime()) && !isNaN(checkoutTime.getTime())) {
+        const workingTimeMs = checkoutTime - checkinTime;
+        if (workingTimeMs > 0) {
+          const workingHours = Math.floor(workingTimeMs / (1000 * 60 * 60));
+          const workingMinutes = Math.floor((workingTimeMs % (1000 * 60 * 60)) / (1000 * 60));
+          workingTime = workingHours > 0 ? `${workingHours}h ${workingMinutes}m` : `${workingMinutes}m`;
+        } else {
+          workingTime = '0m';
+        }
+      }
+    }
+    
+    return [
+      idx + 1,
+      c.employee_id || '',
+      c.user_name || '',
+      c.location_name || '',
+      c.lat != null ? Number(c.lat).toFixed(6) : '',
+      c.lng != null ? Number(c.lng).toFixed(6) : '',
+      c.distance_m != null ? Number(c.distance_m).toFixed(2) : '',
+      c.checkin_type_display || '',
+      formatDate(c.created_at) || '',
+      c.note || '',
+      // Checkout data
+      checkout ? 'Đã checkout' : 'Chưa checkout',
+      checkout ? formatDate(checkout.created_at) : '',
+      checkout && checkout.lat != null ? Number(checkout.lat).toFixed(6) : '',
+      checkout && checkout.lng != null ? Number(checkout.lng).toFixed(6) : '',
+      checkout && checkout.distance_m != null ? Number(checkout.distance_m).toFixed(2) : '',
+      checkout ? (checkout.address || '') : '',
+      checkout ? (checkout.note || '') : '',
+      workingTime
+    ];
+  });
 
   const wsData = [header, ...rows];
   const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -279,7 +351,7 @@ function renderCheckinsTable(items = null) {
     if (checkinsToRender.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="8" class="empty-state-cell">
+          <td colspan="10" class="empty-state-cell">
             <div class="empty-state">
               <i class="fas fa-inbox"></i>
               <h3>Không có check-in nào</h3>
@@ -310,6 +382,19 @@ function renderCheckinsTable(items = null) {
           </td>
           <td>${formatDate(checkin.created_at)}</td>
           <td>${checkin.note || '-'}</td>
+          <td>
+            ${(() => {
+              if (checkin.has_checkout) {
+                return `<span class="status-badge checkout-status" title="Đã checkout - Click để xem chi tiết" style="cursor: pointer;" onclick="viewCheckoutDetail(${checkin.id})">
+                  <i class="fas fa-check-circle"></i> Đã checkout
+                </span>`;
+              } else {
+                return `<span class="status-badge no-checkout-status" title="Chưa checkout">
+                  <i class="fas fa-clock"></i> Chưa checkout
+                </span>`;
+              }
+            })()}
+          </td>
           <td>
             ${(() => {
               const src = normalizePhotoSrc(checkin.photo_url, checkin.photo);
@@ -402,6 +487,23 @@ function renderMobileCards(items = null) {
             <span class="mobile-card-value">${checkin.note}</span>
           </div>
           ` : ''}
+          
+          <div class="mobile-card-row">
+            <span class="mobile-card-label">📊 Trạng thái:</span>
+            <span class="mobile-card-value">
+              ${(() => {
+                if (checkin.has_checkout) {
+                  return `<span class="status-badge checkout-status" title="Đã checkout - Click để xem chi tiết" style="cursor: pointer;" onclick="viewCheckoutDetail(${checkin.id})">
+                    <i class="fas fa-check-circle"></i> Đã checkout
+                  </span>`;
+                } else {
+                  return `<span class="status-badge no-checkout-status" title="Chưa checkout">
+                    <i class="fas fa-clock"></i> Chưa checkout
+                  </span>`;
+                }
+              })()}
+            </span>
+          </div>
         </div>
         
         <div class="mobile-card-photo-container">
@@ -672,7 +774,14 @@ function debounce(func, wait) {
 
 // Utility functions
 function formatDate(dateString) {
+  if (!dateString) return 'N/A';
+  
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    console.error('Invalid date string:', dateString);
+    return 'Invalid Date';
+  }
+  
   return date.toLocaleDateString('vi-VN', {
     year: 'numeric',
     month: '2-digit',
@@ -776,6 +885,114 @@ function loadPage(page) {
     currentPage = page;
     renderCheckinsTable();
     updatePagination();
+  }
+}
+
+// Function to view checkout detail
+function viewCheckoutDetail(checkinId) {
+  // Find the checkout data for this checkin
+  const checkin = allCheckins.find(c => c.id === checkinId);
+  if (checkin && checkin.checkout_data) {
+    const checkout = checkin.checkout_data;
+    
+    // Calculate working time
+    const checkinTime = new Date(checkin.created_at);
+    const checkoutTime = new Date(checkout.created_at);
+    
+    let workingTimeStr = 'N/A';
+    
+    // Check if dates are valid
+    if (isNaN(checkinTime.getTime()) || isNaN(checkoutTime.getTime())) {
+        console.error('Invalid date format:', { checkin: checkin.created_at, checkout: checkout.created_at });
+        workingTimeStr = 'Không thể tính toán';
+    } else {
+        const workingTimeMs = checkoutTime - checkinTime;
+        if (workingTimeMs > 0) {
+            const workingHours = Math.floor(workingTimeMs / (1000 * 60 * 60));
+            const workingMinutes = Math.floor((workingTimeMs % (1000 * 60 * 60)) / (1000 * 60));
+            workingTimeStr = workingHours > 0 ? `${workingHours}h ${workingMinutes}m` : `${workingMinutes}m`;
+        } else {
+            workingTimeStr = '0m';
+        }
+    }
+
+    // Create modal content
+    const modalContent = `
+      <div class="checkout-detail-modal">
+        <div class="modal-header">
+          <h3><i class="fas fa-sign-out-alt"></i> Chi tiết Checkout</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Thời gian Check-in:</label>
+              <span>${formatDate(checkin.created_at)}</span>
+            </div>
+            <div class="detail-item">
+              <label>Thời gian Checkout:</label>
+              <span>${formatDate(checkout.created_at)}</span>
+            </div>
+            <div class="detail-item highlight">
+              <label>Thời gian làm việc:</label>
+              <span class="working-time">${workingTimeStr}</span>
+            </div>
+            <div class="detail-item">
+              <label>Tọa độ Checkout:</label>
+              <span>${checkout.lat ? Number(checkout.lat).toFixed(6) : 'N/A'}, ${checkout.lng ? Number(checkout.lng).toFixed(6) : 'N/A'}</span>
+            </div>
+            <div class="detail-item">
+              <label>Khoảng cách Checkout:</label>
+              <span>${checkout.distance_m ? Number(checkout.distance_m).toFixed(2) + ' mét' : 'N/A'}</span>
+            </div>
+            <div class="detail-item">
+              <label>Địa chỉ Checkout:</label>
+              <span>${checkout.address || 'N/A'}</span>
+            </div>
+            <div class="detail-item">
+              <label>Ghi chú Checkout:</label>
+              <span>${checkout.note || 'Không có'}</span>
+            </div>
+            ${checkout.photo_url ? `
+            <div class="detail-item">
+              <label>Ảnh Checkout:</label>
+              <div class="photo-container">
+                <img src="${checkout.photo_url}" alt="Checkout photo" class="checkout-photo" onclick="openPhotoModal('${checkout.photo_url}')">
+              </div>
+            </div>
+            ` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Show modal
+    showModal(modalContent);
+  } else {
+    alert('Không tìm thấy thông tin checkout cho checkin này.');
+  }
+}
+
+// Function to show modal
+function showModal(content) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.innerHTML = content;
+  document.body.appendChild(modal);
+  
+  // Close on overlay click
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+}
+
+// Function to close modal
+function closeModal() {
+  const modal = document.querySelector('.modal-overlay');
+  if (modal) {
+    modal.remove();
   }
 }
 

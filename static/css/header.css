@@ -110,6 +110,17 @@
     border-radius: var(--radius-sm);
 }
 
+.home-icon {
+    font-size: 1rem;
+    color: var(--primary-color);
+    transition: color 0.2s ease;
+    margin-left: var(--spacing-xs);
+}
+
+.nav-logo:hover .home-icon {
+    color: var(--primary-hover);
+}
+
 /* Navigation menu */
 .nav-menu {
     display: flex;

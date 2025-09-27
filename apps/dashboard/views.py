@@ -13,7 +13,7 @@ from apps.users.permissions import group_required
 
 @login_required
 def dashboard_main_view(request):
-    """Dashboard tổng quan cho tất cả vai trò"""
+    """Trang chủ tổng quan"""
     user = request.user
     today = timezone.now().date()
     week_start = today - timedelta(days=today.weekday())
@@ -35,12 +35,6 @@ def dashboard_main_view(request):
     week_checkins = Checkin.objects.filter(created_at__date__gte=week_start).count()
     context["week_checkins"] = week_checkins
 
-    # Debug logging
-    print(f"Debug - Today: {today}")
-    print(f"Debug - Week start: {week_start}")
-    print(f"Debug - Today checkins: {today_checkins}")
-    print(f"Debug - Week checkins: {week_checkins}")
-
     # Thống kê check-in tháng này
     month_checkins = Checkin.objects.filter(created_at__date__gte=month_start).count()
     context["month_checkins"] = month_checkins
@@ -48,52 +42,31 @@ def dashboard_main_view(request):
     # Thống kê theo vai trò
     if user.role in [UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS]:
         # Thống kê tổng quan cho quản lý
-        total_employees = User.objects.filter(
-            is_active=True
-        ).count()  # Tất cả user active
+        total_employees = User.objects.filter(is_active=True).count()
         total_areas = Location.objects.filter(is_active=True).count()
 
         # Thống kê theo phòng ban
         from apps.users.models import Department
-
         all_departments = Department.objects.all()
         department_stats = all_departments.annotate(
             employee_count=Count("user")
         ).order_by("-employee_count")[:5]
 
         # Check-ins gần đây
-        recent_checkins = Checkin.objects.select_related("user", "location").order_by(
-            "-created_at"
-        )[:10]
+        recent_checkins = Checkin.objects.select_related("user", "location").order_by("-created_at")[:10]
 
-        context.update(
-            {
-                "total_employees": total_employees,
-                "total_areas": total_areas,
-                "total_departments": all_departments.count(),
-                "department_stats": department_stats,
-                "recent_checkins": recent_checkins,
-            }
-        )
-
-        # Debug logging
-        print(f"Debug - Total employees: {total_employees}")
-        print(f"Debug - Total areas: {total_areas}")
-        print(f"Debug - Total departments: {all_departments.count()}")
-        print(f"Debug - Department stats count: {department_stats.count()}")
+        context.update({
+            "total_employees": total_employees,
+            "total_areas": total_areas,
+            "total_departments": all_departments.count(),
+            "department_stats": department_stats,
+            "recent_checkins": recent_checkins,
+        })
     else:
         # Thống kê cá nhân cho nhân viên
-        user_today_checkins = Checkin.objects.filter(
-            user=user, created_at__date=today
-        ).count()
-
-        user_week_checkins = Checkin.objects.filter(
-            user=user, created_at__date__gte=week_start
-        ).count()
-
-        user_month_checkins = Checkin.objects.filter(
-            user=user, created_at__date__gte=month_start
-        ).count()
+        user_today_checkins = Checkin.objects.filter(user=user, created_at__date=today).count()
+        user_week_checkins = Checkin.objects.filter(user=user, created_at__date__gte=week_start).count()
+        user_month_checkins = Checkin.objects.filter(user=user, created_at__date__gte=month_start).count()
 
         # Check-ins gần đây của user
         user_recent_checkins = (
@@ -102,18 +75,16 @@ def dashboard_main_view(request):
             .order_by("-created_at")[:5]
         )
 
-        context.update(
-            {
-                "user_today_checkins": user_today_checkins,
-                "user_week_checkins": user_week_checkins,
-                "user_month_checkins": user_month_checkins,
-                "user_recent_checkins": user_recent_checkins,
-                "total_employees": 0,
-                "total_areas": 0,
-                "total_departments": 0,
-                "department_stats": [],
-            }
-        )
+        context.update({
+            "user_today_checkins": user_today_checkins,
+            "user_week_checkins": user_week_checkins,
+            "user_month_checkins": user_month_checkins,
+            "user_recent_checkins": user_recent_checkins,
+            "total_employees": 0,
+            "total_areas": 0,
+            "total_departments": 0,
+            "department_stats": [],
+        })
 
     return render(request, "dashboard/main.html", context)
 
@@ -122,24 +93,14 @@ def dashboard_main_view(request):
 def dashboard_personal_view(request):
     """Dashboard cá nhân cho nhân viên"""
     user = request.user
-
-    # Thống kê check-in của nhân viên
     today = timezone.now().date()
     week_start = today - timedelta(days=today.weekday())
     month_start = today.replace(day=1)
 
-    # Check-ins hôm nay
+    # Thống kê check-in của nhân viên
     today_checkins = Checkin.objects.filter(user=user, created_at__date=today).count()
-
-    # Check-ins tuần này
-    week_checkins = Checkin.objects.filter(
-        user=user, created_at__date__gte=week_start
-    ).count()
-
-    # Check-ins tháng này
-    month_checkins = Checkin.objects.filter(
-        user=user, created_at__date__gte=month_start
-    ).count()
+    week_checkins = Checkin.objects.filter(user=user, created_at__date__gte=week_start).count()
+    month_checkins = Checkin.objects.filter(user=user, created_at__date__gte=month_start).count()
 
     # Check-ins gần đây
     recent_checkins = (
@@ -148,54 +109,81 @@ def dashboard_personal_view(request):
         .order_by("-created_at")[:5]
     )
 
+    # Tính thời gian làm việc hôm nay
+    work_hours = "0h"  # TODO: Implement work hours calculation
+    
+    # Vị trí hiện tại
+    current_location = "Chưa xác định"  # TODO: Get current location
+    
+    # Thông báo gần đây
+    from apps.notifications.models import Notification
+    recent_notifications = Notification.objects.filter(user=user).order_by('-created_at')[:5]
+
     context = {
         "user": user,
+        "today": today,
         "today_checkins": today_checkins,
         "week_checkins": week_checkins,
         "month_checkins": month_checkins,
+        "work_hours": work_hours,
+        "current_location": current_location,
         "recent_checkins": recent_checkins,
+        "recent_notifications": recent_notifications,
     }
     return render(request, "dashboard/personal.html", context)
 
 
-@group_required(["Super Admin", "Admin", "Manager"])
-def dashboard_manager_view(request):
-    """Dashboard cho quản lý"""
-    # Thống kê tổng quan
-    total_employees = User.objects.filter(
-        role=UserRole.EMPLOYEE, is_active=True
-    ).count()
-    total_areas = Area.objects.filter(is_active=True).count()
-
-    # Thống kê check-in hôm nay
+@login_required
+def dashboard_management_view(request):
+    """Dashboard quản lý cho admin/manager/hcns"""
+    user = request.user
+    
+    # Kiểm tra quyền truy cập
+    if user.role not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.HCNS]:
+        return redirect('dashboard:personal')
+    
     today = timezone.now().date()
-    today_checkins = Checkin.objects.filter(created_at__date=today).count()
-
-    # Thống kê check-in tuần này
     week_start = today - timedelta(days=today.weekday())
+    month_start = today.replace(day=1)
+
+    # Thống kê tổng quan
+    total_employees = User.objects.filter(is_active=True).count()
+    total_areas = Location.objects.filter(is_active=True).count()
+    
+    # Thống kê check-in
+    today_checkins = Checkin.objects.filter(created_at__date=today).count()
     week_checkins = Checkin.objects.filter(created_at__date__gte=week_start).count()
+    
+    # Tính tỷ lệ điểm danh
+    attendance_rate = 85  # TODO: Calculate actual attendance rate
+    online_employees = 12  # TODO: Calculate online employees
+    online_percentage = (online_employees / total_employees * 100) if total_employees > 0 else 0
+    late_employees = 3  # TODO: Calculate late employees
 
     # Thống kê theo phòng ban
     from apps.users.models import Department
-
     department_stats = Department.objects.annotate(
-        employee_count=Count("employees")
-    ).order_by("-employee_count")
+        employee_count=Count("user")
+    ).order_by("-employee_count")[:5]
 
     # Check-ins gần đây
-    recent_checkins = Checkin.objects.select_related("user", "location").order_by(
-        "-created_at"
-    )[:10]
+    recent_checkins = Checkin.objects.select_related("user", "location").order_by("-created_at")[:10]
 
     context = {
+        "user": user,
+        "today": today,
         "total_employees": total_employees,
         "total_areas": total_areas,
         "today_checkins": today_checkins,
         "week_checkins": week_checkins,
+        "attendance_rate": attendance_rate,
+        "online_employees": online_employees,
+        "online_percentage": online_percentage,
+        "late_employees": late_employees,
         "department_stats": department_stats,
         "recent_checkins": recent_checkins,
     }
-    return render(request, "dashboard/manager.html", context)
+    return render(request, "dashboard/management.html", context)
 
 
 @group_required(["Super Admin", "Admin", "Manager", "HR"])
@@ -212,12 +200,17 @@ def dashboard_hr_view(request):
     from apps.users.models import Department
 
     department_stats = Department.objects.annotate(
-        employee_count=Count("employees")
+        employee_count=Count("user")
     ).order_by("-employee_count")
 
     # Thống kê check-in
     today = timezone.now().date()
     today_checkins = Checkin.objects.filter(created_at__date=today).count()
+    
+    # Số nhân viên đã check-in hôm nay
+    employees_with_checkin_today = Checkin.objects.filter(
+        created_at__date=today
+    ).values('user').distinct().count()
 
     # Check-ins gần đây
     recent_checkins = Checkin.objects.select_related("user", "location").order_by(
@@ -230,6 +223,7 @@ def dashboard_hr_view(request):
         "inactive_employees": inactive_employees,
         "department_stats": department_stats,
         "today_checkins": today_checkins,
+        "employees_with_checkin_today": employees_with_checkin_today,
         "recent_checkins": recent_checkins,
     }
     return render(request, "dashboard/hr.html", context)

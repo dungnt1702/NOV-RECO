@@ -90,6 +90,22 @@ class CheckinSerializer(serializers.ModelSerializer):
         """Check if this checkin has a checkout"""
         return obj.checkouts.exists()
 
+    def get_checkout_data(self, obj):
+        """Get checkout data if exists"""
+        checkout = obj.checkouts.first()
+        if checkout:
+            return {
+                'id': checkout.id,
+                'lat': checkout.lat,
+                'lng': checkout.lng,
+                'address': checkout.address,
+                'note': checkout.note,
+                'created_at': checkout.created_at.isoformat(),
+                'distance_m': checkout.distance_m,
+                'photo_url': checkout.photo.url if checkout.photo else None,
+            }
+        return None
+
 
 class CheckinListSerializer(serializers.ModelSerializer):
     """Serializer for Checkin list view"""
@@ -108,6 +124,7 @@ class CheckinListSerializer(serializers.ModelSerializer):
     )
     photo_url = serializers.SerializerMethodField()
     has_checkout = serializers.SerializerMethodField()
+    checkout_data = serializers.SerializerMethodField()
 
     class Meta:
         model = Checkin
@@ -132,6 +149,7 @@ class CheckinListSerializer(serializers.ModelSerializer):
             "created_at",
             "distance_m",
             "has_checkout",
+            "checkout_data",
         ]
         read_only_fields = ["id", "user", "created_at", "distance_m"]
 
@@ -159,3 +177,19 @@ class CheckinListSerializer(serializers.ModelSerializer):
     def get_has_checkout(self, obj):
         """Check if this checkin has a checkout"""
         return obj.checkouts.exists()
+
+    def get_checkout_data(self, obj):
+        """Get checkout data if exists"""
+        checkout = obj.checkouts.first()
+        if checkout:
+            return {
+                'id': checkout.id,
+                'lat': checkout.lat,
+                'lng': checkout.lng,
+                'address': checkout.address,
+                'note': checkout.note,
+                'created_at': checkout.created_at.isoformat(),
+                'distance_m': checkout.distance_m,
+                'photo_url': checkout.photo.url if checkout.photo else None,
+            }
+        return None

@@ -7,7 +7,7 @@ from .api_views import (
 from .views import (
     dashboard_hr_view,
     dashboard_main_view,
-    dashboard_manager_view,
+    dashboard_management_view,
     dashboard_personal_view,
     dashboard_secretary_view,
 )
@@ -21,7 +21,7 @@ urlpatterns = [
     path("personal/", dashboard_personal_view, name="personal"),
     path("secretary/", dashboard_secretary_view, name="secretary"),
     path("hr/", dashboard_hr_view, name="hr"),
-    path("manager/", dashboard_manager_view, name="manager"),
+    path("management/", dashboard_management_view, name="management"),
     # API endpoints for modules
     path("api/modules/", available_modules_api, name="available_modules"),
     path("api/modules/<str:module_name>/", module_data_api, name="module_data"),
