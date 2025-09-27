@@ -1,5 +1,6 @@
-from django.urls import path, include
 from django.shortcuts import redirect
+from django.urls import include, path
+
 from . import urls_checkin
 
 app_name = "checkin"

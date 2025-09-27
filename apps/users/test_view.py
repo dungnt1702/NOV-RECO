@@ -1,23 +1,25 @@
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
+
 from .models import User
+
 
 def test_user_update_view(request, id):
     """Test view để bypass template system"""
     try:
         user = get_object_or_404(User, id=id)
-        return JsonResponse({
-            'status': 'success',
-            'user_id': user.id,
-            'username': user.username,
-            'message': f'User {id} found successfully'
-        })
+        return JsonResponse(
+            {
+                "status": "success",
+                "user_id": user.id,
+                "username": user.username,
+                "message": f"User {id} found successfully",
+            }
+        )
     except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        }, status=500)
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
 
 def simple_user_update_view(request, id):
     """Simple view without template to bypass error"""

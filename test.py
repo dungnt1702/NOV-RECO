@@ -5,13 +5,14 @@ Main entry point for all test activities
 """
 
 import os
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 # Add project root to Python path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
+
 
 def main():
     """Main function - redirect to test manager"""
@@ -32,30 +33,30 @@ def main():
         print("  python test.py module users")
         print("  python test.py watch")
         return
-    
+
     # Get command and arguments
     command = sys.argv[1]
     args = sys.argv[2:] if len(sys.argv) > 2 else []
-    
+
     # Map commands to their respective scripts
     script_map = {
-        'setup': 'tests/scripts/setup_tests.py',
-        'run': 'tests/scripts/run_tests.py',
-        'module': 'tests/scripts/run_tests.py',
-        'watch': 'tests/scripts/start_auto_test.py',
-        'data': 'tests/scripts/test_data_generator.py',
-        'status': 'tests/scripts/test_manager.py'
+        "setup": "tests/scripts/setup_tests.py",
+        "run": "tests/scripts/run_tests.py",
+        "module": "tests/scripts/run_tests.py",
+        "watch": "tests/scripts/start_auto_test.py",
+        "data": "tests/scripts/test_data_generator.py",
+        "status": "tests/scripts/test_manager.py",
     }
-    
+
     if command not in script_map:
         print(f"❌ Unknown command: {command}")
         print("Available commands: setup, run, module, watch, data, status")
         sys.exit(1)
-    
+
     # Build command to run the appropriate script
     script_path = project_root / script_map[command]
     cmd = [sys.executable, str(script_path)] + args
-    
+
     try:
         # Run the appropriate script
         result = subprocess.run(cmd, cwd=project_root)
@@ -67,5 +68,6 @@ def main():
         print(f"❌ Error running test command: {e}")
         sys.exit(1)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

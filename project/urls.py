@@ -1,7 +1,7 @@
-from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
 from django.views.generic import TemplateView
 
 urlpatterns = (
@@ -13,10 +13,14 @@ urlpatterns = (
             TemplateView.as_view(template_name="home.html"),
             name="home",
         ),
-        path("", include(("apps.checkin.urls", "checkin"), namespace="checkin")),  # All modules at root level with namespace
+        path(
+            "", include(("apps.checkin.urls", "checkin"), namespace="checkin")
+        ),  # All modules at root level with namespace
         path("area/", include("apps.area.urls")),  # Area management
         path("users/", include("apps.users.urls")),  # User management
-        path("automation-test/", include("apps.automation_test.urls")),  # Automation test
+        path(
+            "automation-test/", include("apps.automation_test.urls")
+        ),  # Automation test
         path("dashboard/", include("apps.dashboard.urls")),  # Dashboard
         path("personal/", include("apps.personal.urls")),  # Personal profile
     ]

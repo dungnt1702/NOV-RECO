@@ -8,12 +8,8 @@ class Location(models.Model):
     address = models.TextField(blank=True, help_text="Địa chỉ chi tiết")
     lat = models.FloatField(help_text="Vĩ độ trung tâm")
     lng = models.FloatField(help_text="Kinh độ trung tâm")
-    radius_m = models.PositiveIntegerField(
-        default=100, help_text="Bán kính (mét)"
-    )
-    is_active = models.BooleanField(
-        default=True, help_text="Địa điểm có hoạt động"
-    )
+    radius_m = models.PositiveIntegerField(default=100, help_text="Bán kính (mét)")
+    is_active = models.BooleanField(default=True, help_text="Địa điểm có hoạt động")
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

@@ -1,15 +1,16 @@
 from django.urls import path
+
 from .views import (
-    location_list_view,
-    location_create_view,
-    location_update_view,
-    location_detail_view,
-    location_delete_view,
-    location_toggle_active_view,
     location_checkin_history_view,
-    location_statistics_view,
-    location_list_api,
+    location_create_view,
+    location_delete_view,
     location_detail_api,
+    location_detail_view,
+    location_list_api,
+    location_list_view,
+    location_statistics_view,
+    location_toggle_active_view,
+    location_update_view,
 )
 
 app_name = "location"
@@ -24,7 +25,6 @@ urlpatterns = [
     path("toggle/<int:location_id>/", location_toggle_active_view, name="toggle"),
     path("history/<int:location_id>/", location_checkin_history_view, name="history"),
     path("statistics/<int:location_id>/", location_statistics_view, name="statistics"),
-    
     # APIs
     path("api/", location_list_api, name="api"),
     path("api/<int:location_id>/", location_detail_api, name="detail_api"),

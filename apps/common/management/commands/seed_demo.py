@@ -7,23 +7,19 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
-from apps.users.models import User, UserRole
 from apps.area.models import Area
 from apps.checkin.models import Checkin
+from apps.users.models import User, UserRole
 
 
 class Command(BaseCommand):
-    help = (
-        "Seed demo data: departments (if applicable), users, areas, and checkins"
-    )
+    help = "Seed demo data: departments (if applicable), users, areas, and checkins"
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--reset",
             action="store_true",
-            help=(
-                "Delete existing demo objects before seeding"
-            ),
+            help=("Delete existing demo objects before seeding"),
         )
         parser.add_argument(
             "--users",
@@ -194,9 +190,7 @@ class Command(BaseCommand):
                 try:
                     from apps.checkin.utils import haversine_m  # type: ignore
 
-                    checkin.distance_m = haversine_m(
-                        area.lat, area.lng, lat, lng
-                    )
+                    checkin.distance_m = haversine_m(area.lat, area.lng, lat, lng)
                 except Exception:
                     pass
                 # set created_at if model allows
@@ -204,4 +198,3 @@ class Command(BaseCommand):
                     Checkin.objects.filter(id=checkin.id).update(created_at=ts)
                 except Exception:
                     pass
-

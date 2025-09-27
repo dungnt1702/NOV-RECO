@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load checkin_extras %}
 
 {% block title %}Chi tiết Check-out - NOV-RECO{% endblock %}
 
@@ -50,7 +51,7 @@
             <div class="info-grid">
                 <div class="info-item">
                     <label>Thời gian Check-in:</label>
-                    <span>{{ checkin.created_at|date:"d/m/Y H:i:s" }}</span>
+                    <span>{{ checkin.created_at|utc_time }}</span>
                 </div>
                 <div class="info-item">
                     <label>Địa điểm:</label>
@@ -93,7 +94,7 @@
             <div class="info-grid">
                 <div class="info-item">
                     <label>Thời gian Check-out:</label>
-                    <span>{{ checkout.created_at|date:"d/m/Y H:i:s" }}</span>
+                    <span>{{ checkout.created_at|utc_time }}</span>
                 </div>
                 <div class="info-item">
                     <label>Địa điểm Check-out:</label>
@@ -139,9 +140,8 @@
                 <div class="summary-item">
                     <div class="summary-label">Thời gian làm việc</div>
                     <div class="summary-value">
-                        {% with duration=checkout.created_at|timesince:checkin.created_at %}
-                            {{ duration }}
-                        {% endwith %}
+                        {{ checkout.created_at|work_duration:checkin.created_at }}
+                        <br><small class="text-muted">{{ checkout.created_at|work_duration_detailed:checkin.created_at }}</small>
                     </div>
                 </div>
                 <div class="summary-item">

@@ -498,7 +498,31 @@ function renderCheckins(checkins = null) {
                     </div>
                 </div>
                 
-                <div class="mobile-card-badges"></div>
+                <div class="mobile-card-badges">
+                    ${(() => {
+                        const canCheckoutResult = canCheckout(checkin);
+                        
+                        if (canCheckoutResult) {
+                            return `
+                                <button class="btn btn-sm btn-outline-warning checkout-btn" 
+                                        onclick="performCheckout(${checkin.id})" 
+                                        title="Chờ checkout">
+                                    <i class="fas fa-clock"></i>
+                                    Chờ checkout
+                                </button>
+                            `;
+                        } else {
+                            return `
+                                <button class="btn btn-sm btn-outline-success checkout-detail-btn" 
+                                        onclick="viewCheckoutDetail(${checkin.id})" 
+                                        title="Xem chi tiết checkout">
+                                    <i class="fas fa-check-circle"></i>
+                                    Đã checkout
+                                </button>
+                            `;
+                        }
+                    })()}
+                </div>
             </div>
         `).join('');
     }
@@ -554,6 +578,33 @@ function renderCheckins(checkins = null) {
                 <td>
                     <span class="status-badge status-success">Thành công</span>
                 </td>
+                <td>
+                    <div class="action-buttons">
+                        ${(() => {
+                            const canCheckoutResult = canCheckout(checkin);
+                            
+                            if (canCheckoutResult) {
+                                return `
+                                    <button class="btn btn-sm btn-outline-warning checkout-btn" 
+                                            onclick="performCheckout(${checkin.id})" 
+                                            title="Chờ checkout">
+                                        <i class="fas fa-clock"></i>
+                                        Chờ checkout
+                                    </button>
+                                `;
+                            } else {
+                                return `
+                                    <button class="btn btn-sm btn-outline-success checkout-detail-btn" 
+                                            onclick="viewCheckoutDetail(${checkin.id})" 
+                                            title="Xem chi tiết checkout">
+                                        <i class="fas fa-check-circle"></i>
+                                        Đã checkout
+                                    </button>
+                                `;
+                            }
+                        })()}
+                    </div>
+                </td>
             </tr>
         `).join('');
     }
@@ -574,6 +625,63 @@ function showError(message) {
     
     if (mobileContainer) mobileContainer.innerHTML = errorState;
     if (tableBody) tableBody.innerHTML = errorState;
+}
+
+// Check if checkout is allowed for a checkin
+function canCheckout(checkin) {
+    // Chỉ cần kiểm tra xem đã có checkout chưa
+    // Không cần kiểm tra cùng ngày vì có thể checkout vào ngày khác
+    const hasCheckout = checkin.has_checkout || false;
+    
+    return !hasCheckout;
+}
+
+// Perform checkout for a specific checkin
+async function performCheckout(checkinId) {
+    try {
+        // Redirect directly to checkout page without confirmation
+        window.location.href = `/checkin/checkout/?checkin_id=${checkinId}`;
+        
+    } catch (error) {
+        console.error('Error performing checkout:', error);
+        showAlert('Có lỗi xảy ra khi thực hiện checkout', 'error');
+    }
+}
+
+// View checkout detail for a specific checkin
+async function viewCheckoutDetail(checkinId) {
+    try {
+        // Redirect to checkout detail page with checkin ID
+        window.location.href = `/checkin/checkout/detail/${checkinId}/`;
+        
+    } catch (error) {
+        console.error('Error viewing checkout detail:', error);
+        showAlert('Có lỗi xảy ra khi xem chi tiết checkout', 'error');
+    }
+}
+
+// Show alert message
+function showAlert(message, type = 'info') {
+    // Create alert element
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // Insert at top of page
+    const container = document.querySelector('.history-container');
+    if (container) {
+        container.insertBefore(alertDiv, container.firstChild);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
 }
 
 // Format date

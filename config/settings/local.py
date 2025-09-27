@@ -17,17 +17,17 @@ CSRF_COOKIE_SECURE = False
 # Development-specific settings
 if DEBUG:
     # Remove Django's security middleware to avoid CSP conflicts
-    MIDDLEWARE = [mw for mw in MIDDLEWARE if mw != 'django.middleware.security.SecurityMiddleware']
-    
+    MIDDLEWARE = [
+        mw for mw in MIDDLEWARE if mw != "django.middleware.security.SecurityMiddleware"
+    ]
+
     # Move our CSP middleware to the end to override any other CSP settings
-    MIDDLEWARE = [mw for mw in MIDDLEWARE if mw != 'apps.common.middleware.SecurityHeadersMiddleware']
-    MIDDLEWARE.append('apps.common.middleware.SecurityHeadersMiddleware')
-    
-    # Add debug toolbar if available
-    try:
-        import debug_toolbar
-        INSTALLED_APPS.append('debug_toolbar')
-        MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
-        INTERNAL_IPS = ['127.0.0.1', 'localhost']
-    except ImportError:
-        pass
+    MIDDLEWARE = [
+        mw
+        for mw in MIDDLEWARE
+        if mw != "apps.common.middleware.SecurityHeadersMiddleware"
+    ]
+    MIDDLEWARE.append("apps.common.middleware.SecurityHeadersMiddleware")
+
+    # Debug toolbar is already configured in base.py
+    INTERNAL_IPS = ["127.0.0.1", "localhost", "0.0.0.0"]

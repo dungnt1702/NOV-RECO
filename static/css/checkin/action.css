@@ -669,6 +669,29 @@
     box-shadow: 0 8px 25px -5px rgba(72, 187, 120, 0.4);
 }
 
+.checkin-page .btn-location.btn-retry {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    animation: pulse 2s infinite;
+}
+
+.checkin-page .btn-location.btn-retry:hover {
+    background: linear-gradient(135deg, #e085e8 0%, #e04856 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -5px rgba(240, 147, 251, 0.4);
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 .checkin-page .location-details {
     margin-top: 20px;
 }

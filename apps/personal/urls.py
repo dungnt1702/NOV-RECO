@@ -1,18 +1,21 @@
+from django.shortcuts import render
 from django.urls import path
+
 from .views import (
-    personal_profile_view,
-    personal_profile_edit_view,
-    personal_password_change_view,
     personal_avatar_upload_view,
     personal_checkin_history_view,
+    personal_password_change_view,
+    personal_profile_edit_view,
+    personal_profile_view,
 )
-from django.shortcuts import render
 
 app_name = "personal"
 
+
 def avatar_test_view(request):
     """Test avatar upload functionality"""
-    return render(request, 'personal/avatar_test.html')
+    return render(request, "personal/avatar_test.html")
+
 
 urlpatterns = [
     # Personal profile management

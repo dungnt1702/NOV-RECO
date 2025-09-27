@@ -5,4 +5,4 @@ from .base import TestBase
 from .fixtures import TestDataGenerator
 from .utils import TestRunner
 
-__all__ = ['TestBase', 'TestDataGenerator', 'TestRunner']
+__all__ = ["TestBase", "TestDataGenerator", "TestRunner"]

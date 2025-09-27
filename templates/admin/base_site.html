@@ -7,9 +7,49 @@
 <h1 id="site-name">
     <a href="{% url 'admin:index' %}">
         <img src="{% static 'logo.svg' %}" alt="NOV-RECO Logo" style="height: 20px; margin-right: 8px; vertical-align: middle;">
-        {{ site_header|default:_('NOV-RECO Administration') }}
+        NOV-RECO Administration
     </a>
 </h1>
 {% endblock %}
 
-{% block nav-global %}{% endblock %}
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin_interface/css/admin-interface.css' %}">
+<style>
+    /* Custom NOV-RECO theme styles */
+    :root {
+        --primary-color: #1f2937;
+        --secondary-color: #3b82f6;
+        --accent-color: #10b981;
+        --text-color: #ffffff;
+        --background-color: #f9fafb;
+    }
+    
+    #header {
+        background-color: var(--primary-color) !important;
+        color: var(--text-color) !important;
+    }
+    
+    #header h1, #header h1 a:link, #header h1 a:visited {
+        color: var(--text-color) !important;
+    }
+    
+    .module h2, .module caption, .inline-group h2 {
+        background-color: var(--secondary-color) !important;
+        color: var(--text-color) !important;
+    }
+    
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background-color: var(--accent-color) !important;
+        color: var(--text-color) !important;
+    }
+    
+    .button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+        background-color: #059669 !important;
+    }
+    
+    .default {
+        background-color: var(--background-color) !important;
+    }
+</style>
+{% endblock %}

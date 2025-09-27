@@ -159,14 +159,17 @@
   transform: translateY(-1px);
 }
 
-/* Constrain success photo displayed in template (.checkin-photo) */
-.photo-card .checkin-photo {
+/* Constrain success photo displayed in template */
+.photo-card .checkin-photo,
+.photo-card .checkin-photo-preview {
   width: 100%;
-  max-height: 420px;
-  object-fit: contain;
+  max-width: 300px;
+  height: 400px;
+  object-fit: cover;
   border-radius: 12px;
   display: block;
-  margin: 0 auto;
+  margin: 15px auto;
+  aspect-ratio: 3/4; /* Portrait aspect ratio */
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
@@ -217,8 +220,10 @@
     width: 100%;
   }
   
-  .photo-card .checkin-photo {
-    max-height: 320px;
+  .photo-card .checkin-photo,
+  .photo-card .checkin-photo-preview {
+    max-width: 250px;
+    height: 320px;
   }
 
   .photo-preview {
@@ -245,6 +250,12 @@
     padding: 20px 15px;
   }
   
+  .photo-card .checkin-photo,
+  .photo-card .checkin-photo-preview {
+    max-width: 200px;
+    height: 250px;
+  }
+
   .photo-preview {
     max-width: 200px;
     height: 250px;

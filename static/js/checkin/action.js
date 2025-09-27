@@ -8,6 +8,8 @@ let currentPhoto = null;
 let currentAddress = null;
 let stream = null;
 let currentFacingMode = 'environment'; // 'environment' for back camera, 'user' for front camera
+let locationRetryCount = 0;
+const MAX_LOCATION_RETRIES = 3;
 
 // Helper: determine if current context is allowed to use camera/GPS in dev
 function isTrustedContext() {
@@ -166,6 +168,15 @@ function setupEventListeners() {
         console.warn('Location button not found');
     }
     
+    // Retry location button
+    const retryLocationBtn = document.getElementById('retryLocationBtn');
+    if (retryLocationBtn) {
+        console.log('Retry location button found, adding listener');
+        retryLocationBtn.addEventListener('click', getCurrentLocation);
+    } else {
+        console.warn('Retry location button not found');
+    }
+    
     // Camera buttons
     const captureBtn = document.getElementById('captureBtn');
     const retakeBtn = document.getElementById('retakeBtn');
@@ -274,6 +285,14 @@ async function getCurrentLocation() {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
             
+            // Validate coordinates
+            if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
+                console.warn('Invalid coordinates received:', { lat, lng });
+                showAlert('⚠️ Tọa độ không hợp lệ. Vui lòng thử lại.', 'warning');
+                setLoading(btn, false);
+                return;
+            }
+            
             currentPosition = { lat, lng };
             
             // Update map
@@ -295,6 +314,8 @@ async function getCurrentLocation() {
             updateSubmitButtonState();
             showAlert('✅ Đã lấy vị trí thành công!', 'success');
             setLoading(btn, false);
+            hideRetryButton();
+            locationRetryCount = 0; // Reset counter on success
         },
         function(error) {
             let message = '';
@@ -320,15 +341,164 @@ async function getCurrentLocation() {
             }
             
             console.error('Geolocation error:', error);
-            showAlert(`${message}\n\n${suggestion}`, 'error');
-            setLoading(btn, false);
+            
+            // Try fallback with lower accuracy if high accuracy fails
+            if (error.code === error.POSITION_UNAVAILABLE && locationRetryCount < MAX_LOCATION_RETRIES) {
+                locationRetryCount++;
+                console.log(`Trying fallback with lower accuracy... (attempt ${locationRetryCount}/${MAX_LOCATION_RETRIES})`);
+                
+                // Add random delay to avoid conflicts
+                const delay = Math.random() * 1000 + 500; // 500-1500ms
+                setTimeout(() => {
+                    navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
+                            showAlert(`${message}\n\n${suggestion}`, 'error');
+                            setLoading(btn, false);
+                            return;
+                        }
+                        
+                        currentPosition = { lat, lng };
+                        map.setView([lat, lng], 16);
+                        if (marker) {
+                            map.removeLayer(marker);
+                        }
+                        marker = L.marker([lat, lng]).addTo(map);
+                        
+                        document.getElementById('currentLat').textContent = lat.toFixed(6);
+                        document.getElementById('currentLng').textContent = lng.toFixed(6);
+                        document.getElementById('locationAccuracy').textContent = 
+                            `±${position.coords.accuracy.toFixed(0)}m`;
+                        
+                        // Update coordinates display
+                        const coordsElement = document.getElementById('coordinates');
+                        if (coordsElement) {
+                            coordsElement.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                        }
+                        
+                        reverseGeocode(lat, lng);
+                        updateSubmitButtonState();
+                        showAlert('✅ Đã lấy vị trí thành công (độ chính xác thấp)!', 'success');
+                        setLoading(btn, false);
+                        hideRetryButton();
+                        locationRetryCount = 0; // Reset counter on success
+                    },
+                    function(fallbackError) {
+                        console.error('Fallback geolocation also failed:', fallbackError);
+                        // Try IP geolocation as last resort
+                        tryIPGeolocation().then(ipSuccess => {
+                            if (!ipSuccess) {
+                                showAlert(`${message}\n\n${suggestion}`, 'error');
+                                showRetryButton();
+                            }
+                            setLoading(btn, false);
+                            locationRetryCount = 0; // Reset counter for manual retry
+                        }).catch(error => {
+                            console.error('IP geolocation error:', error);
+                            showAlert(`${message}\n\n${suggestion}`, 'error');
+                            showRetryButton();
+                            setLoading(btn, false);
+                            locationRetryCount = 0; // Reset counter for manual retry
+                        });
+                    },
+                    {
+                        enableHighAccuracy: false,
+                        timeout: 10000,
+                        maximumAge: 300000
+                    }
+                );
+                }, delay);
+            } else {
+                // Try IP geolocation as last resort
+                tryIPGeolocation().then(ipSuccess => {
+                    if (!ipSuccess) {
+                        showAlert(`${message}\n\n${suggestion}`, 'error');
+                        showRetryButton();
+                    }
+                    setLoading(btn, false);
+                    locationRetryCount = 0; // Reset counter for manual retry
+                }).catch(error => {
+                    console.error('IP geolocation error:', error);
+                    showAlert(`${message}\n\n${suggestion}`, 'error');
+                    showRetryButton();
+                    setLoading(btn, false);
+                    locationRetryCount = 0; // Reset counter for manual retry
+                });
+            }
         },
         {
             enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 30000
+            timeout: 20000,
+            maximumAge: 60000
         }
     );
+}
+
+// Show retry button when location fails
+function showRetryButton() {
+    const getLocationBtn = document.getElementById('getLocationBtn');
+    const retryLocationBtn = document.getElementById('retryLocationBtn');
+    
+    if (getLocationBtn && retryLocationBtn) {
+        getLocationBtn.classList.add('hidden');
+        retryLocationBtn.classList.remove('hidden');
+    }
+}
+
+// Try IP-based geolocation as last resort
+async function tryIPGeolocation() {
+    try {
+        console.log('Trying IP-based geolocation as fallback...');
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        
+        if (data.latitude && data.longitude) {
+            const lat = parseFloat(data.latitude);
+            const lng = parseFloat(data.longitude);
+            
+            console.log('IP geolocation successful:', { lat, lng });
+            
+            currentPosition = { lat, lng };
+            map.setView([lat, lng], 10); // Lower zoom for IP location
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            marker = L.marker([lat, lng]).addTo(map);
+            
+            // Update coordinates display
+            const coordsElement = document.getElementById('coordinates');
+            if (coordsElement) {
+                coordsElement.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            }
+            
+            document.getElementById('currentLat').textContent = lat.toFixed(6);
+            document.getElementById('currentLng').textContent = lng.toFixed(6);
+            document.getElementById('locationAccuracy').textContent = '±1000m (IP)';
+            
+            reverseGeocode(lat, lng);
+            updateSubmitButtonState();
+            showAlert('✅ Đã lấy vị trí qua IP (độ chính xác thấp)!', 'warning');
+            hideRetryButton();
+            return true;
+        }
+    } catch (error) {
+        console.error('IP geolocation failed:', error);
+    }
+    return false;
+}
+
+// Hide retry button when location succeeds
+function hideRetryButton() {
+    const getLocationBtn = document.getElementById('getLocationBtn');
+    const retryLocationBtn = document.getElementById('retryLocationBtn');
+    
+    if (getLocationBtn && retryLocationBtn) {
+        getLocationBtn.classList.remove('hidden');
+        retryLocationBtn.classList.add('hidden');
+    }
 }
 
 // Reverse geocoding to get address from coordinates
@@ -343,6 +513,10 @@ async function reverseGeocode(lat, lng) {
         }
         if (addressDisplay) {
             addressDisplay.style.display = 'block';
+            addressDisplay.classList.remove('hidden');
+            console.log('Address display shown');
+        } else {
+            console.error('Address display element not found');
         }
         
         // Using OpenStreetMap Nominatim API
@@ -382,6 +556,10 @@ async function reverseGeocode(lat, lng) {
         const addressDisplay = document.getElementById('addressDisplay');
         if (addressDisplay) {
             addressDisplay.style.display = 'block';
+            addressDisplay.classList.remove('hidden');
+            console.log('Address display shown (error case)');
+        } else {
+            console.error('Address display element not found (error case)');
         }
     }
 }

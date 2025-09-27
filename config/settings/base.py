@@ -1,11 +1,12 @@
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Load .env file
-load_dotenv(BASE_DIR / '.env')
+load_dotenv(BASE_DIR / ".env")
 
 # Environment Configuration
 ENVIRONMENT = os.environ.get("DJANGO_ENVIRONMENT", "local")
@@ -15,6 +16,8 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key-change-me")
 
 # Application definition
 INSTALLED_APPS = [
+    "admin_interface",
+    "colorfield",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -28,11 +31,14 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
+    # Development tools (only in DEBUG mode)
+    "debug_toolbar",
+    "django_extensions",
     # Local apps
     "apps.common",
     "apps.checkin",
     "apps.location",
-    "apps.employee", 
+    "apps.employee",
     "apps.dashboard",
     "apps.personal",
     "apps.users",
@@ -54,6 +60,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    # Development tools (only in DEBUG mode)
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -98,7 +106,7 @@ else:
     DATABASE_NAME = os.environ.get("DATABASE_NAME", "data/db.sqlite3")
     if not DATABASE_NAME.startswith("/"):
         DATABASE_NAME = BASE_DIR / DATABASE_NAME
-    
+
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -113,12 +121,8 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
     },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 # Internationalization
@@ -133,9 +137,7 @@ STATIC_ROOT = os.environ.get("STATIC_ROOT", BASE_DIR / "staticfiles")
 if isinstance(STATIC_ROOT, str) and not STATIC_ROOT.startswith("/"):
     STATIC_ROOT = BASE_DIR / STATIC_ROOT
 
-STATICFILES_DIRS = (
-    [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
-)
+STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
 
 # Media Files Configuration
 MEDIA_URL = os.environ.get("MEDIA_URL", "/media/")
@@ -185,7 +187,9 @@ REST_FRAMEWORK = {
 }
 
 # Email Configuration
-EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT") or "587")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
@@ -194,47 +198,155 @@ EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "0") == "1"
 
 # Logging Configuration
 # Create logs directory if it doesn't exist
-LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR = BASE_DIR / "logs"
 LOGS_DIR.mkdir(exist_ok=True)
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
         },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-        },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': LOGS_DIR / 'django.log',
-            'formatter': 'verbose',
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'] if ENVIRONMENT in ["production", "test"] else ['console'],
-            'level': os.environ.get("LOG_LEVEL", "INFO" if ENVIRONMENT in ["production", "test"] else "DEBUG"),
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
         },
-        'apps.checkin': {
-            'handlers': ['console', 'file'] if ENVIRONMENT in ["production", "test"] else ['console'],
-            'level': os.environ.get("LOG_LEVEL", "INFO" if ENVIRONMENT in ["production", "test"] else "DEBUG"),
-            'propagate': False,
-        },
-        'apps.users': {
-            'handlers': ['console', 'file'] if ENVIRONMENT in ["production", "test"] else ['console'],
-            'level': os.environ.get("LOG_LEVEL", "INFO" if ENVIRONMENT in ["production", "test"] else "DEBUG"),
-            'propagate': False,
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": LOGS_DIR / "django.log",
+            "formatter": "verbose",
         },
     },
+    "loggers": {
+        "django": {
+            "handlers": (
+                ["console", "file"]
+                if ENVIRONMENT in ["production", "test"]
+                else ["console"]
+            ),
+            "level": os.environ.get(
+                "LOG_LEVEL",
+                "INFO" if ENVIRONMENT in ["production", "test"] else "DEBUG",
+            ),
+        },
+        "apps.checkin": {
+            "handlers": (
+                ["console", "file"]
+                if ENVIRONMENT in ["production", "test"]
+                else ["console"]
+            ),
+            "level": os.environ.get(
+                "LOG_LEVEL",
+                "INFO" if ENVIRONMENT in ["production", "test"] else "DEBUG",
+            ),
+            "propagate": False,
+        },
+        "apps.users": {
+            "handlers": (
+                ["console", "file"]
+                if ENVIRONMENT in ["production", "test"]
+                else ["console"]
+            ),
+            "level": os.environ.get(
+                "LOG_LEVEL",
+                "INFO" if ENVIRONMENT in ["production", "test"] else "DEBUG",
+            ),
+            "propagate": False,
+        },
+    },
+}
+
+# Development Tools Configuration
+DEBUG = os.environ.get("DEBUG", "True").lower() in ["true", "1", "yes"]
+
+# Django Debug Toolbar
+if DEBUG:
+    INTERNAL_IPS = [
+        "127.0.0.1",
+        "localhost",
+        "0.0.0.0",
+    ]
+
+    # Debug Toolbar Configuration
+    DEBUG_TOOLBAR_CONFIG = {
+        "SHOW_TEMPLATE_CONTEXT": True,
+        "SHOW_TOOLBAR_CALLBACK": lambda request: DEBUG,
+    }
+
+    # Debug Toolbar Panels
+    DEBUG_TOOLBAR_PANELS = [
+        "debug_toolbar.panels.history.HistoryPanel",
+        "debug_toolbar.panels.versions.VersionsPanel",
+        "debug_toolbar.panels.timer.TimerPanel",
+        "debug_toolbar.panels.settings.SettingsPanel",
+        "debug_toolbar.panels.headers.HeadersPanel",
+        "debug_toolbar.panels.request.RequestPanel",
+        "debug_toolbar.panels.sql.SQLPanel",
+        "debug_toolbar.panels.staticfiles.StaticFilesPanel",
+        "debug_toolbar.panels.templates.TemplatesPanel",
+        "debug_toolbar.panels.cache.CachePanel",
+        "debug_toolbar.panels.signals.SignalsPanel",
+        "debug_toolbar.panels.redirects.RedirectsPanel",
+        "debug_toolbar.panels.profiling.ProfilingPanel",
+    ]
+
+# Django Extensions Configuration
+GRAPH_MODELS = {
+    "all_applications": True,
+    "group_models": True,
+}
+
+# Testing Configuration
+TEST_RUNNER = "django.test.runner.DiscoverRunner"
+
+# Code Quality Tools Configuration
+BLACK_EXCLUDE = [
+    "/migrations/",
+    "/venv/",
+    "/env/",
+    "/.git/",
+    "/node_modules/",
+    "/staticfiles/",
+    "/media/",
+]
+
+FLAKE8_CONFIG = {
+    "exclude": [
+        "migrations",
+        "venv",
+        "env",
+        ".git",
+        "node_modules",
+        "staticfiles",
+        "media",
+    ],
+    "max-line-length": 88,
+    "ignore": [
+        "E203",  # whitespace before ':'
+        "W503",  # line break before binary operator
+    ],
+}
+
+ISORT_CONFIG = {
+    "profile": "black",
+    "multi_line_output": 3,
+    "line_length": 88,
+    "known_django": "django",
+    "known_first_party": ["apps", "config"],
+    "sections": [
+        "FUTURE",
+        "STDLIB",
+        "DJANGO",
+        "THIRDPARTY",
+        "FIRSTPARTY",
+        "LOCALFOLDER",
+    ],
 }

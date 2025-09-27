@@ -369,9 +369,9 @@
 .mobile-card-content {
     padding: 20px;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto 1fr auto;
     gap: 16px;
-    align-items: start;
+    align-items: center;
 }
 
 .mobile-card-details {
@@ -404,9 +404,15 @@
     justify-content: center;
 }
 
+.mobile-card-badges {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .mobile-card-photo {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     border-radius: 12px;
     object-fit: cover;
     cursor: pointer;
@@ -603,17 +609,18 @@
     }
     
     .mobile-card-content {
-        grid-template-columns: 1fr;
+        grid-template-columns: auto 1fr auto;
         gap: 12px;
+        align-items: center;
     }
     
     .mobile-card-photo-container {
-        justify-content: flex-start;
+        justify-content: center;
     }
     
     .mobile-card-photo {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
     }
     
     .pagination-container {
@@ -689,4 +696,97 @@
 
 .checkin-table tbody tr {
     animation: fadeInUp 0.3s ease;
+}
+
+/* Custom checkout button styles */
+.checkout-btn {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    color: #000 !important;
+    font-weight: 600 !important;
+}
+
+.checkout-btn:hover,
+.checkout-btn:focus,
+.checkout-btn:active {
+    background-color: #e0a800 !important;
+    border-color: #d39e00 !important;
+    color: #000 !important;
+}
+
+.checkout-detail-btn {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+.checkout-detail-btn:hover,
+.checkout-detail-btn:focus,
+.checkout-detail-btn:active {
+    background-color: #218838 !important;
+    border-color: #1e7e34 !important;
+    color: #fff !important;
+}
+
+/* Mobile card checkout buttons */
+.mobile-card-badges .checkout-btn {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    color: #000 !important;
+    font-weight: 600 !important;
+}
+
+.mobile-card-badges .checkout-btn:hover,
+.mobile-card-badges .checkout-btn:focus,
+.mobile-card-badges .checkout-btn:active {
+    background-color: #e0a800 !important;
+    border-color: #d39e00 !important;
+    color: #000 !important;
+}
+
+.mobile-card-badges .checkout-detail-btn {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+.mobile-card-badges .checkout-detail-btn:hover,
+.mobile-card-badges .checkout-detail-btn:focus,
+.mobile-card-badges .checkout-detail-btn:active {
+    background-color: #218838 !important;
+    border-color: #1e7e34 !important;
+    color: #fff !important;
+}
+
+/* Desktop table checkout buttons */
+.action-buttons .checkout-btn {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    color: #000 !important;
+    font-weight: 600 !important;
+}
+
+.action-buttons .checkout-btn:hover,
+.action-buttons .checkout-btn:focus,
+.action-buttons .checkout-btn:active {
+    background-color: #e0a800 !important;
+    border-color: #d39e00 !important;
+    color: #000 !important;
+}
+
+.action-buttons .checkout-detail-btn {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+
+.action-buttons .checkout-detail-btn:hover,
+.action-buttons .checkout-detail-btn:focus,
+.action-buttons .checkout-detail-btn:active {
+    background-color: #218838 !important;
+    border-color: #1e7e34 !important;
+    color: #fff !important;
 }

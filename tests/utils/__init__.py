@@ -1,5 +1,5 @@
 # Test utilities module
-from .test_runner import TestRunner
 from .module_manager import ModuleManager
+from .test_runner import TestRunner
 
-__all__ = ['TestRunner', 'ModuleManager']
+__all__ = ["TestRunner", "ModuleManager"]

@@ -1,7 +1,7 @@
 from typing import Callable
 
-from django.http import HttpRequest, HttpResponse
 from django.conf import settings
+from django.http import HttpRequest, HttpResponse
 
 
 class SecurityHeadersMiddleware:
@@ -18,7 +18,9 @@ class SecurityHeadersMiddleware:
         response.setdefault("X-Frame-Options", "DENY")
         response.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
         # Allow camera/geolocation on same-origin (needed for Chrome's Permissions Policy)
-        response["Permissions-Policy"] = "geolocation=(self), camera=(self), microphone=(self)"
+        response["Permissions-Policy"] = (
+            "geolocation=(self), camera=(self), microphone=(self)"
+        )
 
         # Keep HSTS disabled in local to avoid issues on http
         # If behind https/prod, set via environment/webserver.
@@ -32,5 +34,3 @@ class SecurityHeadersMiddleware:
         )
 
         return response
-
-
