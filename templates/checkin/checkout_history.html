@@ -48,22 +48,53 @@
                             <span>{{ checkout.get_location_name }}</span>
                         </div>
                         <div class="detail-item">
+                            <label>Tọa độ:</label>
+                            <span>{{ checkout.lat|floatformat:6 }}, {{ checkout.lng|floatformat:6 }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Khoảng cách:</label>
+                            <span>{% if checkout.distance_m %}{{ checkout.distance_m|floatformat:2 }} mét{% else %}N/A{% endif %}</span>
+                        </div>
+                        <div class="detail-item">
                             <label>Check-in ID:</label>
                             <span>{{ checkout.checkin.id }}</span>
                         </div>
+                        <div class="detail-item">
+                            <label>Thời gian Check-in:</label>
+                            <span>{{ checkout.checkin.created_at|date:"d/m/Y H:i:s" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Loại Check-in:</label>
+                            <span>{{ checkout.checkin.get_checkin_type_display }}</span>
+                        </div>
+                        {% if checkout.checkin.note %}
+                        <div class="detail-item">
+                            <label>Ghi chú Check-in:</label>
+                            <span>{{ checkout.checkin.note }}</span>
+                        </div>
+                        {% endif %}
                         {% if checkout.note %}
                         <div class="detail-item">
-                            <label>Ghi chú:</label>
+                            <label>Ghi chú Check-out:</label>
                             <span>{{ checkout.note }}</span>
                         </div>
                         {% endif %}
                     </div>
                     
-                    {% if checkout.photo %}
-                    <div class="history-photo">
-                        <img src="{{ checkout.photo.url }}" alt="Checkout photo" class="photo-thumbnail">
+                    <div class="history-photos">
+                        {% if checkout.checkin.photo %}
+                        <div class="photo-item">
+                            <label>Ảnh Check-in:</label>
+                            <img src="{{ checkout.checkin.photo.url }}" alt="Check-in photo" class="photo-thumbnail">
+                        </div>
+                        {% endif %}
+                        {% if checkout.photo %}
+                        <div class="photo-item">
+                            <label>Ảnh Check-out:</label>
+                            <img src="{{ checkout.photo.url }}" alt="Checkout photo" class="photo-thumbnail">
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
             </div>
             {% endfor %}

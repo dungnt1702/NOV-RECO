@@ -19,28 +19,34 @@ from .utils import find_best_location_for_checkin
 
 @login_required
 def checkout_action_view(request):
-    """Trang checkout chính - hiển thị checkin hiện tại để checkout"""
-    # Lấy checkin_id từ URL parameter nếu có
+    """Trang checkout chính - bắt buộc phải có checkin_id"""
+    # Bắt buộc phải có checkin_id từ URL parameter
     checkin_id = request.GET.get("checkin_id")
 
-    if checkin_id:
-        # Nếu có checkin_id, lấy checkin cụ thể
-        try:
-            latest_checkin = get_object_or_404(
-                Checkin, id=checkin_id, user=request.user
+    if not checkin_id:
+        return render(
+            request,
+            "checkin/checkout_error.html",
+            {"error": "Bạn phải checkout từ một check-in cụ thể. Vui lòng truy cập từ lịch sử check-in."},
+        )
+
+    # Lấy checkin cụ thể
+    try:
+        latest_checkin = get_object_or_404(
+            Checkin, id=checkin_id, user=request.user
+        )
+        # Kiểm tra xem checkin đã có checkout chưa
+        if Checkout.objects.filter(checkin=latest_checkin).exists():
+            return render(
+                request,
+                "checkin/checkout_error.html",
+                {"error": "Check-in này đã được checkout rồi."},
             )
-            # Kiểm tra xem checkin đã có checkout chưa
-            if Checkout.objects.filter(checkin=latest_checkin).exists():
-                latest_checkin = None  # Đã checkout rồi
-        except:
-            latest_checkin = None
-    else:
-        # Lấy checkin gần nhất của user hiện tại chưa có checkout
-        latest_checkin = (
-            Checkin.objects.filter(user=request.user)
-            .exclude(checkouts__isnull=False)  # Loại bỏ checkin đã có checkout
-            .order_by("-created_at")
-            .first()
+    except:
+        return render(
+            request,
+            "checkin/checkout_error.html",
+            {"error": "Check-in không tồn tại hoặc bạn không có quyền truy cập."},
         )
 
     context = {

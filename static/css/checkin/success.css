@@ -261,3 +261,156 @@
     height: 250px;
   }
 }
+
+/* Overlay and Share Styles */
+.overlay-options {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.overlay-preview {
+  margin: 20px 0;
+  text-align: center;
+  display: none; /* Initially hidden, will be shown by JavaScript */
+}
+
+.overlay-canvas {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  /* Remove fixed aspect ratio to prevent distortion */
+  object-fit: contain;
+}
+
+.share-options {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.share-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.share-options h4 {
+  margin: 0;
+  color: #333;
+  font-size: 18px;
+}
+
+#toggleShareBtn {
+  padding: 5px 10px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+#shareToggleIcon {
+  transition: transform 0.3s ease;
+}
+
+#shareToggleIcon.rotated {
+  transform: rotate(180deg);
+}
+
+.share-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.share-buttons .btn {
+  padding: 10px 15px;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-facebook {
+  background: #1877f2;
+  color: white;
+}
+
+.btn-facebook:hover {
+  background: #166fe5;
+  transform: translateY(-2px);
+}
+
+.btn-zalo {
+  background: #0068ff;
+  color: white;
+}
+
+.btn-zalo:hover {
+  background: #0056cc;
+  transform: translateY(-2px);
+}
+
+.btn-whatsapp {
+  background: #25d366;
+  color: white;
+}
+
+.btn-whatsapp:hover {
+  background: #1da851;
+  transform: translateY(-2px);
+}
+
+.btn-telegram {
+  background: #0088cc;
+  color: white;
+}
+
+.btn-telegram:hover {
+  background: #006699;
+  transform: translateY(-2px);
+}
+
+.btn-copy {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-copy:hover {
+  background: #545b62;
+  transform: translateY(-2px);
+}
+
+/* Mobile responsive for overlay and share */
+@media (max-width: 768px) {
+  .overlay-options {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .overlay-options .btn {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .share-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .share-buttons .btn {
+    width: 100%;
+    max-width: 250px;
+  }
+}

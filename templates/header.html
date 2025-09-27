@@ -33,15 +33,15 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'checkin:checkout' %}">
-                                <i class="fas fa-sign-out-alt"></i>
-                                Check-out
+                            <a href="{% url 'checkin:history' %}">
+                                <i class="fas fa-history"></i>
+                                Lịch sử Checkin
                             </a>
                         </li>
                         <li>
-                            <a href="{% url 'checkin:history' %}">
-                                <i class="fas fa-history"></i>
-                                Lịch sử
+                            <a href="{% url 'checkin:checkout_history' %}">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Lịch sử Checkout
                             </a>
                         </li>
                         {% if user|has_permission:'checkin.can_view_all_checkins' %}
@@ -295,15 +295,6 @@
     {% endif %}
     
     {% if user.is_authenticated and 'checkin' in enabled_modules %}
-    <a href="{% url 'checkin:checkout' %}" class="nav-item {% if request.resolver_match and request.resolver_match.url_name|default:'' == 'checkout' %}active{% endif %}">
-        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-        </svg>
-        <span class="nav-label">Check-out</span>
-    </a>
-    {% endif %}
-    
-    {% if user.is_authenticated and 'checkin' in enabled_modules %}
     <a href="{% url 'checkin:history' %}" class="nav-item {% if request.resolver_match and request.resolver_match.url_name|default:'' == 'history' and request.resolver_match.namespace == 'checkin' %}active{% endif %}">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -311,6 +302,7 @@
         <span class="nav-label">Lịch sử</span>
     </a>
     {% endif %}
+    
     
     {% if user.is_authenticated and 'absence' in enabled_modules %}
     <a href="{% url 'absence:request' %}" class="nav-item {% if request.resolver_match and request.resolver_match.url_name|default:'' == 'request' and request.resolver_match.namespace == 'absence' %}active{% endif %}">

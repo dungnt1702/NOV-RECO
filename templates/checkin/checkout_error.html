@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lỗi Checkout{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/checkin/checkout.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="error-card">
+                <div class="error-header">
+                    <i class="fas fa-exclamation-triangle error-icon"></i>
+                    <h2>Không thể thực hiện Checkout</h2>
+                </div>
+                
+                <div class="error-content">
+                    <p class="error-message">{{ error }}</p>
+                    
+                    <div class="error-actions">
+                        <a href="{% url 'checkin:history' %}" class="btn btn-primary">
+                            <i class="fas fa-history"></i>
+                            Xem lịch sử Check-in
+                        </a>
+                        <a href="{% url 'checkin:action' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-plus"></i>
+                            Tạo Check-in mới
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto redirect after 5 seconds
+setTimeout(() => {
+    window.location.href = "{% url 'checkin:history' %}";
+}, 5000);
+</script>
+{% endblock %}

@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from .checkout_serializers import CheckoutListSerializer, CheckoutSerializer
 from .models import Checkin, Checkout
-from .utils import get_location_name_for_checkin
+from .utils import get_location_name_for_checkin, find_best_location_for_checkin
 
 
 class CheckinSerializer(serializers.ModelSerializer):
@@ -68,6 +68,15 @@ class CheckinSerializer(serializers.ModelSerializer):
     def get_location_name(self, obj):
         """Get location name based on lat/lng coordinates"""
         return get_location_name_for_checkin(obj)
+    
+    def get_distance_m(self, obj):
+        """Get distance dynamically based on current locations"""
+        if obj.distance_m is not None:
+            return obj.distance_m
+        
+        # Calculate distance dynamically if not stored
+        location_name, distance = find_best_location_for_checkin(obj.lat, obj.lng)
+        return distance
 
     def get_photo_url(self, obj):
         try:
@@ -93,6 +102,7 @@ class CheckinListSerializer(serializers.ModelSerializer):
     )
     location_id = serializers.IntegerField(source="location.id", read_only=True)
     location_name = serializers.SerializerMethodField()
+    distance_m = serializers.SerializerMethodField()
     checkin_type_display = serializers.CharField(
         source="get_checkin_type_display", read_only=True
     )
@@ -128,6 +138,15 @@ class CheckinListSerializer(serializers.ModelSerializer):
     def get_location_name(self, obj):
         """Get location name based on lat/lng coordinates"""
         return get_location_name_for_checkin(obj)
+    
+    def get_distance_m(self, obj):
+        """Get distance dynamically based on current locations"""
+        if obj.distance_m is not None:
+            return obj.distance_m
+        
+        # Calculate distance dynamically if not stored
+        location_name, distance = find_best_location_for_checkin(obj.lat, obj.lng)
+        return distance
 
     def get_photo_url(self, obj):
         try:

@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from apps.checkin.models import Checkin
-from apps.checkin.utils import find_nearest_location
+from apps.checkin.utils import find_best_location_for_checkin
 
 
 class Command(BaseCommand):
@@ -25,17 +25,21 @@ class Command(BaseCommand):
 
         for checkin in checkins:
             # Tìm địa điểm gần nhất dựa trên tọa độ
-            location, distance = find_nearest_location(checkin.lat, checkin.lng)
+            location_name, distance = find_best_location_for_checkin(checkin.lat, checkin.lng)
 
-            if location:
-                if not dry_run:
+            if location_name != "Không xác định" and distance is not None:
+                # Find location object
+                from apps.location.models import Location
+                location = Location.objects.filter(name=location_name, is_active=True).first()
+                
+                if not dry_run and location:
                     checkin.location = location
                     checkin.distance_m = distance
                     checkin.save()
 
                 updated_count += 1
                 self.stdout.write(
-                    f'Check-in {checkin.id}: {checkin.location.name if checkin.location else "Không có"} -> {location.name} '
+                    f'Check-in {checkin.id}: {checkin.location.name if checkin.location else "Không có"} -> {location_name} '
                     f"(khoảng cách: {distance:.2f}m)"
                 )
             else:
